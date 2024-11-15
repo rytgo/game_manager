@@ -67,6 +67,22 @@ public class SnakeGame {
 
     private void checkCollisions() {
         // Check if snake eats food
+        Rectangle head = snake.getHead();
+        if (head.getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
+            snake.grow();   //increase the length
+            food.reposition(root);  // reposition the food
+            score++;    // Increment score
+        }
+
+        // Check if the snake collides with itself
+        if (snake.checkCollisionWithSelf()) {
+            gameOver = true;
+        }
+
+        // Check for boundary collisions
+        if (head.getX() < 0 || head.getY() < 0 || head.getX() >= 600 || head.getY() >= 400) {
+            gameOver = true;
+        }
     }
 
     private void updateGameBoard(){

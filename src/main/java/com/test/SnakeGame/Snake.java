@@ -29,6 +29,8 @@ public class Snake {
         newHead.setY(body.get(0).getY() + directionY * TILE_SIZE);
 
         body.add(0, newHead);  // Add the new head to the front of the snake
+
+        body.remove(body.size() - 1);   //remove the last segment of the snake ot keep its length
     }
 
     public void grow() {
