@@ -91,6 +91,12 @@ public class SnakeGame {
     }
 
     private boolean checkFoodCollision(){
-        
+        // Check if the snake's head collides with food
+        if (snake.get(0).getBoundsInParent().intersects(food.getBoundsInParent())) {
+            score += 10;
+            spawnFood(root);  // Spawn new food
+            return true;
+        }
+        return false;
     }
 }
