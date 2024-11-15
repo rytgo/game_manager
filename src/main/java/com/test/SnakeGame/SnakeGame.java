@@ -6,6 +6,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -88,6 +89,10 @@ public class SnakeGame {
     private void updateGameBoard(){
         // Update the score if necessary
         // A score label maybe
+        if (gameOver) {
+            gc.setFill(Color.RED);
+            gc.fillText("Game Over! Score: " + score, canvas.getWidth() / 2 - 50, canvas.getHeight() / 2);
+        }
     }
 
     private void render(GraphicsContext gc) {
