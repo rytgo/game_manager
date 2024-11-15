@@ -55,6 +55,14 @@ public class Snake {
         directionY = y;
     }
 
+    public int getDirectionX() {
+        return directionX;
+    }
+
+    public int getDirectionY() {
+        return directionY;
+    }
+
     public ArrayList<Rectangle> getBody() {
         return body;
     }

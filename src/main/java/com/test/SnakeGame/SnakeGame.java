@@ -34,8 +34,19 @@ public class SnakeGame {
         snake = new Snake(300, 200);
         food = new Food(root, snake);
 
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        // Handle keyboard input for snake direction
+        scene.setOnKeyPressed(event -> {
+            KeyCode code = event.getCode();
+            if (code == KeyCode.UP && snake.getDirectionY() != 1) {
+                snake.setDirection(0, -1);
+            } else if (code == KeyCode.DOWN && snake.getDirectionY() != -1) {
+                snake.setDirection(0, 1);
+            } else if (code == KeyCode.LEFT && snake.getDirectionX() != 1) {
+                snake.setDirection(-1, 0);
+            } else if (code == KeyCode.RIGHT && snake.getDirectionX() != -1) {
+                snake.setDirection(1, 0);
+            }
+        });
 
         // Set up the game loop
         AnimationTimer gameLoop = new AnimationTimer() {
@@ -51,19 +62,6 @@ public class SnakeGame {
         };
         gameLoop.start();
 
-        // Handle user input
-        scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.UP && snake.getHead().getY() != snake.getBody().get(1).getY()) {
-                snake.setDirection(0, -1);
-            } else if (event.getCode() == KeyCode.DOWN && snake.getHead().getY() != snake.getBody().get(1).getY()) {
-                snake.setDirection(0, 1);
-            } else if (event.getCode() == KeyCode.LEFT && snake.getHead().getX() != snake.getBody().get(1).getX()) {
-                snake.setDirection(-1, 0);
-            } else if (event.getCode() == KeyCode.RIGHT && snake.getHead().getX() != snake.getBody().get(1).getX()) {
-                snake.setDirection(1, 0);
-            }
-        });
-        
         primaryStage.setScene(scene);
         primaryStage.setTitle("Snake Game");
         primaryStage.show();
@@ -72,7 +70,7 @@ public class SnakeGame {
     private void checkCollisions() {
         // Check if snake eats food
         Rectangle head = snake.getHead();
-        if (head.getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
+        if (snake.getHead().getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
             snake.grow();   //increase the length
             food.reposition(root);  // reposition the food
             score++;    // Increment score
