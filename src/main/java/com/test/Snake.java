@@ -40,4 +40,24 @@ public class Snake {
         body.add(newSegment);
     }
 
+    public void moveTail() {
+        // Remove the last segment (tail) of the snake
+        Rectangle tail = body.remove(body.size() - 1);
+        // Update the graphical representation
+        tail.setVisible(false);
+    }
+
+    public void setDirection(int x, int y) {
+        // Set the direction of movement
+        directionX = x;
+        directionY = y;
+    }
+
+    public ArrayList<Rectangle> getBody() {
+        return body;
+    }
+
+    public Rectangle getHead() {
+        return body.get(0);
+    }
 }
