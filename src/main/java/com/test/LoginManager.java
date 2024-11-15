@@ -35,6 +35,29 @@ public class LoginManager {
         return users.containsKey(username) && users.get(username).equals(password);
     }
 
+    public boolean createAccount(String username, String password){
+        if (users.containsKey(username)){
+            System.out.println("Username already exists!");
+            return false;
+        }
+        users.put(username, password);
+        saveUser(username, password);
+        return true;
+    }
 
+    /*
+     * The reason there is a separate method for saving to file is for the purpose of possible encryption
+     */
+    private void saveUser(String username, String password){
+        try{
+            //Explaining this line
+            //First parameter must be type Path, second parameter converts a String into byte array byte[],
+            //Third parameter tells Files.write() to add data to the end of the existing file
+            Files.write(Paths.get(fileName), (username + ":" + password + System.lineSeparator()).getBytes(), java.nio.file.StandardOpenOption.APPEND);
+            System.out.println("Saved!");
+        } catch (IOException e){
+            System.out.println("Error saving user: " + e.getMessage());
+        }
+    }
 
 }
