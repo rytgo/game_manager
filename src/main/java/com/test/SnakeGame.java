@@ -127,4 +127,9 @@ public class SnakeGame {
             }
         }
     }
+
+    private void updateGameBoard(){
+        // Update the score if necessary
+        // A score label maybe
+    }
 }
