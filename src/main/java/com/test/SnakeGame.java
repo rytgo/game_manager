@@ -1,6 +1,7 @@
 package com.test;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
@@ -98,5 +99,17 @@ public class SnakeGame {
             return true;
         }
         return false;
+    }
+
+    private void spawnFood(StackPane root) {
+        // Generate random position for food
+        Random random = new Random();
+        int x = random.nextInt(GRID_WIDTH) * TILE_SIZE;
+        int y = random.nextInt(GRID_HEIGHT) * TILE_SIZE;
+
+        food = new Rectangle(TILE_SIZE, TILE_SIZE, Color.RED);
+        food.setX(x);
+        food.setY(y);
+        root.getChildren().add(food);
     }
 }
