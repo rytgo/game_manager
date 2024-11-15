@@ -2,6 +2,7 @@ package com.test;
 
 import java.util.ArrayList;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -34,4 +35,17 @@ public class SnakeGame {
         
         // Set up the food
         spawnFood(root);
+
+        // Set up the game loop
+        AnimationTimer gameLoop = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                if (!gameOver) {
+                    moveSnake();
+                    checkCollisions();
+                    updateGameBoard();
+                }
+            }
+        };
+        gameLoop.start();
 }
