@@ -71,4 +71,26 @@ public class SnakeGame {
         primaryStage.setTitle("Snake Game");
         primaryStage.show();
     }
+
+    private void moveSnake() {
+        // Move the head in the current direction
+        Rectangle newHead = new Rectangle(TILE_SIZE, TILE_SIZE, Color.GREEN);
+        newHead.setX(snake.get(0).getX() + directionX * TILE_SIZE);
+        newHead.setY(snake.get(0).getY() + directionY * TILE_SIZE);
+
+        // Add new head to the snake
+        snake.add(0, newHead);
+
+        // Remove tail if no food is eaten
+        if (!checkFoodCollision()) {
+            Rectangle tail = snake.remove(snake.size() - 1);
+            root.getChildren().remove(tail);
+        }
+
+        root.getChildren().add(newHead);
+    }
+
+    private boolean checkFoodCollision(){
+        
+    }
 }
