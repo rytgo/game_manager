@@ -10,6 +10,8 @@ import javafx.stage.Stage;
  */
 public class App extends Application {
 
+    private LoginManager loginManager = new LoginManager("user_accounts.txt");
+
 
     @Override
     public void start(Stage stage) {
