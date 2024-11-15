@@ -22,5 +22,22 @@ public class Snake {
         body.add(head);
     }
 
+    public void move() {
+        // Move the snake in the current direction
+        Rectangle newHead = new Rectangle(TILE_SIZE, TILE_SIZE, Color.GREEN);
+        newHead.setX(body.get(0).getX() + directionX * TILE_SIZE);
+        newHead.setY(body.get(0).getY() + directionY * TILE_SIZE);
+
+        body.add(0, newHead);  // Add the new head to the front of the snake
+    }
+
+    public void grow() {
+        // Add a new segment to the snake (does not remove the tail)
+        Rectangle newSegment = new Rectangle(TILE_SIZE, TILE_SIZE, Color.GREEN);
+        // Place new segment at the position of the last tail segment
+        newSegment.setX(body.get(body.size() - 1).getX());
+        newSegment.setY(body.get(body.size() - 1).getY());
+        body.add(newSegment);
+    }
 
 }
