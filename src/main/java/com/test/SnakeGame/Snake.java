@@ -1,4 +1,4 @@
-package com.test;
+package com.test.SnakeGame;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
