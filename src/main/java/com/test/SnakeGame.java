@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -48,4 +49,26 @@ public class SnakeGame {
             }
         };
         gameLoop.start();
+
+        // Handle user input
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.UP && directionY == 0) {
+                directionX = 0;
+                directionY = -1;
+            } else if (event.getCode() == KeyCode.DOWN && directionY == 0) {
+                directionX = 0;
+                directionY = 1;
+            } else if (event.getCode() == KeyCode.LEFT && directionX == 0) {
+                directionX = -1;
+                directionY = 0;
+            } else if (event.getCode() == KeyCode.RIGHT && directionX == 0) {
+                directionX = 1;
+                directionY = 0;
+            }
+        });
+        
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Snake Game");
+        primaryStage.show();
+    }
 }
