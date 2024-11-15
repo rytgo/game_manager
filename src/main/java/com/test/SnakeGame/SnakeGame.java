@@ -32,7 +32,10 @@ public class SnakeGame {
 
         // Initialize snake and food 
         snake = new Snake(300, 200);
-        food = new Food(root);
+        food = new Food(root, snake);
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
 
         // Set up the game loop
         AnimationTimer gameLoop = new AnimationTimer() {

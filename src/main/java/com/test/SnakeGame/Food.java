@@ -10,12 +10,14 @@ import javafx.scene.shape.Rectangle;
 public class Food {
     private static final int TILE_SIZE = 20;
     private Rectangle food;
+    private Snake snake;
 
-    public Food(StackPane root, ArrayList<Rectangle> snakeBody ) {
-        spawnFood(root, snakeBody);
+    public Food(StackPane root, Snake snake) {
+        this.snake = snake;
+        spawnFood(root);
     }
 
-    public void spawnFood(StackPane root, ArrayList<Rectangle> snakeBody) {
+    public void spawnFood(StackPane root) {
         Random random = new Random();
         boolean validPosition = false;
 
@@ -24,25 +26,24 @@ public class Food {
             int y = random.nextInt(20) * TILE_SIZE;
 
             // Check if the position overlaps with the snake
-            validPosition = true;
-            for (Rectangle segment : snakeBody) {
-                if (segment.getX() == x && segment.getY() == y) {
-                    validPosition = false;
-                    break;
-                }
-            }
+            validPosition = snake.getBody().stream()
+                .noneMatch(segment -> segment.getX() == x && segment.getY() == y);
+            
             if (validPosition) {
-                food.setX(x);
-                food.setY(y);
+                food = new Rectangle(TILE_SIZE, TILE_SIZE, Color.RED);
+                food.setTranslateX(x);
+                food.setTranslateY(y);
+                
+                root.getChildren().add(food);
             }
-        }
+        } 
     }
 
     public Rectangle getFood() {
         return food;
     }
 
-    public void reposition(StackPane root, ArrayList<Rectangle> snakeBody) {
-        spawnFood(root, snakeBody);  // Reposition food at a new random location
+    public void reposition(StackPane root) {
+        spawnFood(root);  // Reposition food at a new random location
     }
 }
