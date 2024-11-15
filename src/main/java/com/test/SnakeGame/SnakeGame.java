@@ -1,12 +1,12 @@
 package com.test.SnakeGame;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class SnakeGame {
@@ -16,10 +16,19 @@ public class SnakeGame {
     private boolean gameOver = false;
     private int score = 0;
 
+
+    private Canvas canvas;
+    private GraphicsContext gc;
+
     public void start(Stage primaryStage) {
         StackPane root = new StackPane();
         Scene scene = new Scene(root, 600, 400);
         
+        // Initialize canvas
+        canvas = new Canvas(600, 400);  // Set the size of the canvas
+        gc = canvas.getGraphicsContext2D();     // Get the drawing context
+        root.getChildren().add(canvas);     // Add the canvas to the root
+
         // Initialize snake and food 
         snake = new Snake(300, 200);
         food = new Food(root);
@@ -32,6 +41,7 @@ public class SnakeGame {
                     snake.move();
                     checkCollisions();
                     updateGameBoard();
+                    render(gc);
                 }
             }
         };
@@ -62,5 +72,19 @@ public class SnakeGame {
     private void updateGameBoard(){
         // Update the score if necessary
         // A score label maybe
+    }
+
+    private void render(GraphicsContext gc) {
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Clear previous frame
+
+        // Draw the snake
+        for (Rectangle segment : snake.getBody()) {
+            gc.setFill(segment.getFill());
+            gc.fillRect(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight());
+        }
+
+        // Draw the food
+        gc.setFill(food.getFood().getFill());
+        gc.fillRect(food.getFood().getX(), food.getFood().getY(), food.getFood().getWidth(), food.getFood().getHeight());
     }
 }
