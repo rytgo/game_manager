@@ -112,4 +112,19 @@ public class SnakeGame {
         food.setY(y);
         root.getChildren().add(food);
     }
+
+    private void checkCollisions() {
+        // Check if snake hits the walls
+        if (snake.get(0).getX() < 0 || snake.get(0).getX() >= GRID_WIDTH * TILE_SIZE ||
+            snake.get(0).getY() < 0 || snake.get(0).getY() >= GRID_HEIGHT * TILE_SIZE) {
+            gameOver = true;
+        }
+
+        // Check if snake collides with itself
+        for (int i = 1; i < snake.size(); i++) {
+            if (snake.get(0).getBoundsInParent().intersects(snake.get(i).getBoundsInParent())) {
+                gameOver = true;
+            }
+        }
+    }
 }
