@@ -59,10 +59,13 @@ public class SnakeGame {
                     if (now - lastUpdate >= speed) {
                         snake.move();
                         checkCollisions();
-                        updateGameBoard();
+                        //updateGameBoard();
                         render(gc);
                         lastUpdate = now;
                     }
+                } else {
+                    stop();
+                    renderGameOverMessage();
                 }
             }
         };
@@ -98,14 +101,14 @@ public class SnakeGame {
         }
     }
 
-    private void updateGameBoard(){
+    //private void updateGameBoard(){
         // Update the score if necessary
         // A score label maybe
-        if (gameOver) {
-            gc.setFill(Color.RED);
-            gc.fillText("Game Over! Score: " + score, canvas.getWidth() / 2 - 50, canvas.getHeight() / 2);
-        }
-    }
+      //  if (gameOver) {
+        //    gc.setFill(Color.RED);
+          //  gc.fillText("Game Over! Score: " + score, canvas.getWidth() / 2 - 50, canvas.getHeight() / 2);
+       // }
+    //}
 
     private void render(GraphicsContext gc) {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Clear previous frame
@@ -119,5 +122,11 @@ public class SnakeGame {
         // Draw the food
         gc.setFill(food.getFood().getFill());
         gc.fillRect(food.getFood().getX(), food.getFood().getY(), food.getFood().getWidth(), food.getFood().getHeight());
+    }
+
+    private void renderGameOverMessage(){
+        gc.setFill(Color.RED);
+        gc.setFont(new javafx.scene.text.Font(30));
+        gc.fillText("Game Over! Score: " + score, canvas.getWidth() / 2 - 100, canvas.getHeight() / 2);
     }
 }

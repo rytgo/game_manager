@@ -44,6 +44,7 @@ public class Food {
     }
 
     public void reposition(StackPane root) {
+        root.getChildren().remove(food);    // Remove the old food if it exists
         spawnFood(root);  // Reposition food at a new random location
     }
 }
