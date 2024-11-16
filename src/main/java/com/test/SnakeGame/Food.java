@@ -15,7 +15,7 @@ public class Food {
     private Image foodImage;
 
     public Food(StackPane root, Snake snake) {
-        foodImage = new Image("C:/Users/ACER/Downloads/apple.jpg");
+        foodImage = new Image(getClass().getResource("/apple.jpg").toExternalForm());
         this.snake = snake;
         spawnFood(root);
     }
