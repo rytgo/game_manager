@@ -21,6 +21,9 @@ public class SnakeGame {
     private Canvas canvas;
     private GraphicsContext gc;
 
+    private long lastUpdate = 0;    //tracks time since last movement
+    private int speed = 200_000_000;    // initial speed in nanosecs
+
     public void start(Stage primaryStage) {
         StackPane root = new StackPane();
         Scene scene = new Scene(root, 600, 400);
@@ -53,10 +56,13 @@ public class SnakeGame {
             @Override
             public void handle(long now) {
                 if (!gameOver) {
-                    snake.move();
-                    checkCollisions();
-                    updateGameBoard();
-                    render(gc);
+                    if (now - lastUpdate >= speed) {
+                        snake.move();
+                        checkCollisions();
+                        updateGameBoard();
+                        render(gc);
+                        lastUpdate = now;
+                    }
                 }
             }
         };
@@ -74,6 +80,11 @@ public class SnakeGame {
             snake.grow();   //increase the length
             food.reposition(root);  // reposition the food
             score++;    // Increment score
+
+            // Increase speed after every 5 pts
+            if (score % 5 == 0 && speed > 50_000_000) {   // Minimum speed limit
+                speed -= 200_000_000;   // increase speed by reducing the delay
+            }
         }
 
         // Check if the snake collides with itself
