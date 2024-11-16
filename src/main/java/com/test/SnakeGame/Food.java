@@ -38,6 +38,16 @@ public class Food {
                 food.setTranslateY(y);
                 
                 root.getChildren().add(food);
+
+                // Set the apple image after creating the food rectangle
+                food.setFill(Color.TRANSPARENT);  // Make the rectangle transparent
+                food.setStroke(Color.TRANSPARENT); // Hide the rectangle's border
+                root.getChildren().add(new javafx.scene.image.ImageView(foodImage) {{
+                    setX(x);
+                    setY(y);
+                    setFitWidth(TILE_SIZE);
+                    setFitHeight(TILE_SIZE);
+                }});
             }
         } 
     }
@@ -51,7 +61,7 @@ public class Food {
     }
 
     public void reposition(StackPane root) {
-        root.getChildren().remove(food);    // Remove the old food if it exists
+        root.getChildren().removeIf(node -> node instanceof javafx.scene.image.ImageView);    // Remove the old food if it exists
         spawnFood(root);  // Reposition food at a new random location
     }
 }
