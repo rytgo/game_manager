@@ -81,7 +81,7 @@ public class SnakeGame {
         Rectangle head = snake.getHead();
         if (snake.getHead().getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
             snake.grow();   //increase the length
-            food.reposition(root);  // reposition the food
+            food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
             score++;    // Increment score
 
             // Increase speed after every 5 pts
@@ -111,17 +111,18 @@ public class SnakeGame {
     //}
 
     private void render(GraphicsContext gc) {
+        gc.setFill(Color.BLACK);
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Clear previous frame
 
         // Draw the snake
         for (Rectangle segment : snake.getBody()) {
             gc.setFill(segment.getFill());
-            gc.fillRect(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight());
+            gc.fillRoundRect(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight(), 10, 10);
         }
 
         // Draw the food
         gc.setFill(food.getFood().getFill());
-        gc.fillRect(food.getFood().getX(), food.getFood().getY(), food.getFood().getWidth(), food.getFood().getHeight());
+        gc.drawImage(food.getFoodImage(), food.getFood().getX(), food.getFood().getY(), food.getFood().getWidth(), food.getFood().getHeight());
     }
 
     private void renderGameOverMessage(){
