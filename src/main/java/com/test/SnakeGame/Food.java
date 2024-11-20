@@ -58,10 +58,6 @@ public class Food {
         return foodImageView;
     }
 
-    //public Image getFoodImage() {
-      //  return foodImage; // Expose the image to the rendering logic
-    //}
-
     public void reposition(StackPane root) {
         spawnFood(root);  // Reposition food at a new random location
     }
