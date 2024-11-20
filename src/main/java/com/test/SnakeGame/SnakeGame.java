@@ -137,9 +137,7 @@ public class SnakeGame {
             gc.fillRoundRect(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight(), 10, 10);
         }
 
-        // Draw the food
-        gc.setFill(food.getFood().getFill());
-        gc.drawImage(food.getFoodImage(), food.getFood().getX(), food.getFood().getY(), food.getFood().getWidth(), food.getFood().getHeight());
+        
     }
 
     private void renderGameOverMessage(){
