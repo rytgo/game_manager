@@ -3,16 +3,21 @@ package com.test.SnakeGame;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class Food {
     private static final int TILE_SIZE = 20;
+    private ImageView foodImageView;
     private Rectangle food;
     private Snake snake;
+    private Image foodImage;
 
     public Food(StackPane root, Snake snake) {
+        foodImage = new Image(getClass().getResource("/apple.jpg").toExternalForm());
         this.snake = snake;
         spawnFood(root);
     }
@@ -20,6 +25,10 @@ public class Food {
     public void spawnFood(StackPane root) {
         Random random = new Random();
         boolean validPosition = false;
+
+        if (foodImageView != null) {
+            root.getChildren().remove(foodImageView);
+        }
 
         while (!validPosition) {
             int x = random.nextInt(30) * TILE_SIZE;
@@ -30,17 +39,23 @@ public class Food {
                 .noneMatch(segment -> segment.getX() == x && segment.getY() == y);
             
             if (validPosition) {
-                food = new Rectangle(TILE_SIZE, TILE_SIZE, Color.RED);
-                food.setTranslateX(x);
-                food.setTranslateY(y);
-                
-                root.getChildren().add(food);
+                // Create a new ImageView for the food
+                foodImageView = new ImageView(foodImage);
+                foodImageView.setFitWidth(TILE_SIZE);
+                foodImageView.setFitHeight(TILE_SIZE);
+
+                // Position the food at the generated coordinates
+                foodImageView.setTranslateX(x);
+                foodImageView.setTranslateY(y);
+
+                // Add the ImageView to the root
+                root.getChildren().add(foodImageView);
             }
         } 
     }
 
-    public Rectangle getFood() {
-        return food;
+    public ImageView getFood() {
+        return foodImageView;
     }
 
     public void reposition(StackPane root) {

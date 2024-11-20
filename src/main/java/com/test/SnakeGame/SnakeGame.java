@@ -1,11 +1,19 @@
 package com.test.SnakeGame;
 
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.animation.AnimationTimer;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -28,6 +36,17 @@ public class SnakeGame {
         StackPane root = new StackPane();
         Scene scene = new Scene(root, 600, 400);
         
+        // Set the background image
+        Image backgroundImage = new Image("file:/C:/Users/ACER/Documents/game_manager/src/main/resources/snakebackground.jpg");
+        BackgroundImage bgImage = new BackgroundImage(
+            backgroundImage,
+            BackgroundRepeat.NO_REPEAT,
+            BackgroundRepeat.NO_REPEAT,
+            BackgroundPosition.CENTER,
+            new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false)
+        );
+        root.setBackground(new Background(bgImage));
+
         // Initialize canvas
         canvas = new Canvas(600, 400);  // Set the size of the canvas
         gc = canvas.getGraphicsContext2D();     // Get the drawing context
@@ -59,10 +78,12 @@ public class SnakeGame {
                     if (now - lastUpdate >= speed) {
                         snake.move();
                         checkCollisions();
-                        updateGameBoard();
                         render(gc);
                         lastUpdate = now;
                     }
+                } else {
+                    stop();
+                    renderGameOverMessage(primaryStage);
                 }
             }
         };
@@ -78,7 +99,7 @@ public class SnakeGame {
         Rectangle head = snake.getHead();
         if (snake.getHead().getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
             snake.grow();   //increase the length
-            food.reposition(root);  // reposition the food
+            food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
             score++;    // Increment score
 
             // Increase speed after every 5 pts
@@ -98,26 +119,41 @@ public class SnakeGame {
         }
     }
 
-    private void updateGameBoard(){
-        // Update the score if necessary
-        // A score label maybe
-        if (gameOver) {
-            gc.setFill(Color.RED);
-            gc.fillText("Game Over! Score: " + score, canvas.getWidth() / 2 - 50, canvas.getHeight() / 2);
-        }
-    }
-
     private void render(GraphicsContext gc) {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Clear previous frame
 
         // Draw the snake
         for (Rectangle segment : snake.getBody()) {
-            gc.setFill(segment.getFill());
-            gc.fillRect(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight());
+            gc.setFill(Color.WHITE);
+            gc.fillOval(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight());
         }
+    }
 
-        // Draw the food
-        gc.setFill(food.getFood().getFill());
-        gc.fillRect(food.getFood().getX(), food.getFood().getY(), food.getFood().getWidth(), food.getFood().getHeight());
+    private void renderGameOverMessage(Stage primaryStage){
+        Stage gameOverStage = new Stage();
+        StackPane gameOverRoot = new StackPane();
+        Scene gameOverScene = new Scene(gameOverRoot, 300, 200);
+        
+        javafx.scene.control.Label gameOverLabel = new javafx.scene.control.Label("Game Over! Score: " + score);
+        gameOverLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: red;");
+        
+        javafx.scene.control.Button playAgainButton = new javafx.scene.control.Button("Play Again");
+        playAgainButton.setOnAction(e -> {
+            // Reset the game state
+            gameOver = false;
+            score = 0;
+            snake = new Snake(300, 200);
+            food = new Food(gameOverRoot, snake);
+            gameOverStage.close();
+            start(primaryStage);  // Restart the game
+        });
+        
+        VBox layout = new VBox(10, gameOverLabel, playAgainButton);
+        layout.setAlignment(Pos.CENTER);
+        gameOverRoot.getChildren().add(layout);
+        
+        gameOverStage.setScene(gameOverScene);
+        gameOverStage.setTitle("Game Over");
+        gameOverStage.show();
     }
 }

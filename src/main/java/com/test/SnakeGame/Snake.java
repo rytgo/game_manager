@@ -16,7 +16,7 @@ public class Snake {
         directionY = 0;
 
         // Add the initial head of the snake
-        Rectangle head = new Rectangle(TILE_SIZE, TILE_SIZE, Color.GREEN);
+        Rectangle head = new Rectangle(TILE_SIZE, TILE_SIZE, Color.WHITE);
         head.setX(startX);
         head.setY(startY);
         body.add(head);
@@ -24,7 +24,7 @@ public class Snake {
 
     public void move() {
         // Move the snake in the current direction
-        Rectangle newHead = new Rectangle(TILE_SIZE, TILE_SIZE, Color.GREEN);
+        Rectangle newHead = new Rectangle(TILE_SIZE, TILE_SIZE, Color.WHITE);
         newHead.setX(body.get(0).getX() + directionX * TILE_SIZE);
         newHead.setY(body.get(0).getY() + directionY * TILE_SIZE);
 
@@ -35,7 +35,7 @@ public class Snake {
 
     public void grow() {
         // Add a new segment to the snake (does not remove the tail)
-        Rectangle newSegment = new Rectangle(TILE_SIZE, TILE_SIZE, Color.GREEN);
+        Rectangle newSegment = new Rectangle(TILE_SIZE, TILE_SIZE, Color.WHITE);
         // Place new segment at the position of the last tail segment
         newSegment.setX(body.get(body.size() - 1).getX());
         newSegment.setY(body.get(body.size() - 1).getY());
