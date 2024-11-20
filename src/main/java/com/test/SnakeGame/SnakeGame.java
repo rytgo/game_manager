@@ -1,5 +1,11 @@
 package com.test.SnakeGame;
 
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -28,6 +34,17 @@ public class SnakeGame {
         StackPane root = new StackPane();
         Scene scene = new Scene(root, 600, 400);
         
+        // Set the background image
+        Image backgroundImage = new Image("file:/C:/Users/ACER/Documents/game_manager/src/main/resources/snakebackground.jpg");
+        BackgroundImage bgImage = new BackgroundImage(
+            backgroundImage,
+            BackgroundRepeat.NO_REPEAT,
+            BackgroundRepeat.NO_REPEAT,
+            BackgroundPosition.CENTER,
+            new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false)
+        );
+        root.setBackground(new Background(bgImage));
+
         // Initialize canvas
         canvas = new Canvas(600, 400);  // Set the size of the canvas
         gc = canvas.getGraphicsContext2D();     // Get the drawing context

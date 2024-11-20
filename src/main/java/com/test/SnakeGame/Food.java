@@ -24,6 +24,9 @@ public class Food {
         Random random = new Random();
         boolean validPosition = false;
 
+        if (food != null) {
+            root.getChildren().remove(food);
+        }
         while (!validPosition) {
             int x = random.nextInt(30) * TILE_SIZE;
             int y = random.nextInt(20) * TILE_SIZE;
@@ -61,7 +64,6 @@ public class Food {
     }
 
     public void reposition(StackPane root) {
-        root.getChildren().removeIf(node -> node instanceof javafx.scene.image.ImageView);    // Remove the old food if it exists
         spawnFood(root);  // Reposition food at a new random location
     }
 }
