@@ -6,8 +6,7 @@ import java.util.List;
 public class Deck {
     private List<Card> cards;
 
-    public Deck(List<Card> cards) {
-        this.cards = cards;
+    public Deck() {
         initializeDeck();
         shuffleDeck();
     }
@@ -35,16 +34,11 @@ public class Deck {
         if (cards.isEmpty()) {
             return null;
         }
-        return cards.remove(0);
+        return cards.removeFirst();
     }
 
     // Getter for cards
     public List<Card> getCards() {
         return cards;
-    }
-
-    // Setter for cards
-    public void setCards(List<Card> cards) {
-        this.cards = cards;
     }
 }
