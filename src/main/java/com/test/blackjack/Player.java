@@ -7,12 +7,15 @@ abstract class Player {
     protected List<Card> hand;
     protected int money;
     protected int bet;
+    protected int total;
 
-    public Player(String name, List<Card> hand, int money, int bet) {
+    public Player(String name, int money) {
         this.name = name;
-        this.hand = hand;
-        this.money = money;
-        this.bet = bet;
+        this.money = 1000;
+    }
+
+    public Player(String name) {
+        this.name = name;
     }
 
     // Getter for money
@@ -20,49 +23,42 @@ abstract class Player {
         return money;
     }
 
-    // Setter for money
-    public void setMoney(int money) {
-        this.money = money;
-    }
-
     // Getter for bet
     public int getBet() {
         return bet;
     }
 
-    // Setter for bet
-    public void setBet(int bet) {
-        this.bet = bet;
-    }
-
     // Getter for hand
-    public List<Card> getHand() {
+    protected List<Card> getHand() {
         return hand;
     }
+
 
     // Getter for name
     public String getName() {
         return name;
     }
 
-    // Add a card to the player's hand
-    public void addCard(Card card) {
-        hand.add(card);
-    }
+    // Abstract method for a player's turn to play
+    public abstract void play(Deck deck);
 
-    // A player's turn to play
-    public void play(Deck deck) {
-        int total = 0;
+    // Adjust for aces in the hand and calculate hand total
+    protected int calculateTotal() {
+        int aceCount = 0;
+
+        // Calculate initial total and count aces
         for (Card card : hand) {
             total += card.getValue();
-        }
-        while (total < 16) {
-            Card card = deck.dealCard();
-            if (card == null) {
-                break;
+            if (card.getRank().equals("ace")) {
+                aceCount++;
             }
-            hand.add(card);
-            total += card.getValue();
         }
+
+        // Adjust for aces if total > 21
+        while (total > 21 && aceCount > 0) {
+            total -= 10; // Reduce ace value from 11 to 1
+            aceCount--;
+        }
+        return total;
     }
 }
