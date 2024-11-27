@@ -9,3 +9,11 @@
 target/game_manager-23.0.1.jar
 target/maven-archiver/
 target/maven-status/
+target/classes/com/test/App.class
+target/classes/com/test/LoginManager.class
+target/classes/com/test/SnakeGame/Main.class
+target/classes/com/test/blackjack/BlackJackUI.class
+target/classes/com/test/blackjack/Card.class
+target/classes/com/test/blackjack/Computer.class
+
+
