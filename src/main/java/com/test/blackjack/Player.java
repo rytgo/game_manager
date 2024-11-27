@@ -23,6 +23,11 @@ abstract class Player {
         return money;
     }
 
+    // Setter for money
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
     // Getter for bet
     public int getBet() {
         return bet;

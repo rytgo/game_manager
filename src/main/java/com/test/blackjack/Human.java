@@ -37,7 +37,4 @@ public class Human extends Player {
     public void setBet(int betAmount) {
         userBet = betAmount;
     }
-
-
-    //
 }

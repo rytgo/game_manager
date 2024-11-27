@@ -1,10 +1,11 @@
 package com.test.blackjack;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Deck {
-    private List<Card> cards;
+    private List<Card> cards = new ArrayList<>();
 
     public Deck() {
         initializeDeck();
