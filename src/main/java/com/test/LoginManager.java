@@ -1,5 +1,13 @@
 package com.test;
 
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,26 +16,25 @@ import java.util.List;
 
 public class LoginManager {
     private String fileName;
-    private HashMap<String,String> users;
+    private HashMap<String, String> users;
 
-    public LoginManager(String fileName){
+    public LoginManager(String fileName) {
         this.fileName = fileName;
         this.users = new HashMap<>();
         loadUsers();
     }
 
-    private void loadUsers(){
-        try{
+    private void loadUsers() {
+        try {
             List<String> lines = Files.readAllLines(Paths.get(fileName));
-            for (String line: lines){
+            for (String line : lines) {
                 String[] parts = line.split(":");
-                if (parts.length == 2){
+                if (parts.length == 2) {
                     users.put(parts[0], parts[1]); // Store username and password in the map
-                    System.out.println("Username: " + parts[0] + ", Password: " + parts[1]);
                 }
             }
-        } catch (IOException e){
-            System.out.println("Error loading users: " + e.getMessage() + " (The file cannot be found!)" );
+        } catch (IOException e) {
+            System.out.println("Error loading users: " + e.getMessage());
         }
     }
 
@@ -35,8 +42,8 @@ public class LoginManager {
         return users.containsKey(username) && users.get(username).equals(password);
     }
 
-    public boolean createAccount(String username, String password){
-        if (users.containsKey(username)){
+    public boolean createAccount(String username, String password) {
+        if (users.containsKey(username)) {
             System.out.println("Username already exists!");
             return false;
         }
@@ -45,19 +52,92 @@ public class LoginManager {
         return true;
     }
 
-    /*
-     * The reason there is a separate method for saving to file is for the purpose of possible encryption
-     */
-    private void saveUser(String username, String password){
-        try{
-            //Explaining this line
-            //First parameter must be type Path, second parameter converts a String into byte array byte[],
-            //Third parameter tells Files.write() to add data to the end of the existing file
-            Files.write(Paths.get(fileName), (username + ":" + password + System.lineSeparator()).getBytes(), java.nio.file.StandardOpenOption.APPEND);
-            System.out.println("Saved!");
-        } catch (IOException e){
+    private void saveUser(String username, String password) {
+        try {
+            Files.write(Paths.get(fileName), (username + ":" + password + System.lineSeparator()).getBytes(),
+                    java.nio.file.StandardOpenOption.APPEND);
+        } catch (IOException e) {
             System.out.println("Error saving user: " + e.getMessage());
         }
     }
 
+    // Moved login screen logic here
+    public VBox getLoginScreen(Stage stage) {
+        VBox loginLayout = new VBox();
+        loginLayout.getStyleClass().add("container");
+
+        Label usernameLabel = new Label("Username");
+        TextField usernameField = new TextField();
+        usernameField.getStyleClass().add("text-field");
+
+        Label passwordLabel = new Label("Password");
+        PasswordField passwordField = new PasswordField();
+        passwordField.getStyleClass().add("password-field");
+
+        Button loginButton = new Button("Login");
+        Button createAccountButton = new Button("Create Account");
+
+        loginButton.getStyleClass().add("button");
+        createAccountButton.getStyleClass().add("button");
+
+        loginButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+
+            if (authenticate(username, password)) {
+                System.out.println("Login successful!");
+            } else {
+                System.out.println("Invalid username or password.");
+            }
+        });
+
+        createAccountButton.setOnAction(e -> {
+            Scene scene = stage.getScene();
+            scene.setRoot(getCreateAccountScreen(stage));
+        });
+
+        loginLayout.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField, loginButton, createAccountButton);
+        return loginLayout;
+    }
+
+    // Moved create account screen logic here
+    public VBox getCreateAccountScreen(Stage stage) {
+        VBox createAccountLayout = new VBox();
+        createAccountLayout.getStyleClass().add("container");
+
+        Label usernameLabel = new Label("Username");
+        TextField usernameField = new TextField();
+        usernameField.getStyleClass().add("text-field");
+
+        Label passwordLabel = new Label("Password");
+        PasswordField passwordField = new PasswordField();
+        passwordField.getStyleClass().add("password-field");
+
+        Button createAccountButton = new Button("Create Account");
+        Button backButton = new Button("Back to Login");
+
+        createAccountButton.getStyleClass().add("button");
+        backButton.getStyleClass().add("button");
+
+        createAccountButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+
+            if (createAccount(username, password)) {
+                System.out.println("Account created successfully!");
+                Scene scene = stage.getScene();
+                scene.setRoot(getLoginScreen(stage));
+            } else {
+                System.out.println("Failed to create account. Username might already exist.");
+            }
+        });
+
+        backButton.setOnAction(e -> {
+            Scene scene = stage.getScene();
+            scene.setRoot(getLoginScreen(stage));
+        });
+
+        createAccountLayout.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField, createAccountButton, backButton);
+        return createAccountLayout;
+    }
 }
