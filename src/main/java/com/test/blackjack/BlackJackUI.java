@@ -12,10 +12,15 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class BlackJackUI extends Application {
     private BlackJack blackJack;
+    private Button startGame = new Button("Start Game");
+    private Button hit;
+    private Button stand;
 
     public void start(Stage stage) {
         AnchorPane root = new AnchorPane();
@@ -63,11 +68,11 @@ public class BlackJackUI extends Application {
         computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
 
         // Create deck and background images
-        ImageView deckImage = setImageView("deck.png");
+        ImageView deckImage = setImageView("back.png");
         ImageView backgroundImage = setImageView("background.png");
 
         // Set deck image size
-        deckImage.setFitHeight(100);
+        deckImage.setFitHeight(160);
         deckImage.setFitWidth(100);
 
         // Create a BorderPane to hold the players' spots
@@ -117,19 +122,19 @@ public class BlackJackUI extends Application {
         // Set the CSS file for the scene
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
 
-        AnchorPane.setTopAnchor(borderPane, 40.0);
-        AnchorPane.setBottomAnchor(borderPane, 40.0);
-        AnchorPane.setLeftAnchor(borderPane, 40.0);
-        AnchorPane.setRightAnchor(borderPane, 40.0);
+        AnchorPane.setTopAnchor(borderPane, 20.0);
+        AnchorPane.setBottomAnchor(borderPane, 20.0);
+        AnchorPane.setLeftAnchor(borderPane, 20.0);
+        AnchorPane.setRightAnchor(borderPane, 20.0);
 
-        AnchorPane.setTopAnchor(chips, 40.0);
-        AnchorPane.setBottomAnchor(chips, 40.0);
-        AnchorPane.setLeftAnchor(chips, 40.0);
-        AnchorPane.setRightAnchor(chips, 40.0);
+        AnchorPane.setTopAnchor(chips, 30.0);
+        AnchorPane.setBottomAnchor(chips, 30.0);
+        AnchorPane.setLeftAnchor(chips, 30.0);
+        AnchorPane.setRightAnchor(chips, 30.0);
 
         root.getChildren().addAll(borderPane, chips, buttons);
 
-        // Start the game
+        // Initialize a new game
         newGame.setOnAction(e -> {
             // Show a message about selecting a bet
             TextField messageField = new TextField("Choose a chip to select your bet...");
@@ -143,31 +148,47 @@ public class BlackJackUI extends Application {
             // Initialize the BlackJack game object
             blackJack = new BlackJack();
 
-            // Add event handlers for the chip clicks
-            chip10.setOnMouseClicked(e1 -> {
-                blackJack.getHuman().setBet(10); // Set the bet to $10
-                userBet.setText("Bet: $10");
-                messageField.setVisible(false);
-            });
-
-            chip20.setOnMouseClicked(e1 -> {
-                blackJack.getHuman().setBet(20); // Set the bet to $20
-                userBet.setText("Bet: $20");
-                messageField.setVisible(false);
-            });
-
-            chip50.setOnMouseClicked(e1 -> {
-                blackJack.getHuman().setBet(50); // Set the bet to $50
-                userBet.setText("Bet: $50");
-                messageField.setVisible(false);
-            });
-
-            chip100.setOnMouseClicked(e1 -> {
-                blackJack.getHuman().setBet(100); // Set the bet to $100
-                userBet.setText("Bet: $100");
-                messageField.setVisible(false);
-            });
+            addChipClickHandler(chip10, 10, messageField, userBet, root);
+            addChipClickHandler(chip20, 20, messageField, userBet, root);
+            addChipClickHandler(chip50, 50, messageField, userBet, root);
+            addChipClickHandler(chip100, 100, messageField, userBet, root);
         });
+
+        startGame.setOnAction(e -> {
+            startGame.disableProperty().set(true);
+            blackJack.dealCard();
+            List<ImageView> cardImages = new ArrayList<>();
+            for (Card card : blackJack.getDealtCards()) {
+                cardImages.add(createCardImage(card));
+            }
+
+            // Create HBox for user hand
+            HBox userHand = new HBox(10);  // Spacing between cards
+            userHand.getChildren().addAll(cardImages.get(0), cardImages.get(1));
+            userVBox.getChildren().add(userHand);
+
+            // Create HBox for computer one hand
+            HBox computerOneHand = new HBox(10);  // Spacing between cards
+            computerOneHand.getChildren().addAll(cardImages.get(2), cardImages.get(3));
+            computerOneVBox.getChildren().add(computerOneHand);
+
+            // Create HBox for computer two hand
+            HBox computerTwoHand = new HBox(10);  // Spacing between cards
+            computerTwoHand.getChildren().addAll(cardImages.get(4), cardImages.get(5));
+            computerTwoVBox.getChildren().add(computerTwoHand);
+
+            // Create HBox for dealer hand
+            HBox dealerHand = new HBox(10);  // Spacing between cards
+            dealerHand.getChildren().addAll(cardImages.get(6), cardImages.get(7));
+            dealerVBox.getChildren().add(dealerHand);
+
+            // Optionally set alignment for all HBoxes
+            userHand.setAlignment(Pos.CENTER);
+            computerOneHand.setAlignment(Pos.CENTER);
+            computerTwoHand.setAlignment(Pos.CENTER);
+            dealerHand.setAlignment(Pos.CENTER);
+        });
+
 
         // Set the stage
         stage.setTitle("BlackJack Game");
@@ -175,7 +196,7 @@ public class BlackJackUI extends Application {
         stage.show();
     }
 
-    // Set ImageView for images
+    // Helper method to set ImageView for images
     private ImageView setImageView(String imageName) {
         File file = new File("blackjack_images/" + imageName);
         ImageView imageView = new ImageView(new Image(file.toURI().toString()));
@@ -184,11 +205,36 @@ public class BlackJackUI extends Application {
         return imageView;
     }
 
-    // Create a button with the specified size
+    // Helper method to create a button with the specified size
     private Button createButton(String text) {
         Button button = new Button(text);
         button.setPrefSize(130, 70);
         return button;
+    }
+
+    // Helper method to add chip click handlers
+    private void addChipClickHandler(ImageView chip, int betAmount, TextField messageField, Label userBet, AnchorPane root) {
+        chip.setOnMouseClicked(e -> {
+            blackJack.getHuman().setBet(betAmount); // Set the bet
+            userBet.setText("Bet: $" + betAmount);
+            messageField.setVisible(false);
+            startGame.setPrefSize(30,10);
+            startGame.setDisable(false);
+            root.getChildren().add(startGame);
+
+            AnchorPane.setBottomAnchor(startGame, 250.0);
+            AnchorPane.setLeftAnchor(startGame, 30.0);
+            AnchorPane.setRightAnchor(startGame, 30.0);
+        });
+    }
+
+    // Helper method to create card images
+    private ImageView createCardImage(Card card) {
+        String cardImageFile = "blackjack_images/" + card.getRank() + "-" + card.getSuit() + ".png";  // Ensure the correct path for your images
+        ImageView cardImageView = new ImageView(new Image(new File(cardImageFile).toURI().toString()));
+        cardImageView.setFitHeight(140);  // Set size of the card image
+        cardImageView.setFitWidth(100);
+        return cardImageView;
     }
 
     public static void main(String[] args) {

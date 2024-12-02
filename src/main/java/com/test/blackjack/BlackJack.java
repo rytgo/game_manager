@@ -12,6 +12,7 @@ public class BlackJack {
     private String userName;
     private int userBet;
     private List<Player> players = new ArrayList<>();
+    private List <Card> dealtCards = new ArrayList<>();
 
     public BlackJack() {
         deck = new Deck();
@@ -54,11 +55,21 @@ public class BlackJack {
         dealer.getHand().add(deck.dealCard());
         dealer.getHand().add(deck.dealCard());
 
-        // Play the game
-        human.play(deck);
-        computerOne.play(deck);
-        computerTwo.play(deck);
-        dealer.play(deck);
+        dealtCards.addAll(human.getHand());
+        dealtCards.addAll(computerOne.getHand());
+        dealtCards.addAll(computerTwo.getHand());
+        dealtCards.addAll(dealer.getHand());
+
+//        // Play the game
+//        human.play(deck);
+//        computerOne.play(deck);
+//        computerTwo.play(deck);
+//        dealer.play(deck);
+    }
+
+    // Getter for dealt cards
+    public List<Card> getDealtCards() {
+        return dealtCards;
     }
 
     public void determineWinner() {
