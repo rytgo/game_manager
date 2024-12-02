@@ -1,7 +1,6 @@
 package com.test.blackjack;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -155,7 +154,19 @@ public class BlackJackUI extends Application {
         });
 
         startGame.setOnAction(e -> {
-            startGame.disableProperty().set(true);
+            startGame.setVisible(false);
+            // Random bet for computers
+            computerOneBet.setText("Bet: $" + blackJack.getComputerOne().randomBet());
+            computerTwoBet.setText("Bet: $" + blackJack.getComputerTwo().randomBet());
+
+            // Create Hit and Stand buttons
+            hit = createButton("Hit");
+            stand = createButton("Stand");
+            HBox hitAndStand = new HBox(10);
+            hitAndStand.getChildren().addAll(hit, stand);
+            userVBox.getChildren().add(hitAndStand);
+            hitAndStand.setAlignment(Pos.CENTER);
+
             blackJack.dealCard();
             List<ImageView> cardImages = new ArrayList<>();
             for (Card card : blackJack.getDealtCards()) {

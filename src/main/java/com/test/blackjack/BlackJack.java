@@ -10,7 +10,6 @@ public class BlackJack {
     private Computer computerTwo;
     private Dealer dealer;
     private String userName;
-    private int userBet;
     private List<Player> players = new ArrayList<>();
     private List <Card> dealtCards = new ArrayList<>();
 
