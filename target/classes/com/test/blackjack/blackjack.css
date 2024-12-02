@@ -35,3 +35,8 @@
     -fx-alignment: baseline-center;
     -fx-background-color: transparent;
 }
+
+.vbox {
+    -fx-spacing: 10px;
+    -fx-alignment: center;
+}

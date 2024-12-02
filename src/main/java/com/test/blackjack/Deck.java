@@ -19,8 +19,8 @@ public class Deck {
 
     // Initialize the deck with 52 cards
     public void initializeDeck() {
-        String[] suits = {"heart", "diamond", "club", " spade"};
-        String[] ranks = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king", "ace"};
+        String[] suits = {"heart", "diamond", "club", "spade"};
+        String[] ranks = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k", "a"};
         int[] values = {2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, 11};
 
         for (String suit : suits) {
@@ -35,7 +35,7 @@ public class Deck {
         if (cards.isEmpty()) {
             return null;
         }
-        return cards.removeFirst();
+        return cards.remove(0);
     }
 
     // Getter for cards

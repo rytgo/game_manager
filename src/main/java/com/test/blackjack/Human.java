@@ -3,13 +3,13 @@ package com.test.blackjack;
 import java.util.List;
 
 public class Human extends Player {
-    private int userBet;
+    private int bet;
     private String userChoice;
 
     public Human(String name, List<Card> hand, int money) {
         super(name, money);
         this.hand = hand;
-        this.bet = userBet;
+        this.bet = 0;
     }
 
     // Human's turn to play
@@ -34,6 +34,6 @@ public class Human extends Player {
 
     // Setter for human's bet
     public void setBet(int betAmount) {
-        userBet = betAmount;
+        bet = betAmount;
     }
 }
