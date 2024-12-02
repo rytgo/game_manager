@@ -1,6 +1,5 @@
 package com.test.blackjack;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Human extends Player {
