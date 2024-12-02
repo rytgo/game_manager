@@ -3,6 +3,7 @@ package com.test.blackjack;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.Scene;
@@ -17,13 +18,13 @@ import java.io.File;
 import java.util.Objects;
 
 public class BlackJackUI extends Application {
-    private final BlackJack blackJack = new BlackJack();
+    private BlackJack blackJack;
 
     public void start(Stage stage) {
         StackPane root = new StackPane();
-        Scene scene = new Scene(root, 1911, 1940);
+        Scene scene = new Scene(root, 800, 600);
 
-        // Create buttons for New Game, Stop Game, and Save Game
+        // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
         Button newGame = createButton("New Game");
         Button saveGame = createButton("Save Game");
         Button viewGameScores = createButton("View Scores");
@@ -36,27 +37,33 @@ public class BlackJackUI extends Application {
         // Create VBox to hold the players' spots
         // userVBox
         VBox userVBox = new VBox();
-        Label userLabel = new Label(blackJack.getHuman().getName());
+        Label userLabel = new Label("userName");
+        Label userBet = new Label("Bet: 0");
+        Label userTotal = new Label("Total: 1000");
         userVBox.setAlignment(Pos.CENTER);
-        userVBox.getChildren().add(userLabel);
+        userVBox.getChildren().addAll(userLabel, userBet, userTotal);
 
         // dealerVBox
         VBox dealerVBox = new VBox();
-        Label dealerLabel = new Label(blackJack.getDealer().getName());
+        Label dealerLabel = new Label("Dealer");
         dealerVBox.setAlignment(Pos.CENTER);
         dealerVBox.getChildren().add(dealerLabel);
 
         // computerOneVBox
         VBox computerOneVBox = new VBox();
-        Label computerOneLabel = new Label(blackJack.getComputerOne().getName());
+        Label computerOneLabel = new Label("Computer 1");
+        Label computerOneBet = new Label("Bet: 0");
+        Label computerOneTotal = new Label("Total: 1000");
         computerOneVBox.setAlignment(Pos.CENTER);
-        computerOneVBox.getChildren().add(computerOneLabel);
+        computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
 
         // computerTwoVBox
         VBox computerTwoVBox = new VBox();
-        Label computerTwoLabel = new Label(blackJack.getComputerTwo().getName());
+        Label computerTwoLabel = new Label("Computer 2");
+        Label computerTwoBet = new Label("Bet: 0");
+        Label computerTwoTotal = new Label("Total: 1000");
         computerTwoVBox.setAlignment(Pos.CENTER);
-        computerTwoVBox.getChildren().add(computerTwoLabel);
+        computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
 
         // Create deck and background images
         ImageView deckImage = setImageView("deck.png");
@@ -72,6 +79,8 @@ public class BlackJackUI extends Application {
         // Set the background image size
         backgroundImage.setFitHeight(1911);
         backgroundImage.setFitWidth(1940);
+
+        root.getChildren().add(backgroundImage);
 
         // Set chip images and labels for each chip
         VBox chip10Box = new VBox();
@@ -111,7 +120,38 @@ public class BlackJackUI extends Application {
         // Set the CSS file for the scene
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
 
-        root.getChildren().addAll(backgroundImage, borderPane, chips, buttons);
+        root.getChildren().addAll(borderPane, chips, buttons);
+
+        // Start the game
+        newGame.setOnAction(e -> {
+            // Show a message about selecting a bet
+            TextField messageField = new TextField("Choose a chip to select your bet...");
+            messageField.setEditable(false);
+            root.getChildren().add(messageField);
+
+            // Initialize the BlackJack game object
+            blackJack = new BlackJack();
+
+            // Add event handlers for the chip clicks
+            chip10.setOnMouseClicked(e1 -> {
+                blackJack.getHuman().setBet(10); // Set the bet to $10
+                userBet.setText("Bet: $10");
+            });
+
+            chip20.setOnMouseClicked(e1 -> {
+                blackJack.getHuman().setBet(20); // Set the bet to $20
+                userBet.setText("Bet: $20");
+            });
+
+            chip50.setOnMouseClicked(e1 -> {
+                blackJack.getHuman().setBet(50); // Set the bet to $50
+                userBet.setText("Bet: $50");
+            });
+
+            chip100.setOnMouseClicked(e1 -> {
+                blackJack.getHuman().setBet(100); // Set the bet to $100
+                userBet.setText("Bet: $100");});
+        });
 
         // Set the stage
         stage.setTitle("BlackJack Game");
