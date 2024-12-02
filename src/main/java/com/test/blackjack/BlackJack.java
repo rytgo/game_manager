@@ -39,11 +39,7 @@ public class BlackJack {
         return dealer;
     }
 
-    public void playGame() {
-        // Create bets for each player
-        human.setBet(userBet);
-        computerOne.randomBet();
-        computerTwo.randomBet();
+    public void dealCard() {
 
         // Add two cards to each player's hand
         human.getHand().add(deck.dealCard());

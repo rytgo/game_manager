@@ -19,10 +19,19 @@
     -fx-font-family: "AppleMyungjo";
     -fx-font-weight: bolder;
     -fx-background-radius: 5px;
-    -fx-padding: 10px 10px;
+    -fx-padding: 0px 10px;
 }
 
 .chips {
     -fx-alignment: bottom-right;
     -fx-padding: 920px 200px 20px 60px;
+}
+
+.text-field {
+    -fx-text-fill: white;
+    -fx-font-size: 25px;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
+    -fx-alignment: baseline-center;
+    -fx-background-color: transparent;
 }
