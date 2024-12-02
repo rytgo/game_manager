@@ -7,10 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.Scene;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
@@ -21,7 +18,7 @@ public class BlackJackUI extends Application {
     private BlackJack blackJack;
 
     public void start(Stage stage) {
-        StackPane root = new StackPane();
+        AnchorPane root = new AnchorPane();
         Scene scene = new Scene(root, 800, 600);
 
         // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
@@ -120,6 +117,16 @@ public class BlackJackUI extends Application {
         // Set the CSS file for the scene
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
 
+        AnchorPane.setTopAnchor(borderPane, 40.0);
+        AnchorPane.setBottomAnchor(borderPane, 40.0);
+        AnchorPane.setLeftAnchor(borderPane, 40.0);
+        AnchorPane.setRightAnchor(borderPane, 40.0);
+
+        AnchorPane.setTopAnchor(chips, 40.0);
+        AnchorPane.setBottomAnchor(chips, 40.0);
+        AnchorPane.setLeftAnchor(chips, 40.0);
+        AnchorPane.setRightAnchor(chips, 40.0);
+
         root.getChildren().addAll(borderPane, chips, buttons);
 
         // Start the game
@@ -129,6 +136,10 @@ public class BlackJackUI extends Application {
             messageField.setEditable(false);
             root.getChildren().add(messageField);
 
+            AnchorPane.setBottomAnchor(messageField, 180.0);
+            AnchorPane.setLeftAnchor(messageField, 60.0);
+            AnchorPane.setRightAnchor(messageField, 60.0);
+
             // Initialize the BlackJack game object
             blackJack = new BlackJack();
 
@@ -136,21 +147,26 @@ public class BlackJackUI extends Application {
             chip10.setOnMouseClicked(e1 -> {
                 blackJack.getHuman().setBet(10); // Set the bet to $10
                 userBet.setText("Bet: $10");
+                messageField.setVisible(false);
             });
 
             chip20.setOnMouseClicked(e1 -> {
                 blackJack.getHuman().setBet(20); // Set the bet to $20
                 userBet.setText("Bet: $20");
+                messageField.setVisible(false);
             });
 
             chip50.setOnMouseClicked(e1 -> {
                 blackJack.getHuman().setBet(50); // Set the bet to $50
                 userBet.setText("Bet: $50");
+                messageField.setVisible(false);
             });
 
             chip100.setOnMouseClicked(e1 -> {
                 blackJack.getHuman().setBet(100); // Set the bet to $100
-                userBet.setText("Bet: $100");});
+                userBet.setText("Bet: $100");
+                messageField.setVisible(false);
+            });
         });
 
         // Set the stage
