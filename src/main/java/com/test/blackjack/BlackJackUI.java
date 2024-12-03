@@ -18,8 +18,8 @@ import java.util.Objects;
 public class BlackJackUI extends Application {
     private BlackJack blackJack;
     private Button startGame = new Button("Start Game");
-    private Button hit;
-    private Button stand;
+    private Button hit = new Button("Hit");
+    private Button stand = new Button("Stand");
 
     public void start(Stage stage) {
         AnchorPane root = new AnchorPane();
@@ -37,32 +37,32 @@ public class BlackJackUI extends Application {
 
         // Create VBox to hold the players' spots
         // userVBox
-        VBox userVBox = new VBox();
+        VBox userVBox = new VBox(10);
         Label userLabel = new Label("userName");
         Label userBet = new Label("Bet: 0");
-        Label userTotal = new Label("Total: 1000");
+        Label userTotal = new Label("Balance: 1000");
         userVBox.setAlignment(Pos.CENTER);
         userVBox.getChildren().addAll(userLabel, userBet, userTotal);
 
         // dealerVBox
-        VBox dealerVBox = new VBox();
+        VBox dealerVBox = new VBox(10);
         Label dealerLabel = new Label("Dealer");
         dealerVBox.setAlignment(Pos.CENTER);
         dealerVBox.getChildren().add(dealerLabel);
 
         // computerOneVBox
-        VBox computerOneVBox = new VBox();
+        VBox computerOneVBox = new VBox(10);
         Label computerOneLabel = new Label("Computer 1");
         Label computerOneBet = new Label("Bet: 0");
-        Label computerOneTotal = new Label("Total: 1000");
+        Label computerOneTotal = new Label("Balance: 1000");
         computerOneVBox.setAlignment(Pos.CENTER);
         computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
 
         // computerTwoVBox
-        VBox computerTwoVBox = new VBox();
+        VBox computerTwoVBox = new VBox(10);
         Label computerTwoLabel = new Label("Computer 2");
         Label computerTwoBet = new Label("Bet: 0");
-        Label computerTwoTotal = new Label("Total: 1000");
+        Label computerTwoTotal = new Label("Balance: 1000");
         computerTwoVBox.setAlignment(Pos.CENTER);
         computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
 
@@ -153,6 +153,7 @@ public class BlackJackUI extends Application {
             addChipClickHandler(chip100, 100, messageField, userBet, root);
         });
 
+        // Start Game button function
         startGame.setOnAction(e -> {
             startGame.setVisible(false);
             // Random bet for computers
@@ -160,8 +161,6 @@ public class BlackJackUI extends Application {
             computerTwoBet.setText("Bet: $" + blackJack.getComputerTwo().randomBet());
 
             // Create Hit and Stand buttons
-            hit = createButton("Hit");
-            stand = createButton("Stand");
             HBox hitAndStand = new HBox(10);
             hitAndStand.getChildren().addAll(hit, stand);
             userVBox.getChildren().add(hitAndStand);
@@ -198,8 +197,19 @@ public class BlackJackUI extends Application {
             computerOneHand.setAlignment(Pos.CENTER);
             computerTwoHand.setAlignment(Pos.CENTER);
             dealerHand.setAlignment(Pos.CENTER);
+
+            // Calculate the total for all players
+            blackJack.getHuman().calculateTotal();
+            blackJack.getComputerOne().calculateTotal();
+            blackJack.getComputerTwo().calculateTotal();
+            blackJack.getDealer().calculateTotal();
         });
 
+        // Hit button function
+        hit.setOnAction(e -> {
+            blackJack.getHuman().setUserChoice("hit");
+
+                });
 
         // Set the stage
         stage.setTitle("BlackJack Game");

@@ -19,7 +19,7 @@
     -fx-font-family: "AppleMyungjo";
     -fx-font-weight: bolder;
     -fx-background-radius: 5px;
-    -fx-padding: 0px 10px;
+    -fx-padding: 0px 5px;
 }
 
 .chips {
@@ -36,7 +36,3 @@
     -fx-background-color: transparent;
 }
 
-.vbox {
-    -fx-spacing: 10px;
-    -fx-alignment: center;
-}

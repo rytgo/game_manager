@@ -38,6 +38,11 @@ abstract class Player {
         return hand;
     }
 
+    // Getter for initial total
+    public int getTotal() {
+        return total;
+    }
+
 
     // Getter for name
     public String getName() {
