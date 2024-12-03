@@ -15,11 +15,6 @@ public class Human extends Player {
     // Human's turn to play
     @Override
     public void play(Deck deck) {
-        // Calculate initial total
-        for (Card card : hand) {
-            total += card.getValue();
-        }
-
         // Human's turn to play
         while (total < 21) {
             if (userChoice.equals("hit")) {
@@ -35,5 +30,10 @@ public class Human extends Player {
     // Setter for human's bet
     public void setBet(int betAmount) {
         bet = betAmount;
+    }
+
+    // Setter for user's choice
+    public void setUserChoice(String choice) {
+        userChoice = choice;
     }
 }
