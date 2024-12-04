@@ -4,9 +4,11 @@
     -fx-text-fill: black;
     -fx-font-weight: bold;
     -fx-font-family: "AppleMyungjo";
-    -fx-font-size: 16px;
+    -fx-font-size: 14px; /* Smaller font size */
     -fx-background-radius: 5px;
-    -fx-padding: 10px 20px;
+    -fx-padding: 10px 20px; /* Reduced padding */
+    -fx-pref-width: 120px;
+    -fx-pref-height: 70px;
 }
 
 .button:hover {

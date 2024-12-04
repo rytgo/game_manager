@@ -16,14 +16,10 @@ public class Human extends Player {
     @Override
     public void play(Deck deck) {
         // Human's turn to play
-        while (total < 21) {
-            if (userChoice.equals("hit")) {
-                Card card = deck.dealCard();
-                hand.add(card);
-                total = calculateTotal();
-            } else if (userChoice.equals("stand")) {
-                break;
-            }
+        if (userChoice.equals("hit")) {
+            Card card = deck.dealCard();
+            hand.add(card);
+            total = calculateTotal();
         }
     }
 
