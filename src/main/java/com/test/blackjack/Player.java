@@ -38,6 +38,10 @@ abstract class Player {
         return hand;
     }
 
+    // Getter for initial total
+    public int getTotal() {
+        return total;
+    }
 
     // Getter for name
     public String getName() {
@@ -52,9 +56,10 @@ abstract class Player {
         int aceCount = 0;
 
         // Calculate initial total and count aces
+        total = 0;
         for (Card card : hand) {
             total += card.getValue();
-            if (card.getRank().equals("ace")) {
+            if (card.getRank().equals("a")) {
                 aceCount++;
             }
         }

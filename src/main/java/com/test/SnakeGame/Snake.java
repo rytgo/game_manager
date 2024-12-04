@@ -71,6 +71,7 @@ public class Snake {
         return body.get(0);
     }
 
+    // TODO: Fix bug with food here
     public boolean checkCollisionWithSelf() {
         // Check if the snake's head collides with any part of its body
         for (int i = 1; i < body.size(); i++) {

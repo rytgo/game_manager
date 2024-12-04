@@ -13,10 +13,6 @@ public class Dealer extends Player {
     @Override
     public void play(Deck deck) {
 
-        for (Card card : hand) {
-            total += card.getValue();
-        }
-
         while (total <= 16) {
             Card card = deck.dealCard();
             hand.add(card);
@@ -25,10 +21,12 @@ public class Dealer extends Player {
 
         // Handle soft 17 case
         boolean isSoft17 = false;
-        for (Card card : hand) {
-            if (card.getRank().equals("ace") && total == 17) {
-                isSoft17 = true;
-                break;
+        while (getHand().size() == 2) {
+            for (Card card : hand) {
+                if (card.getRank().equals("a") && total == 17) {
+                    isSoft17 = true;
+                    break;
+                }
             }
         }
 

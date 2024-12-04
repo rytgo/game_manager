@@ -1,0 +1,40 @@
+/* blackjack.css */
+.button {
+    -fx-background-color: #F5F5F5;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-size: 14px; /* Smaller font size */
+    -fx-background-radius: 5px;
+    -fx-padding: 10px 20px; /* Reduced padding */
+    -fx-pref-width: 120px;
+    -fx-pref-height: 70px;
+}
+
+.button:hover {
+    -fx-background-color: #3367D6;
+}
+
+.label {
+    -fx-font-size: 20px;
+    -fx-text-fill: #F5F5F5;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
+    -fx-background-radius: 5px;
+    -fx-padding: 0px 5px;
+}
+
+.chips {
+    -fx-alignment: bottom-right;
+    -fx-padding: 920px 200px 20px 60px;
+}
+
+.text-field {
+    -fx-text-fill: white;
+    -fx-font-size: 25px;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
+    -fx-alignment: baseline-center;
+    -fx-background-color: transparent;
+}
+
