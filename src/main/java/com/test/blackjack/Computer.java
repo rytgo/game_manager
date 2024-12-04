@@ -12,12 +12,6 @@ public class Computer extends Player {
     // Computer's turn to play
     @Override
     public void play(Deck deck) {
-
-        // Calculate initial total
-        for (Card card : hand) {
-            total = calculateTotal();
-        }
-
         while (total < 16) {
             Card card = deck.dealCard();
             hand.add(card);

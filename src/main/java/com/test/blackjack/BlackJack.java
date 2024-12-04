@@ -11,15 +11,14 @@ public class BlackJack {
     private Dealer dealer;
     private String userName;
     private List<Player> players = new ArrayList<>();
-    private List <Card> dealtCards = new ArrayList<>();
 
     public BlackJack() {
         deck = new Deck();
-        human = new Human("userName",  new ArrayList<Card>(), 1000);
+        human = new Human("userName", new ArrayList<Card>(), 1000);
         computerOne = new Computer("Computer 1", new ArrayList<Card>(), 1000);
-        computerTwo = new Computer("Computer 2",  new ArrayList<Card>(), 1000);
+        computerTwo = new Computer("Computer 2", new ArrayList<Card>(), 1000);
         dealer = new Dealer("Dealer", new ArrayList<Card>());
-        players.addAll(List.of(human, computerOne, computerTwo));
+        players.addAll(List.of(human, computerOne, computerTwo, dealer));
     }
 
     // Getters for players
@@ -53,23 +52,8 @@ public class BlackJack {
 
         dealer.getHand().add(deck.dealCard());
         dealer.getHand().add(deck.dealCard());
-
-        dealtCards.addAll(human.getHand());
-        dealtCards.addAll(computerOne.getHand());
-        dealtCards.addAll(computerTwo.getHand());
-        dealtCards.addAll(dealer.getHand());
-
-//        // Play the game
-//        human.play(deck);
-//        computerOne.play(deck);
-//        computerTwo.play(deck);
-//        dealer.play(deck);
     }
 
-    // Getter for dealt cards
-    public List<Card> getDealtCards() {
-        return dealtCards;
-    }
 
     public void determineWinner() {
         int dealerTotal = dealer.calculateTotal();
@@ -103,5 +87,13 @@ public class BlackJack {
                 player.setMoney(player.getMoney());  // No change in money
             }
         }
+    }
+
+    public Deck getDeck() {
+        return this.deck;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
     }
 }
