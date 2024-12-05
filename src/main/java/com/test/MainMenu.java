@@ -1,4 +1,5 @@
 package com.test;
+
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -6,44 +7,34 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-public class MainMenu{
-    private String highScoresFile;
+public class MainMenu {
+    private HighScoresManager highScoresManager;
     private LoginManager loginManager;
     private String user;
 
-    public MainMenu(String highScoresFile, LoginManager loginManager, String user){
-        this.highScoresFile = highScoresFile;
+    public MainMenu(HighScoresManager highScoresManager, LoginManager loginManager, String user) {
+        this.highScoresManager = highScoresManager;
         this.loginManager = loginManager;
         this.user = user;
     }
 
-    //Note that Map.Entry allows us to sort by value. Map.Entry allows you to access each pair as an object.
-    //Once you sort Map.Entry objects in a list, it becomes a list of sorted pairs (Username, Score)
-    private List<Map.Entry<String, Integer>> loadHighScores(){
-        Map<String, Integer> scores = new HashMap<>(); 
-        try{
-            List<String> lines = Files.readAllLines(Paths.get(highScoresFile));
-            for (String l: lines){
-                String[] parts = l.split(":");
-                if (parts.length == 2){
-                    scores.put(parts[0], Integer.parseInt(parts[1]));
-                }
-            }
-        } catch (IOException e){
-            System.out.println("Error loading high scores: " + e.getMessage());
-        }
-
-        List<Map.Entry<String, Integer>> sortedScores = new ArrayList<>(scores.entrySet());
-        sortedScores.sort((a, b) -> b.getValue().compareTo(a.getValue()));
-        return sortedScores;
+    // Helper method to get top scores for a specific game
+    private List<Map.Entry<String, Integer>> getTopScores(String game) {
+        return highScoresManager.getScores()
+                .entrySet()
+                .stream()
+                .map(entry -> Map.entry(entry.getKey(), entry.getValue().get(game)))
+                .filter(entry -> entry.getValue() != null) // Ensure the score exists
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue())) // Sort descending by score
+                .limit(5) // Get the top 5
+                .collect(Collectors.toList());
     }
 
-    public VBox launchMainMenu(Stage stage){
+    public VBox launchMainMenu(Stage stage) {
         VBox root = new VBox();
         root.getStyleClass().add("container");
 
@@ -53,8 +44,44 @@ public class MainMenu{
         HBox scoresBox = new HBox();
         VBox blackjackScores = new VBox();
         VBox snakeScores = new VBox();
-        
-        return root;
 
+        Label blackjackTitle = new Label("BlackJack High Scores: ");
+        Label snakeTitle = new Label("Snake High Scores: ");
+
+        blackjackScores.getChildren().add(blackjackTitle);
+        snakeScores.getChildren().add(snakeTitle);
+
+        // Get top 5 scores for each game
+        List<Map.Entry<String, Integer>> blackjackTopScores = getTopScores("BlackJack");
+        List<Map.Entry<String, Integer>> snakeTopScores = getTopScores("Snake");
+
+        // Populate BlackJack scores
+        for (int i = 0; i < blackjackTopScores.size(); i++) {
+            Map.Entry<String, Integer> entry = blackjackTopScores.get(i);
+            Label scoreLabel = new Label((i + 1) + ". " + entry.getKey() + ": " + entry.getValue());
+            blackjackScores.getChildren().add(scoreLabel);
+        }
+
+        // Populate Snake scores
+        for (int i = 0; i < snakeTopScores.size(); i++) {
+            Map.Entry<String, Integer> entry = snakeTopScores.get(i);
+            Label scoreLabel = new Label((i + 1) + ". " + entry.getKey() + ": " + entry.getValue());
+            snakeScores.getChildren().add(scoreLabel);
+        }
+
+        scoresBox.getChildren().addAll(blackjackScores, snakeScores);
+
+        // Add buttons for games
+        Button blackjackButton = new Button("Play BlackJack");
+        Button snakeButton = new Button("Play Snake");
+        blackjackButton.setOnAction(e -> System.out.println("Launching BlackJack game...")); // Placeholder
+        snakeButton.setOnAction(e -> System.out.println("Launching Snake game...")); // Placeholder
+
+        // Add logout button
+        Button logoutButton = new Button("Logout");
+        logoutButton.setOnAction(e -> stage.getScene().setRoot(loginManager.getLoginScreen(stage)));
+
+        root.getChildren().addAll(title, scoresBox, blackjackButton, snakeButton, logoutButton);
+        return root;
     }
 }

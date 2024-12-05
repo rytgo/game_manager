@@ -13,15 +13,23 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class LoginManager {
     private String fileName;
     private HashMap<String, String> users;
+    private Consumer<String> onLoginSuccess; // Callback for successful login
+    private HighScoresManager highScoresManager; // Manage high scores
 
-    public LoginManager(String fileName) {
+    public LoginManager(String fileName, HighScoresManager highScoresManager) {
         this.fileName = fileName;
         this.users = new HashMap<>();
+        this.highScoresManager = highScoresManager;
         loadUsers();
+    }
+
+    public void setOnLoginSuccess(Consumer<String> onLoginSuccess) {
+        this.onLoginSuccess = onLoginSuccess; // Assign the callback
     }
 
     private void loadUsers() {
@@ -49,6 +57,10 @@ public class LoginManager {
         }
         users.put(username, password);
         saveUser(username, password);
+
+        // Add default high scores for the new user
+        highScoresManager.addUser(username);
+
         return true;
     }
 
@@ -61,7 +73,6 @@ public class LoginManager {
         }
     }
 
-    // Moved login screen logic here
     public VBox getLoginScreen(Stage stage) {
         VBox loginLayout = new VBox();
         loginLayout.getStyleClass().add("container");
@@ -86,6 +97,13 @@ public class LoginManager {
 
             if (authenticate(username, password)) {
                 System.out.println("Login successful!");
+                
+                // Initialize high scores for existing users if missing
+                highScoresManager.addUser(username);
+
+                if (onLoginSuccess != null) { // Ensure the callback is not null
+                    onLoginSuccess.accept(username); // Call the callback with the username
+                }
             } else {
                 System.out.println("Invalid username or password.");
             }
@@ -100,7 +118,6 @@ public class LoginManager {
         return loginLayout;
     }
 
-    // Moved create account screen logic here
     public VBox getCreateAccountScreen(Stage stage) {
         VBox createAccountLayout = new VBox();
         createAccountLayout.getStyleClass().add("container");

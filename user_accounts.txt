@@ -1,8 +1,3 @@
-user1:password1
-user2:password2
-tester1:tester2
 dez:dez
-default:default
-FlabbHs:Foxxie123
 
-sd:sd
+test:test
