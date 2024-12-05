@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class BlackJackUI extends Application {
-    private BlackJack blackJack = new BlackJack();
+    private final BlackJack blackJack = new BlackJack();
     private final Button startGame = new Button("Start Game");
     private final Button hit = new Button("Hit");
     private final Button stand = new Button("Stand");
@@ -51,7 +51,7 @@ public class BlackJackUI extends Application {
         // userVBox
         Label userLabel = new Label("userName");
         Label userBet = new Label("Bet: 0");
-        userLabel.setText("Balance: 1000");
+        userTotal.setText("Balance: 1000");
         userVBox.setAlignment(Pos.CENTER);
         userVBox.getChildren().addAll(userLabel, userBet, userTotal);
 
@@ -177,10 +177,6 @@ public class BlackJackUI extends Application {
             if (!root.getChildren().contains(messageField)) {
                 root.getChildren().add(messageField);
             }
-            AnchorPane.setBottomAnchor(messageField, 180.0);
-            AnchorPane.setLeftAnchor(messageField, 60.0);
-            AnchorPane.setRightAnchor(messageField, 60.0);
-
 
             AnchorPane.setBottomAnchor(messageField, 180.0);
             AnchorPane.setLeftAnchor(messageField, 60.0);
@@ -212,15 +208,6 @@ public class BlackJackUI extends Application {
             computerTwoBet.setText("Bet: " + betTwo);
             blackJack.getComputerTwo().setBet(betTwo);
 
-            // Create Hit and Stand buttons
-            if (!userVBox.getChildren().contains(hitAndStand)) {
-                if (hitAndStand.getChildren().isEmpty()) {
-                    hitAndStand.getChildren().addAll(hit, stand);
-                }
-                userVBox.getChildren().add(hitAndStand);
-                hitAndStand.setAlignment(Pos.CENTER);
-            }
-
             // Deal 8 cards to 4 players
             blackJack.dealCard();
 
@@ -251,6 +238,7 @@ public class BlackJackUI extends Application {
 
                 // Add each card in the player's hand to their UI HBox
                 for (Card card : player.getHand()) {
+                    System.out.println(card.getRank() + card.getSuit());   // Debugging
                     handUI.getChildren().add(createCardImage(card));
                 }
             }
@@ -260,6 +248,15 @@ public class BlackJackUI extends Application {
             computerOneHand.setAlignment(Pos.CENTER);
             computerTwoHand.setAlignment(Pos.CENTER);
             dealerHand.setAlignment(Pos.CENTER);
+
+            // Create Hit and Stand buttons
+            if (!userVBox.getChildren().contains(hitAndStand)) {
+                if (hitAndStand.getChildren().isEmpty()) {
+                    hitAndStand.getChildren().addAll(hit, stand);
+                }
+                userVBox.getChildren().add(hitAndStand);
+                hitAndStand.setAlignment(Pos.CENTER);
+            }
 
             // Calculate the total for all players
             blackJack.getHuman().calculateTotal();
@@ -278,7 +275,7 @@ public class BlackJackUI extends Application {
             } else {
                 blackJack.getHuman().play(blackJack.getDeck());
                 userHand.getChildren().add(createCardImage(blackJack.getHuman().getHand().getLast()));
-                // If the user busts, auto loses the game
+                // If the user busts, auto lose
                 if (blackJack.getHuman().getTotal() > 21) {
                     notUserPlay();
                 }
