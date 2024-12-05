@@ -1,6 +1,6 @@
 /* blackjack.css */
 .button {
-    -fx-background-color: #F5F5F5;
+    -fx-background-color: #B19CD9;
     -fx-text-fill: black;
     -fx-font-weight: bold;
     -fx-font-family: "AppleMyungjo";
@@ -12,12 +12,12 @@
 }
 
 .button:hover {
-    -fx-background-color: #3367D6;
+    -fx-background-color: #957DAD;
 }
 
 .label {
     -fx-font-size: 20px;
-    -fx-text-fill: #F5F5F5;
+    -fx-text-fill: #B19CD9;
     -fx-font-family: "AppleMyungjo";
     -fx-font-weight: bolder;
     -fx-background-radius: 5px;
@@ -30,7 +30,7 @@
 }
 
 .text-field {
-    -fx-text-fill: white;
+    -fx-text-fill: #B19CD9;
     -fx-font-size: 25px;
     -fx-font-family: "AppleMyungjo";
     -fx-font-weight: bolder;

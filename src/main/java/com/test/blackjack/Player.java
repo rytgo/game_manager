@@ -9,7 +9,7 @@ abstract class Player {
     protected int bet;
     protected int total;
 
-    public Player(String name, int money) {
+    protected Player(String name, int money) {
         this.name = name;
         this.money = 1000;
     }
@@ -31,6 +31,11 @@ abstract class Player {
     // Getter for bet
     public int getBet() {
         return bet;
+    }
+
+    // Setter for bet
+    public void setBet(int amount) {
+        bet = amount;
     }
 
     // Getter for hand
