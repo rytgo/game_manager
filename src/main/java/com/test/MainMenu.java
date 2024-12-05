@@ -1,6 +1,5 @@
 package com.test;
 
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -9,17 +8,24 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class MainMenu {
     private HighScoresManager highScoresManager;
     private LoginManager loginManager;
     private String user;
+    private Consumer<Void> onLogout; // Callback for logout behavior
 
     public MainMenu(HighScoresManager highScoresManager, LoginManager loginManager, String user) {
         this.highScoresManager = highScoresManager;
         this.loginManager = loginManager;
         this.user = user;
+    }
+
+    // Set a callback for logout
+    public void setOnLogout(Consumer<Void> onLogout) {
+        this.onLogout = onLogout;
     }
 
     // Helper method to get top scores for a specific game
@@ -38,7 +44,7 @@ public class MainMenu {
         VBox root = new VBox();
         root.getStyleClass().add("container");
 
-        Label title = new Label("Main Menu");
+        Label title = new Label("Main Menu - Welcome " + user);
         title.getStyleClass().add("label");
 
         HBox scoresBox = new HBox();
@@ -79,7 +85,11 @@ public class MainMenu {
 
         // Add logout button
         Button logoutButton = new Button("Logout");
-        logoutButton.setOnAction(e -> stage.getScene().setRoot(loginManager.getLoginScreen(stage)));
+        logoutButton.setOnAction(e -> {
+            if (onLogout != null) {
+                onLogout.accept(null); // Trigger the logout callback
+            }
+        });
 
         root.getChildren().addAll(title, scoresBox, blackjackButton, snakeButton, logoutButton);
         return root;

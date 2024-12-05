@@ -41,7 +41,7 @@ public class HighScoresManager {
             System.out.println("Error loading high scores: " + e.getMessage());
         }
     }
-
+    
     private void saveHighScores() {
         StringBuilder data = new StringBuilder();
         for (Map.Entry<String, Map<String, Integer>> entry : scores.entrySet()) {
