@@ -11,7 +11,7 @@ abstract class Player {
 
     protected Player(String name, int money) {
         this.name = name;
-        this.money = 1000;
+        this.money = money;
     }
 
     public Player(String name) {

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class BlackJackUI extends Application {
-    private BlackJack blackJack;
+    private BlackJack blackJack = new BlackJack();
     private final Button startGame = new Button("Start Game");
     private final Button hit = new Button("Hit");
     private final Button stand = new Button("Stand");
@@ -27,7 +27,11 @@ public class BlackJackUI extends Application {
     private final HBox computerTwoHand = new HBox(10);
     private final HBox dealerHand = new HBox(10);
     private final HBox hitAndStand = new HBox(10);
-    private TextField result = new TextField();
+    private final TextField result = new TextField();
+    private final VBox userVBox = new VBox(10);
+    private final Label userTotal = new Label();
+    private final Label computerOneTotal = new Label();
+    private final Label computerTwoTotal = new Label();
 
     public void start(Stage stage) {
         AnchorPane root = new AnchorPane();
@@ -45,10 +49,9 @@ public class BlackJackUI extends Application {
 
         // Create VBox to hold the players' spots
         // userVBox
-        VBox userVBox = new VBox(10);
         Label userLabel = new Label("userName");
         Label userBet = new Label("Bet: 0");
-        Label userTotal = new Label("Balance: 1000");
+        userLabel.setText("Balance: 1000");
         userVBox.setAlignment(Pos.CENTER);
         userVBox.getChildren().addAll(userLabel, userBet, userTotal);
 
@@ -62,7 +65,7 @@ public class BlackJackUI extends Application {
         VBox computerOneVBox = new VBox(10);
         Label computerOneLabel = new Label("Computer 1");
         Label computerOneBet = new Label("Bet: 0");
-        Label computerOneTotal = new Label("Balance: 1000");
+        computerOneTotal.setText("Balance: 1000");
         computerOneVBox.setAlignment(Pos.CENTER);
         computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
 
@@ -70,7 +73,7 @@ public class BlackJackUI extends Application {
         VBox computerTwoVBox = new VBox(10);
         Label computerTwoLabel = new Label("Computer 2");
         Label computerTwoBet = new Label("Bet: 0");
-        Label computerTwoTotal = new Label("Balance: 1000");
+        computerTwoTotal.setText("Balance: 1000");
         computerTwoVBox.setAlignment(Pos.CENTER);
         computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
 
@@ -183,8 +186,8 @@ public class BlackJackUI extends Application {
             AnchorPane.setLeftAnchor(messageField, 60.0);
             AnchorPane.setRightAnchor(messageField, 60.0);
 
-            // Initialize the BlackJack game object
-            blackJack = new BlackJack();
+            // Restart the game
+            blackJack.resetGame();
 
             addChipClickHandler(chip10, 10, messageField, userBet, root);
             addChipClickHandler(chip20, 20, messageField, userBet, root);
@@ -218,11 +221,8 @@ public class BlackJackUI extends Application {
                 hitAndStand.setAlignment(Pos.CENTER);
             }
 
+            // Deal 8 cards to 4 players
             blackJack.dealCard();
-            System.out.println("Human Hand: " + blackJack.getHuman().getHand().get(0).getValue() + " " + blackJack.getHuman().getHand().get(1).getValue());  // Debugging
-            System.out.println("Computer 1 Hand: " + blackJack.getComputerOne().getHand().get(0).getValue() + " " + blackJack.getComputerOne().getHand().get(1).getValue());  // Debugging
-            System.out.println("Computer 2 Hand: " + blackJack.getComputerTwo().getHand().get(0).getValue() + " " + blackJack.getComputerTwo().getHand().get(1).getValue());  // Debugging
-            System.out.println("Dealer Hand: " + blackJack.getDealer().getHand().get(0).getValue() + " " + blackJack.getDealer().getHand().get(1).getValue());  // Debugging
 
             List<HBox> playerHands = List.of(userHand, computerOneHand, computerTwoHand, dealerHand);
 
@@ -251,7 +251,6 @@ public class BlackJackUI extends Application {
 
                 // Add each card in the player's hand to their UI HBox
                 for (Card card : player.getHand()) {
-                    System.out.println(card.getRank() + card.getSuit());   // Debugging
                     handUI.getChildren().add(createCardImage(card));
                 }
             }
@@ -276,12 +275,13 @@ public class BlackJackUI extends Application {
         hit.setOnAction(e -> {
             if (blackJack.getHuman().getTotal() == 21) {
                 showAlert("Warning", "You have 21 or Blackjack!", "You have 21 or Blackjack! Stand to finish your turn.");
-            } else if (blackJack.getHuman().getTotal() > 21) {
-                showAlert("Warning", "You are busted!", "You are busted! Stand to finish your turn.");
             } else {
                 blackJack.getHuman().play(blackJack.getDeck());
                 userHand.getChildren().add(createCardImage(blackJack.getHuman().getHand().getLast()));
-                System.out.println("Human total: " + blackJack.getHuman().getTotal());  // Debugging
+                // If the user busts, auto loses the game
+                if (blackJack.getHuman().getTotal() > 21) {
+                    notUserPlay();
+                }
             }
         });
 
@@ -290,43 +290,7 @@ public class BlackJackUI extends Application {
             if (blackJack.getHuman().getTotal() < 16) {
                 showAlert("Warning", "You must hit!", "You must hit! Your total is less than 16.");
             } else {
-                userVBox.getChildren().remove(hitAndStand);
-
-                // Computer 1's turn to play
-                blackJack.getComputerOne().play(blackJack.getDeck());
-                for (int i = 2; i < blackJack.getComputerOne().getHand().size(); i++) {
-                    computerOneHand.getChildren().add(createCardImage(blackJack.getComputerOne().getHand().get(i)));
-                }
-
-                // Computer 2's turn to play
-                blackJack.getComputerTwo().play(blackJack.getDeck());
-                for (int i = 2; i < blackJack.getComputerTwo().getHand().size(); i++) {
-                    computerTwoHand.getChildren().add(createCardImage(blackJack.getComputerTwo().getHand().get(i)));
-                }
-
-                // Dealer's turn to play
-                // If all players are busted, reveal the dealer's second card
-                if (blackJack.getHuman().getTotal() > 21 && blackJack.getComputerOne().getTotal() > 21 && blackJack.getComputerTwo().getTotal() > 21) {
-                    revealDealerCard();
-                } else {
-                    revealDealerCard();
-                    blackJack.getDealer().play(blackJack.getDeck());
-                    for (int i = 2; i < blackJack.getDealer().getHand().size(); i++) {
-                        dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(i)));
-                    }
-                }
-
-                // Determine the winner
-                blackJack.determineWinner(blackJack.getComputerOne());
-                computerOneTotal.setText("Balance: " + blackJack.getComputerOne().getMoney());
-
-                blackJack.determineWinner(blackJack.getComputerTwo());
-                computerTwoTotal.setText("Balance: " + blackJack.getComputerTwo().getMoney());
-
-                result.setText(blackJack.determineWinner(blackJack.getHuman()));
-                result.setEditable(false);
-                userTotal.setText("Balance: " + blackJack.getHuman().getMoney());
-                userVBox.getChildren().addAll(result, newGameMessage);
+                notUserPlay();
             }
         });
 
@@ -393,6 +357,47 @@ public class BlackJackUI extends Application {
     private void revealDealerCard() {
         dealerHand.getChildren().remove(1);  // Remove the back image
         dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(1)));  // Add the second card
+    }
+
+    // Helper method for computers and dealer to play and determine the winner
+    public void notUserPlay() {
+        userVBox.getChildren().remove(hitAndStand);
+        // Computer 1's turn to play
+        blackJack.getComputerOne().play(blackJack.getDeck());
+        for (int i = 2; i < blackJack.getComputerOne().getHand().size(); i++) {
+            computerOneHand.getChildren().add(createCardImage(blackJack.getComputerOne().getHand().get(i)));
+        }
+
+        // Computer 2's turn to play
+        blackJack.getComputerTwo().play(blackJack.getDeck());
+        for (int i = 2; i < blackJack.getComputerTwo().getHand().size(); i++) {
+            computerTwoHand.getChildren().add(createCardImage(blackJack.getComputerTwo().getHand().get(i)));
+        }
+
+        // Dealer's turn to play
+        // If all players are busted, reveal the dealer's second card
+        if (blackJack.getHuman().getTotal() > 21 && blackJack.getComputerOne().getTotal() > 21 && blackJack.getComputerTwo().getTotal() > 21) {
+            revealDealerCard();
+        } else {
+            revealDealerCard();
+            blackJack.getDealer().play(blackJack.getDeck());
+            for (int i = 2; i < blackJack.getDealer().getHand().size(); i++) {
+                dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(i)));
+            }
+        }
+
+        // Determine the winner
+        blackJack.determineWinner(blackJack.getComputerOne());
+        computerOneTotal.setText("Balance: " + blackJack.getComputerOne().getMoney());
+
+        blackJack.determineWinner(blackJack.getComputerTwo());
+        computerTwoTotal.setText("Balance: " + blackJack.getComputerTwo().getMoney());
+
+        result.setText(blackJack.determineWinner(blackJack.getHuman()));
+        result.setEditable(false);
+        newGameMessage.setEditable(false);
+        userTotal.setText("Balance: " + blackJack.getHuman().getMoney());
+        userVBox.getChildren().addAll(result, newGameMessage);
     }
 
     public static void main(String[] args) {
