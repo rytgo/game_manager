@@ -70,7 +70,7 @@ public class BlackJack {
         // Case 2: Player <= 21, Dealer > 21 (dealer busts)
         else if (dealerTotal > 21) {
             player.setMoney(player.getMoney() + playerBet); // Player wins bet
-            message = "You win!";
+            message = "You won!";
         }
         // Case 3: Player > 21, Dealer <= 21 (player busts)
         else if (playerTotal > 21) {
@@ -81,8 +81,8 @@ public class BlackJack {
         else {
             // Case 5: Player has Blackjack
             if (playerHasBlackjack && !dealerHasBlackjack) {
-                player.setMoney(player.getMoney() + (int) (playerBet * 1.5)); // Player wins 1.5x bet
-                message = "You have Blackjack! You win!";
+                player.setMoney(player.getMoney() + playerBet); // Player wins bet
+                message = "You have Blackjack! You won!";
             }
             // Case 6: Dealer has Blackjack, Player doesn't
             else if (dealerHasBlackjack && !playerHasBlackjack) {
@@ -97,7 +97,7 @@ public class BlackJack {
             // Case 8: Player has a higher total than the dealer
             else if (playerTotal > dealerTotal) {
                 player.setMoney(player.getMoney() + playerBet); // Player wins bet
-                message = "You win!";
+                message = "You won!";
             }
             // Case 9: Player has a lower total than the dealer
             else if (playerTotal < dealerTotal) {
