@@ -50,6 +50,7 @@ public class Main extends Application {
         // Set the action for the New Game button
         newGame.setOnAction(e -> {
             blackJackUI.start(primaryStage);
+            primaryStage.centerOnScreen();
         });
 
 

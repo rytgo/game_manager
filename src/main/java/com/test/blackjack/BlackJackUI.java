@@ -1,5 +1,7 @@
 package com.test.blackjack;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
@@ -10,6 +12,9 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import javafx.util.Duration;
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +37,10 @@ public class BlackJackUI {
     private final Label computerOneTotal = new Label();
     private final Label computerTwoTotal = new Label();
     private String userName;
+    private boolean roundPlaying = false;
+    private VBox computerOneVBox = new VBox(10);
+    private VBox computerTwoVBox = new VBox(10);
+    private VBox dealerVBox = new VBox(10);
 
     public BlackJackUI(String userName) {
         this.userName = userName;
@@ -44,16 +53,16 @@ public class BlackJackUI {
 
     public void start(Stage stage) {
         AnchorPane root = new AnchorPane();
-        Scene scene = new Scene(root, 1920, 1080);
+        Scene scene = new Scene(root, 1800, 1200);
 
         // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
-        Button newGame = new Button("New Round");
+        Button newRound = new Button("New Round");
         Button saveGame = new Button("Save Game");
         Button backToMainMenu = new Button("Main Menu");
 
         // Set button styles
         HBox buttons = new HBox();
-        buttons.getChildren().addAll(newGame, saveGame, backToMainMenu);
+        buttons.getChildren().addAll(newRound, saveGame, backToMainMenu);
 
         // Create VBox to hold the players' spots
         // userVBox
@@ -64,13 +73,11 @@ public class BlackJackUI {
         userVBox.getChildren().addAll(userLabel, userBet, userTotal);
 
         // dealerVBox
-        VBox dealerVBox = new VBox(10);
         Label dealerLabel = new Label("Dealer");
         dealerVBox.setAlignment(Pos.CENTER);
         dealerVBox.getChildren().add(dealerLabel);
 
         // computerOneVBox
-        VBox computerOneVBox = new VBox(10);
         Label computerOneLabel = new Label("Computer 1");
         Label computerOneBet = new Label("Bet: 0");
         computerOneTotal.setText("Balance: 1000");
@@ -78,7 +85,6 @@ public class BlackJackUI {
         computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
 
         // computerTwoVBox
-        VBox computerTwoVBox = new VBox(10);
         Label computerTwoLabel = new Label("Computer 2");
         Label computerTwoBet = new Label("Bet: 0");
         computerTwoTotal.setText("Balance: 1000");
@@ -157,7 +163,13 @@ public class BlackJackUI {
         root.getChildren().addAll(borderPane, chips, buttons);
 
         // Initialize a new game
-        newGame.setOnAction(e -> {
+        newRound.setOnAction(e -> {
+
+            if (roundPlaying) {
+                showAlert("Warning", "Round is not over!", "The round is not over. Finish the round before starting a new one.");
+                return;
+            }
+
             // Remove the previous game UI elements
             userHand.getChildren().clear();
             computerOneHand.getChildren().clear();
@@ -201,6 +213,8 @@ public class BlackJackUI {
 
         // Start Game button function
         startGame.setOnAction(e -> {
+
+            roundPlaying = true;
 
             // Hide start game, message field and chips
             startGame.setVisible(false);
@@ -278,6 +292,7 @@ public class BlackJackUI {
 
         // Hit button function
         hit.setOnAction(e -> {
+            roundPlaying = true;
             if (blackJack.getHuman().getTotal() == 21) {
                 showAlert("Warning", "You have 21 or Blackjack!", "You have 21 or Blackjack! Stand to finish your turn.");
             } else {
@@ -286,16 +301,19 @@ public class BlackJackUI {
                 // If the user busts, auto lose
                 if (blackJack.getHuman().getTotal() > 21) {
                     notUserPlay();
+                    showResult();
                 }
             }
         });
 
         // Stand button function
         stand.setOnAction(e -> {
+            roundPlaying = true;
             if (blackJack.getHuman().getTotal() < 16) {
                 showAlert("Warning", "You must hit!", "You must hit! Your total is less than 16.");
             } else {
                 notUserPlay();
+                showResult();
             }
         });
 
@@ -317,6 +335,9 @@ public class BlackJackUI {
     // Helper method to add chip click handlers
     private void addChipClickHandler(ImageView chip, int betAmount, TextField messageField, Label userBet, AnchorPane root) {
         chip.setOnMouseClicked(e -> {
+
+            roundPlaying = true;
+
             // Show start game button
             startGame.setVisible(true);
 
@@ -367,30 +388,92 @@ public class BlackJackUI {
     // Helper method for computers and dealer to play and determine the winner
     public void notUserPlay() {
         userVBox.getChildren().remove(hitAndStand);
-        // Computer 1's turn to play
-        blackJack.getComputerOne().play(blackJack.getDeck());
-        for (int i = 2; i < blackJack.getComputerOne().getHand().size(); i++) {
-            computerOneHand.getChildren().add(createCardImage(blackJack.getComputerOne().getHand().get(i)));
-        }
 
-        // Computer 2's turn to play
-        blackJack.getComputerTwo().play(blackJack.getDeck());
-        for (int i = 2; i < blackJack.getComputerTwo().getHand().size(); i++) {
-            computerTwoHand.getChildren().add(createCardImage(blackJack.getComputerTwo().getHand().get(i)));
-        }
+        // Computer 1's turn
+        Timeline computerOneTimeline = createPlayerTimeline(
+                blackJack.getComputerOne(),
+                computerOneHand,
+                computerOneVBox
+        );
+        computerOneTimeline.setOnFinished(e -> {
+            // After Computer 1 finishes, start Computer 2's turn
+            computerOneVBox.setId(null);
+            Timeline computerTwoTimeline = createPlayerTimeline(
+                    blackJack.getComputerTwo(),
+                    computerTwoHand,
+                    computerTwoVBox
+            );
+            computerTwoTimeline.setOnFinished(event -> {
+                // After Computer 2 finishes, start Dealer's turn
+                computerTwoVBox.setId(null);
+                dealerPlay();
+            });
+            computerTwoTimeline.play();
+        });
+        computerOneTimeline.play();
+    }
 
-        // Dealer's turn to play
-        // If all players are busted, reveal the dealer's second card
-        if (blackJack.getHuman().getTotal() > 21 && blackJack.getComputerOne().getTotal() > 21 && blackJack.getComputerTwo().getTotal() > 21) {
-            revealDealerCard();
+    // Create a timeline for a specific player's turn
+    private Timeline createPlayerTimeline(Player player, HBox hand, VBox playerBox) {
+        Timeline timeline = new Timeline();
+        int cardDelay = 2000; // Delay in milliseconds for each card
+
+        // Highlight the current player
+        playerBox.setId("styled-vbox");
+
+        // Add animations for the player
+        player.play(blackJack.getDeck());
+        // Check if the player has 2 cards (stand immediately)
+        if (player.getHand().size() == 2) {
+            timeline.setOnFinished(e -> {
+                Label messageArea = new Label(player.getName() + " stands!");
+                messageArea.setStyle("-fx-font-weight: bold; -fx-text-fill: green;"); // Optional: styling the message
+                playerBox.getChildren().add(messageArea);
+                // When player stands, no further actions are needed, move to next player
+                playerBox.setId(null);
+            });
         } else {
-            revealDealerCard();
-            blackJack.getDealer().play(blackJack.getDeck());
-            for (int i = 2; i < blackJack.getDealer().getHand().size(); i++) {
-                dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(i)));
+            // Otherwise, add animations for drawing the remaining cards
+            for (int i = 2; i < player.getHand().size(); i++) {
+                int index = i; // Use a separate variable for lambda
+                timeline.getKeyFrames().add(new KeyFrame(
+                        Duration.millis(cardDelay * (index - 1)), // Delay incrementally
+                        event -> hand.getChildren().add(createCardImage(player.getHand().get(index)))
+                ));
             }
         }
+        return timeline;
+    }
 
+    // Dealer's turn
+    private void dealerPlay() {
+        if (blackJack.getHuman().getTotal() > 21 &&
+                blackJack.getComputerOne().getTotal() > 21 &&
+                blackJack.getComputerTwo().getTotal() > 21) {
+            // All players are busted, no need to continue
+            showResult();
+        } else {
+            Timeline dealerTimeline = new Timeline();
+            dealerVBox.setId("styled-vbox");
+            blackJack.getDealer().play(blackJack.getDeck());
+            revealDealerCard();
+            int cardDelay = 2000; // Delay in milliseconds for each card
+            for (int i = 2; i < blackJack.getDealer().getHand().size(); i++) {
+                int index = i; // Use a separate variable for lambda
+                dealerTimeline.getKeyFrames().add(new KeyFrame(
+                        Duration.millis(cardDelay * (index - 1)), // Delay incrementally
+                        event -> dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(index)))
+                ));
+            }
+            dealerTimeline.setOnFinished(e -> {
+                dealerVBox.setId(null);
+                showResult();
+            });
+            dealerTimeline.play();
+        }
+    }
+
+    private void showResult() {
         // Determine the winner
         blackJack.determineWinner(blackJack.getComputerOne());
         computerOneTotal.setText("Balance: " + blackJack.getComputerOne().getMoney());
@@ -404,5 +487,6 @@ public class BlackJackUI {
         userTotal.setText("Balance: " + blackJack.getHuman().getMoney());
         userVBox.getChildren().addAll(result, newGameMessage);
 
+        roundPlaying = false;
     }
 }

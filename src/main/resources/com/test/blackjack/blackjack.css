@@ -49,3 +49,12 @@
     -fx-padding: 10px 10px;
 }
 
+#styled-vbox {
+    -fx-padding: 20;
+    -fx-border-color: white;
+    -fx-border-width: 3;
+    -fx-border-radius: 15;
+    -fx-background-color: transparent; /* Background color */
+    -fx-background-radius: 15; /* Match background corners with border */
+}
+
