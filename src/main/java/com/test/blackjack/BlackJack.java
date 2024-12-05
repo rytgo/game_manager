@@ -62,11 +62,6 @@ public class BlackJack {
         int playerBet = player.getBet();
         String message = "";
 
-        // Log key details
-        System.out.println("Player Total: " + playerTotal + " " + player.getName() + " Blackjack: " + playerHasBlackjack);
-        System.out.println("Dealer Total: " + dealerTotal + ", Dealer Blackjack: " + dealerHasBlackjack);
-        System.out.println(player.getName() + " Bet: " + playerBet);
-
         // Case 1: Player and Dealer both > 21 (both busted)
         if (dealerTotal > 21 && playerTotal > 21) {
             player.setMoney(player.getMoney() - playerBet); // Player loses bet
@@ -92,7 +87,7 @@ public class BlackJack {
             // Case 6: Dealer has Blackjack, Player doesn't
             else if (dealerHasBlackjack && !playerHasBlackjack) {
                 player.setMoney(player.getMoney() - playerBet); // Player loses bet
-                message = "Dealer has Blackjack! You lose!";
+                message = "Dealer has Blackjack! You lost!";
             }
             // Case 7: Both Player and Dealer have Blackjack (Push)
             else if (playerHasBlackjack) {
@@ -107,7 +102,7 @@ public class BlackJack {
             // Case 9: Player has a lower total than the dealer
             else if (playerTotal < dealerTotal) {
                 player.setMoney(player.getMoney() - playerBet); // Player loses bet
-                message = "You lose!";
+                message = "You lost!";
             }
             // Case 10: Player and Dealer have the same total (Push)
             else {
@@ -115,10 +110,29 @@ public class BlackJack {
                 message = "It's a push!";
             }
         }
-        System.out.println(player.getName() + " Money: " + player.getMoney());
         return message;
     }
 
+    // Reset the game
+    public void resetGame() {
+        deck = new Deck();
+        human.getHand().clear();
+        computerOne.getHand().clear();
+        computerTwo.getHand().clear();
+        human.setMoney(human.getMoney());
+        computerOne.setMoney(computerOne.getMoney());
+        computerTwo.setMoney(computerTwo.getMoney());
+        dealer.getHand().clear();
+
+        // Check and reset computers money
+        if (computerOne.getMoney() <= 0) {
+            computerOne.setMoney(1000); // Reset to initial money amount
+        }
+
+        if (computerTwo.getMoney() <= 0) {
+            computerTwo.setMoney(1000); // Reset to initial money amount
+        }
+    }
 
 
     public Deck getDeck() {
