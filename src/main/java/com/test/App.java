@@ -13,21 +13,26 @@ public class App extends Application {
         LoginManager loginManager = new LoginManager("user_accounts.txt", highScoresManager);
         ToolbarManager toolbarManager = new ToolbarManager();
 
-        // Create MainMenu with placeholders (user will be set on login)
-        MainMenu mainMenu = new MainMenu(highScoresManager, loginManager, null);
-
-        Scene scene = new Scene(loginManager.getLoginScreen(stage), 640, 480);
+        BorderPane rootLayout = new BorderPane();
+        Scene scene = new Scene(rootLayout, 640, 480);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        rootLayout.setCenter(loginManager.getLoginScreen(stage));
 
+        // Define the behavior for successful login
         loginManager.setOnLoginSuccess(username -> {
             MainMenu updatedMainMenu = new MainMenu(highScoresManager, loginManager, username);
 
-            // Create the layout for the main menu with the toolbar
-            BorderPane rootLayout = new BorderPane();
-            rootLayout.setTop(toolbarManager.createToolbar(stage, updatedMainMenu)); // Add toolbar at the top
-            rootLayout.setCenter(updatedMainMenu.launchMainMenu(stage)); // Add main menu in the center
+            // Add the toolbar (only once, after login)
+            rootLayout.setTop(toolbarManager.createToolbar(stage, rootLayout, updatedMainMenu));
+            rootLayout.setCenter(updatedMainMenu.launchMainMenu(stage));
 
-            scene.setRoot(rootLayout);
+            updatedMainMenu.setOnLogout(v -> {
+                // Clear the toolbar
+                rootLayout.setTop(null);
+        
+                // Reset to login screen
+                rootLayout.setCenter(loginManager.getLoginScreen(stage));
+            });
         });
 
         stage.setScene(scene);
