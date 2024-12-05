@@ -38,3 +38,14 @@
     -fx-background-color: transparent;
 }
 
+.title {
+    -fx-font-size: 15px;
+    -fx-text-fill: white;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
+    -fx-alignment: center;
+    -fx-background-color: #341539;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px 10px;
+}
+

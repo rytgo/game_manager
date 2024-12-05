@@ -1,6 +1,5 @@
 package com.test.blackjack;
 
-import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
@@ -15,13 +14,13 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
-public class BlackJackUI extends Application {
+public class BlackJackUI {
     private final BlackJack blackJack = new BlackJack();
     private final Button startGame = new Button("Start Game");
     private final Button hit = new Button("Hit");
     private final Button stand = new Button("Stand");
     private final TextField messageField = new TextField("Choose a chip to select your bet...");
-    private final TextField newGameMessage = new TextField("Press 'New Game' to start a new game...");
+    private final TextField newGameMessage = new TextField("Press 'New Round' to start a new game...");
     private final HBox userHand = new HBox(10);
     private final HBox computerOneHand = new HBox(10);
     private final HBox computerTwoHand = new HBox(10);
@@ -32,24 +31,33 @@ public class BlackJackUI extends Application {
     private final Label userTotal = new Label();
     private final Label computerOneTotal = new Label();
     private final Label computerTwoTotal = new Label();
+    private String userName;
+
+    public BlackJackUI(String userName) {
+        this.userName = userName;
+    }
+
+    // Getter for userName
+    public String getUserName() {
+        return userName;
+    }
 
     public void start(Stage stage) {
         AnchorPane root = new AnchorPane();
-        Scene scene = new Scene(root, 1800, 1200);
+        Scene scene = new Scene(root, 1920, 1080);
 
         // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
-        Button newGame = new Button("New Game");
+        Button newGame = new Button("New Round");
         Button saveGame = new Button("Save Game");
-        Button loadGame = new Button("Load Game");
         Button backToMainMenu = new Button("Main Menu");
 
         // Set button styles
         HBox buttons = new HBox();
-        buttons.getChildren().addAll(newGame, saveGame, loadGame, backToMainMenu);
+        buttons.getChildren().addAll(newGame, saveGame, backToMainMenu);
 
         // Create VBox to hold the players' spots
         // userVBox
-        Label userLabel = new Label("userName");
+        Label userLabel = new Label(getUserName());
         Label userBet = new Label("Bet: 0");
         userTotal.setText("Balance: 1000");
         userVBox.setAlignment(Pos.CENTER);
@@ -182,7 +190,7 @@ public class BlackJackUI extends Application {
             AnchorPane.setLeftAnchor(messageField, 60.0);
             AnchorPane.setRightAnchor(messageField, 60.0);
 
-            // Restart the game
+            // Reset the game
             blackJack.resetGame();
 
             addChipClickHandler(chip10, 10, messageField, userBet, root);
@@ -298,7 +306,7 @@ public class BlackJackUI extends Application {
     }
 
     // Helper method to set ImageView for images
-    private ImageView setImageView(String imageName) {
+    public ImageView setImageView(String imageName) {
         File file = new File("blackjack_images/" + imageName);
         ImageView imageView = new ImageView(new Image(file.toURI().toString()));
         imageView.setPreserveRatio(true);
@@ -395,9 +403,6 @@ public class BlackJackUI extends Application {
         newGameMessage.setEditable(false);
         userTotal.setText("Balance: " + blackJack.getHuman().getMoney());
         userVBox.getChildren().addAll(result, newGameMessage);
-    }
 
-    public static void main(String[] args) {
-        launch(args);
     }
 }
