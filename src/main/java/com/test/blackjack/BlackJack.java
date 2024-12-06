@@ -119,7 +119,6 @@ public class BlackJack {
         human.getHand().clear();
         computerOne.getHand().clear();
         computerTwo.getHand().clear();
-        human.setMoney(human.getMoney());
         computerOne.setMoney(computerOne.getMoney());
         computerTwo.setMoney(computerTwo.getMoney());
         dealer.getHand().clear();
