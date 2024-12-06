@@ -135,7 +135,7 @@ public class SnakeGame {
         Scene gameOverScene = new Scene(gameOverRoot, 300, 200);
         
         javafx.scene.control.Label gameOverLabel = new javafx.scene.control.Label("Game Over! Score: " + score);
-        gameOverLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: red;");
+        gameOverLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: black;");
         
         javafx.scene.control.Button playAgainButton = new javafx.scene.control.Button("Play Again");
         playAgainButton.setOnAction(e -> {
