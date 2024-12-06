@@ -57,10 +57,10 @@
     -fx-background-color: transparent;
 }
 
-#message-area {
-    -fx-font-weight: bold;
+#custom-label {
+    -fx-font-size: 23px;
     -fx-text-fill: white;
-    -fx-font-size: 30px;
     -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
 }
 

@@ -65,49 +65,49 @@ public class BlackJack {
         // Case 1: Player and Dealer both > 21 (both busted)
         if (dealerTotal > 21 && playerTotal > 21) {
             player.setMoney(player.getMoney() - playerBet); // Player loses bet
-            message = "You busted!";
+            message = player.getName() + " busted!";
         }
         // Case 2: Player <= 21, Dealer > 21 (dealer busts)
         else if (dealerTotal > 21) {
             player.setMoney(player.getMoney() + playerBet); // Player wins bet
-            message = "You won!";
+            message = player.getName() + " won!";
         }
         // Case 3: Player > 21, Dealer <= 21 (player busts)
         else if (playerTotal > 21) {
             player.setMoney(player.getMoney() - playerBet); // Player loses bet
-            message = "You busted!";
+            message = player.getName() + " busted!";
         }
         // Case 4: Dealer <= 21 && Player <= 21
         else {
             // Case 5: Player has Blackjack
             if (playerHasBlackjack && !dealerHasBlackjack) {
                 player.setMoney(player.getMoney() + playerBet); // Player wins bet
-                message = "You have Blackjack! You won!";
+                message = player.getName() + " have Blackjack! " + player.getName() + " won!";
             }
             // Case 6: Dealer has Blackjack, Player doesn't
             else if (dealerHasBlackjack && !playerHasBlackjack) {
                 player.setMoney(player.getMoney() - playerBet); // Player loses bet
-                message = "Dealer has Blackjack! You lost!";
+                message = "Dealer has Blackjack! " + player.getName() + " lost!";
             }
             // Case 7: Both Player and Dealer have Blackjack (Push)
             else if (playerHasBlackjack) {
                 player.setMoney(player.getMoney()); // No change in player's money, it's a tie (push)
-                message = "It's a push!";
+                message = player.getName() + " tied!";
             }
             // Case 8: Player has a higher total than the dealer
             else if (playerTotal > dealerTotal) {
                 player.setMoney(player.getMoney() + playerBet); // Player wins bet
-                message = "You won!";
+                message = player.getName() + " won!";
             }
             // Case 9: Player has a lower total than the dealer
             else if (playerTotal < dealerTotal) {
                 player.setMoney(player.getMoney() - playerBet); // Player loses bet
-                message = "You lost!";
+                message = player.getName() + " lost!";
             }
             // Case 10: Player and Dealer have the same total (Push)
             else {
                 player.setMoney(player.getMoney()); // No change in player's money, it's a tie (push)
-                message = "It's a push!";
+                message = player.getName() + " tied!";
             }
         }
         return message;

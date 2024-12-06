@@ -24,23 +24,25 @@ public class BlackJackUI {
     private final Button hit = new Button("Hit");
     private final Button stand = new Button("Stand");
     private final TextField messageField = new TextField("Choose a chip to select your bet...");
-    private final TextField newGameMessage = new TextField("Press 'New Round' to start a new game...");
+    private final Label newGameMessage = new Label("Press 'New Round' to start a new round...");
     private final HBox userHand = new HBox(10);
     private final HBox computerOneHand = new HBox(10);
     private final HBox computerTwoHand = new HBox(10);
     private final HBox dealerHand = new HBox(10);
     private final HBox hitAndStand = new HBox(10);
-    private final TextField result = new TextField();
+    private final Label result = new Label();
     private final VBox userVBox = new VBox(10);
     private final Label userTotal = new Label();
     private final Label computerOneTotal = new Label();
     private final Label computerTwoTotal = new Label();
-    private String userName;
+    private final String userName;
     private boolean roundPlaying = false;
-    private VBox computerOneVBox = new VBox(10);
-    private VBox computerTwoVBox = new VBox(10);
-    private VBox dealerVBox = new VBox(10);
+    private final VBox computerOneVBox = new VBox(10);
+    private final VBox computerTwoVBox = new VBox(10);
+    private final VBox dealerVBox = new VBox(10);
     private Label messageArea = new Label();
+    private Label resultOne = new Label();
+    private Label resultTwo = new Label();
 
     public BlackJackUI(String userName) {
         this.userName = userName;
@@ -67,8 +69,8 @@ public class BlackJackUI {
         // Create VBox to hold the players' spots
         // userVBox
         Label userLabel = new Label(getUserName());
-        Label userBet = new Label("Bet: 0");
-        userTotal.setText("Balance: 1000");
+        Label userBet = new Label("Bet: $0");
+        userTotal.setText("Balance: $1000");
         userVBox.setAlignment(Pos.CENTER);
         userVBox.getChildren().addAll(userLabel, userBet, userTotal);
 
@@ -79,15 +81,15 @@ public class BlackJackUI {
 
         // computerOneVBox
         Label computerOneLabel = new Label("Computer 1");
-        Label computerOneBet = new Label("Bet: 0");
-        computerOneTotal.setText("Balance: 1000");
+        Label computerOneBet = new Label("Bet: $0");
+        computerOneTotal.setText("Balance: $1000");
         computerOneVBox.setAlignment(Pos.CENTER);
         computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
 
         // computerTwoVBox
         Label computerTwoLabel = new Label("Computer 2");
-        Label computerTwoBet = new Label("Bet: 0");
-        computerTwoTotal.setText("Balance: 1000");
+        Label computerTwoBet = new Label("Bet: $0");
+        computerTwoTotal.setText("Balance: $1000");
         computerTwoVBox.setAlignment(Pos.CENTER);
         computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
 
@@ -96,8 +98,8 @@ public class BlackJackUI {
         ImageView backgroundImage = setImageView("background.png");
 
         // Set deck image size
-        backImage.setFitHeight(160);
-        backImage.setFitWidth(100);
+        backImage.setFitHeight(120);
+        backImage.setFitWidth(85);
 
         // Create a BorderPane to hold the players' spots
         BorderPane borderPane = new BorderPane();
@@ -138,10 +140,10 @@ public class BlackJackUI {
         chip100Box.setAlignment(Pos.CENTER);
 
         // Set chip image size
-        chip10.setFitHeight(70);
-        chip20.setFitHeight(70);
-        chip50.setFitHeight(70);
-        chip100.setFitHeight(70);
+        chip10.setFitHeight(60);
+        chip20.setFitHeight(60);
+        chip50.setFitHeight(60);
+        chip100.setFitHeight(60);
 
         // Create an HBox for chips
         HBox chips = new HBox(chip10Box, chip20Box, chip50Box, chip100Box);
@@ -176,9 +178,9 @@ public class BlackJackUI {
             dealerHand.getChildren().clear();
 
             // Reset bets and balances
-            userBet.setText("Bet: 0");
-            computerOneBet.setText("Bet: 0");
-            computerTwoBet.setText("Bet: 0");
+            userBet.setText("Bet: $0");
+            computerOneBet.setText("Bet: $0");
+            computerTwoBet.setText("Bet: $0");
 
             // Hide Hit and Stand buttons
             userVBox.getChildren().remove(hitAndStand);
@@ -186,6 +188,8 @@ public class BlackJackUI {
             // Remove the result and new game message
             userVBox.getChildren().remove(newGameMessage);
             userVBox.getChildren().remove(result);
+            computerOneVBox.getChildren().remove(resultOne);
+            computerTwoVBox.getChildren().remove(resultTwo);
 
             // Show the chips and message field and start game button
             chips.setVisible(true);
@@ -193,6 +197,7 @@ public class BlackJackUI {
 
             // Show a message about selecting a bet
             messageField.setEditable(false);
+            messageField.setId("custom-label");
             if (!root.getChildren().contains(messageField)) {
                 root.getChildren().add(messageField);
             }
@@ -222,11 +227,11 @@ public class BlackJackUI {
 
             // Random bet for computers
             int betOne = blackJack.getComputerOne().randomBet();
-            computerOneBet.setText("Bet: " + betOne);
+            computerOneBet.setText("Bet: $" + betOne);
             blackJack.getComputerOne().setBet(betOne);
 
             int betTwo = blackJack.getComputerTwo().randomBet();
-            computerTwoBet.setText("Bet: " + betTwo);
+            computerTwoBet.setText("Bet: $" + betTwo);
             blackJack.getComputerTwo().setBet(betTwo);
 
             // Deal 8 cards to 4 players
@@ -341,7 +346,7 @@ public class BlackJackUI {
             startGame.setVisible(true);
 
             blackJack.getHuman().setBet(betAmount); // Set the bet
-            userBet.setText("Bet: " + betAmount);
+            userBet.setText("Bet: $" + betAmount);
             messageField.setVisible(false);
 
             if (!root.getChildren().contains(startGame)) {
@@ -357,8 +362,8 @@ public class BlackJackUI {
     private ImageView createCardImage(Card card) {
         String cardImageFile = "blackjack_images/" + card.getRank() + "-" + card.getSuit() + ".png";  // Ensure the correct path for your images
         ImageView cardImageView = new ImageView(new Image(new File(cardImageFile).toURI().toString()));
-        cardImageView.setFitHeight(140);  // Set size of the card image
-        cardImageView.setFitWidth(100);
+        cardImageView.setFitHeight(120);  // Set size of the card image
+        cardImageView.setFitWidth(80);
         return cardImageView;
     }
 
@@ -419,7 +424,7 @@ public class BlackJackUI {
             } else if (player.calculateTotal() >= 16) {
                 messageArea = new Label(player.getName() + " stands!");
             }
-            messageArea.setId("message-area");
+            messageArea.setId("custom-label");
             timeline.getKeyFrames().add(new KeyFrame(
                     Duration.millis(cardDelay),
                     event -> playerBox.getChildren().add(messageArea)
@@ -437,7 +442,7 @@ public class BlackJackUI {
                         event -> {
                             hand.getChildren().add(createCardImage(player.getHand().get(index)));
                             messageArea = new Label(player.getName() + " hits!");
-                            messageArea.setId("message-area");
+                            messageArea.setId("custom-label");
                             playerBox.getChildren().add(messageArea);
                         }
                 ));
@@ -459,7 +464,7 @@ public class BlackJackUI {
                 event -> {
                     String message = player.calculateTotal() > 21 ? player.getName() + " busted!" : player.getName() + " stands!";
                     messageArea = new Label(message);
-                    messageArea.setId("message-area");
+                    messageArea.setId("custom-label");
                     playerVBox.getChildren().add(messageArea);
                 }
         ));
@@ -491,7 +496,7 @@ public class BlackJackUI {
             } else if (blackJack.getDealer().calculateTotal() >= 17) {
                 messageArea = new Label(blackJack.getDealer().getName() + " stands!");
             }
-            messageArea.setId("message-area");
+            messageArea.setId("custom-label");
             dealerTimeline.getKeyFrames().add(new KeyFrame(
                     Duration.millis(cardDelay),
                     event -> dealerVBox.getChildren().add(messageArea)
@@ -508,7 +513,7 @@ public class BlackJackUI {
                         event -> {
                             dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(index)));
                             messageArea = new Label(blackJack.getDealer().getName() + " hits!");
-                            messageArea.setId("message-area");
+                            messageArea.setId("custom-label");
                             dealerVBox.getChildren().add(messageArea);
                         }
                 ));
@@ -534,18 +539,22 @@ public class BlackJackUI {
                 blackJack.getComputerTwo().getTotal() > 21;
     }
 
-    // Show the final result after all players finish
+    // Helper method to show the result of the game
     private void showResult() {
-        blackJack.determineWinner(blackJack.getComputerOne());
-        computerOneTotal.setText("Balance: " + blackJack.getComputerOne().getMoney());
-        blackJack.determineWinner(blackJack.getComputerTwo());
-        computerTwoTotal.setText("Balance: " + blackJack.getComputerTwo().getMoney());
-        result.setText(blackJack.determineWinner(blackJack.getHuman()));
-        result.setEditable(false);
-        newGameMessage.setEditable(false);
-        userTotal.setText("Balance: " + blackJack.getHuman().getMoney());
-        userVBox.getChildren().addAll(result, newGameMessage);
+        customResult(blackJack.getComputerOne(), resultOne, computerOneTotal, computerOneVBox);
+        customResult(blackJack.getComputerTwo(), resultTwo, computerTwoTotal, computerTwoVBox);
+        customResult(blackJack.getHuman(), result, userTotal, userVBox);
+        newGameMessage.setId("custom-label");
+        userVBox.getChildren().add(newGameMessage);
         roundPlaying = false;
+    }
+
+    // Helper method to custom the result label of the game
+    private void customResult(Player player, Label resultLabel, Label totalLabel, VBox playerVBox) {
+        resultLabel.setText(blackJack.determineWinner(player));
+        resultLabel.setId("custom-label");
+        totalLabel.setText("Balance: $" + player.getMoney());
+        playerVBox.getChildren().add(resultLabel);
     }
 }
 
