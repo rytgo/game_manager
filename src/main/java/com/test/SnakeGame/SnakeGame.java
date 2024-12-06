@@ -37,7 +37,7 @@ public class SnakeGame {
         Scene scene = new Scene(root, 600, 400);
         
         // Set the background image
-        Image backgroundImage = new Image("file:/C:/Users/ACER/Documents/game_manager/src/main/resources/snakebackground.jpg");
+        Image backgroundImage = new Image("snakebackground.jpg");
         BackgroundImage bgImage = new BackgroundImage(
             backgroundImage,
             BackgroundRepeat.NO_REPEAT,
@@ -54,6 +54,7 @@ public class SnakeGame {
 
         // Initialize snake and food 
         snake = new Snake(300, 200);
+
         food = new Food(root, snake);
 
         // Handle keyboard input for snake direction
@@ -97,6 +98,7 @@ public class SnakeGame {
     private void checkCollisions() {
         // Check if snake eats food
         Rectangle head = snake.getHead();
+
         if (snake.getHead().getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
             snake.grow();   //increase the length
             food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
@@ -109,6 +111,7 @@ public class SnakeGame {
         }
 
         // Check if the snake collides with itself
+        // TODO: Check condition of function
         if (snake.checkCollisionWithSelf()) {
             gameOver = true;
         }
@@ -124,7 +127,7 @@ public class SnakeGame {
 
         // Draw the snake
         for (Rectangle segment : snake.getBody()) {
-            gc.setFill(Color.WHITE);
+            gc.setFill(Color.PURPLE);
             gc.fillOval(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight());
         }
     }
@@ -133,7 +136,7 @@ public class SnakeGame {
         Stage gameOverStage = new Stage();
         StackPane gameOverRoot = new StackPane();
         Scene gameOverScene = new Scene(gameOverRoot, 300, 200);
-        
+
         javafx.scene.control.Label gameOverLabel = new javafx.scene.control.Label("Game Over! Score: " + score);
         gameOverLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: black;");
         
