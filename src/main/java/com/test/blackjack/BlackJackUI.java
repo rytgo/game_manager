@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.util.Duration;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.List;
@@ -41,6 +40,7 @@ public class BlackJackUI {
     private VBox computerOneVBox = new VBox(10);
     private VBox computerTwoVBox = new VBox(10);
     private VBox dealerVBox = new VBox(10);
+    private Label messageArea = new Label();
 
     public BlackJackUI(String userName) {
         this.userName = userName;
@@ -53,7 +53,7 @@ public class BlackJackUI {
 
     public void start(Stage stage) {
         AnchorPane root = new AnchorPane();
-        Scene scene = new Scene(root, 1800, 1200);
+        Scene scene = new Scene(root, 1280, 920);
 
         // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
         Button newRound = new Button("New Round");
@@ -155,10 +155,9 @@ public class BlackJackUI {
         AnchorPane.setLeftAnchor(borderPane, 20.0);
         AnchorPane.setRightAnchor(borderPane, 20.0);
 
-        AnchorPane.setTopAnchor(chips, 30.0);
-        AnchorPane.setBottomAnchor(chips, 30.0);
-        AnchorPane.setLeftAnchor(chips, 30.0);
-        AnchorPane.setRightAnchor(chips, 30.0);
+        AnchorPane.setTopAnchor(chips, 10.0);
+        AnchorPane.setBottomAnchor(chips, 10.0);
+        AnchorPane.setRightAnchor(chips, -50.0);
 
         root.getChildren().addAll(borderPane, chips, buttons);
 
@@ -271,6 +270,7 @@ public class BlackJackUI {
             computerTwoHand.setAlignment(Pos.CENTER);
             dealerHand.setAlignment(Pos.CENTER);
 
+
             // Create Hit and Stand buttons
             if (!userVBox.getChildren().contains(hitAndStand)) {
                 if (hitAndStand.getChildren().isEmpty()) {
@@ -298,10 +298,10 @@ public class BlackJackUI {
             } else {
                 blackJack.getHuman().play(blackJack.getDeck());
                 userHand.getChildren().add(createCardImage(blackJack.getHuman().getHand().getLast()));
+
                 // If the user busts, auto lose
                 if (blackJack.getHuman().getTotal() > 21) {
                     notUserPlay();
-                    showResult();
                 }
             }
         });
@@ -313,7 +313,6 @@ public class BlackJackUI {
                 showAlert("Warning", "You must hit!", "You must hit! Your total is less than 16.");
             } else {
                 notUserPlay();
-                showResult();
             }
         });
 
@@ -389,104 +388,165 @@ public class BlackJackUI {
     public void notUserPlay() {
         userVBox.getChildren().remove(hitAndStand);
 
-        // Computer 1's turn
-        Timeline computerOneTimeline = createPlayerTimeline(
-                blackJack.getComputerOne(),
-                computerOneHand,
-                computerOneVBox
-        );
-        computerOneTimeline.setOnFinished(e -> {
-            // After Computer 1 finishes, start Computer 2's turn
-            computerOneVBox.setId(null);
-            Timeline computerTwoTimeline = createPlayerTimeline(
-                    blackJack.getComputerTwo(),
-                    computerTwoHand,
-                    computerTwoVBox
-            );
-            computerTwoTimeline.setOnFinished(event -> {
-                // After Computer 2 finishes, start Dealer's turn
-                computerTwoVBox.setId(null);
-                dealerPlay();
-            });
-            computerTwoTimeline.play();
+        // Start the computer and dealer turns in sequence
+        playComputerTurn(blackJack.getComputerOne(), computerOneHand, computerOneVBox, () ->
+                playComputerTurn(blackJack.getComputerTwo(), computerTwoHand, computerTwoVBox, this::dealerPlay));
+    }
+
+    // Helper method to handle computer turn and callback after completion
+    private void playComputerTurn(Player player, HBox hand, VBox playerBox, Runnable callback) {
+        Timeline playerTimeline = createPlayerTimeline(player, hand, playerBox);
+        playerTimeline.setOnFinished(e -> {
+            playerBox.setId(null);
+            playerBox.getChildren().remove(messageArea);
+            callback.run();  // Call the next player or dealer turn
         });
-        computerOneTimeline.play();
+        playerTimeline.play();
     }
 
     // Create a timeline for a specific player's turn
     private Timeline createPlayerTimeline(Player player, HBox hand, VBox playerBox) {
         Timeline timeline = new Timeline();
-        int cardDelay = 2000; // Delay in milliseconds for each card
+        int cardDelay = 2000;  // Delay for card animations
 
-        // Highlight the current player
         playerBox.setId("styled-vbox");
-
-        // Add animations for the player
         player.play(blackJack.getDeck());
-        // Check if the player has 2 cards (stand immediately)
+
         if (player.getHand().size() == 2) {
-            timeline.setOnFinished(e -> {
-                Label messageArea = new Label(player.getName() + " stands!");
-                messageArea.setStyle("-fx-font-weight: bold; -fx-text-fill: green;"); // Optional: styling the message
-                playerBox.getChildren().add(messageArea);
-                // When player stands, no further actions are needed, move to next player
-                playerBox.setId(null);
-            });
+            // Player stands immediately if they have Blackjack or >= 16
+            if (player.calculateTotal() == 21) {
+                messageArea = new Label(player.getName() + " has Blackjack!");
+            } else if (player.calculateTotal() >= 16) {
+                messageArea = new Label(player.getName() + " stands!");
+            }
+            messageArea.setId("message-area");
+            timeline.getKeyFrames().add(new KeyFrame(
+                    Duration.millis(cardDelay),
+                    event -> playerBox.getChildren().add(messageArea)
+            ));
+            timeline.getKeyFrames().add(new KeyFrame(
+                    Duration.millis(cardDelay * 2), // Delay to allow the message to be visible
+                    event -> playerBox.getChildren().remove(messageArea)
+            ));
         } else {
-            // Otherwise, add animations for drawing the remaining cards
+            // Handle "Hit" animations
             for (int i = 2; i < player.getHand().size(); i++) {
-                int index = i; // Use a separate variable for lambda
+                int index = i;
                 timeline.getKeyFrames().add(new KeyFrame(
-                        Duration.millis(cardDelay * (index - 1)), // Delay incrementally
-                        event -> hand.getChildren().add(createCardImage(player.getHand().get(index)))
+                        Duration.millis(cardDelay * (index - 1) + 300),
+                        event -> {
+                            hand.getChildren().add(createCardImage(player.getHand().get(index)));
+                            messageArea = new Label(player.getName() + " hits!");
+                            messageArea.setId("message-area");
+                            playerBox.getChildren().add(messageArea);
+                        }
+                ));
+
+                timeline.getKeyFrames().add(new KeyFrame(
+                        Duration.millis(cardDelay * index),
+                        event -> playerBox.getChildren().remove(messageArea)
                 ));
             }
+            showStandMessage(player, playerBox, timeline, cardDelay);
         }
         return timeline;
     }
 
-    // Dealer's turn
-    private void dealerPlay() {
-        if (blackJack.getHuman().getTotal() > 21 &&
-                blackJack.getComputerOne().getTotal() > 21 &&
-                blackJack.getComputerTwo().getTotal() > 21) {
-            // All players are busted, no need to continue
-            showResult();
-        } else {
-            Timeline dealerTimeline = new Timeline();
-            dealerVBox.setId("styled-vbox");
-            blackJack.getDealer().play(blackJack.getDeck());
-            revealDealerCard();
-            int cardDelay = 2000; // Delay in milliseconds for each card
-            for (int i = 2; i < blackJack.getDealer().getHand().size(); i++) {
-                int index = i; // Use a separate variable for lambda
-                dealerTimeline.getKeyFrames().add(new KeyFrame(
-                        Duration.millis(cardDelay * (index - 1)), // Delay incrementally
-                        event -> dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(index)))
-                ));
-            }
-            dealerTimeline.setOnFinished(e -> {
-                dealerVBox.setId(null);
-                showResult();
-            });
-            dealerTimeline.play();
-        }
+    // Show the "Stand" or "Busted" message after a player's turn
+    private void showStandMessage(Player player, VBox playerVBox, Timeline timeline, int cardDelay) {
+        timeline.getKeyFrames().add(new KeyFrame(
+                Duration.millis(cardDelay * (player.getHand().size() - 1) + 500),
+                event -> {
+                    String message = player.calculateTotal() > 21 ? player.getName() + " busted!" : player.getName() + " stands!";
+                    messageArea = new Label(message);
+                    messageArea.setId("message-area");
+                    playerVBox.getChildren().add(messageArea);
+                }
+        ));
+        timeline.getKeyFrames().add(new KeyFrame(
+                Duration.millis(cardDelay * (player.getHand().size() + 1)),
+                event -> playerVBox.getChildren().remove(messageArea)
+        ));
     }
 
+    // Dealer's turn logic
+    private void dealerPlay() {
+        if (allPlayersBusted()) {
+            revealDealerCard();
+            showResult();
+            return;
+        }
+
+        Timeline dealerTimeline = new Timeline();
+        dealerVBox.setId("styled-vbox");
+
+        blackJack.getDealer().play(blackJack.getDeck());
+        revealDealerCard();
+        int cardDelay = 2000;
+
+        if (blackJack.getDealer().getHand().size() == 2) {
+            // Dealer stands immediately if they only have 2 cards
+            if (blackJack.getDealer().calculateTotal() == 21) {
+                messageArea = new Label(blackJack.getDealer().getName() + " has Blackjack!");
+            } else if (blackJack.getDealer().calculateTotal() >= 17) {
+                messageArea = new Label(blackJack.getDealer().getName() + " stands!");
+            }
+            messageArea.setId("message-area");
+            dealerTimeline.getKeyFrames().add(new KeyFrame(
+                    Duration.millis(cardDelay),
+                    event -> dealerVBox.getChildren().add(messageArea)
+            ));
+            dealerTimeline.getKeyFrames().add(new KeyFrame(
+                    Duration.millis(cardDelay * 2), // Delay to allow the message to be visible
+                    event -> dealerVBox.getChildren().remove(messageArea)
+            ));
+        } else {
+            for (int i = 2; i < blackJack.getDealer().getHand().size(); i++) {
+                int index = i;
+                dealerTimeline.getKeyFrames().add(new KeyFrame(
+                        Duration.millis(cardDelay * (index - 1) + 300),
+                        event -> {
+                            dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(index)));
+                            messageArea = new Label(blackJack.getDealer().getName() + " hits!");
+                            messageArea.setId("message-area");
+                            dealerVBox.getChildren().add(messageArea);
+                        }
+                ));
+
+                dealerTimeline.getKeyFrames().add(new KeyFrame(
+                        Duration.millis(cardDelay * index),
+                        event -> dealerVBox.getChildren().remove(messageArea)
+                ));
+            }
+            showStandMessage(blackJack.getDealer(), dealerVBox, dealerTimeline, cardDelay);
+        }
+        dealerTimeline.setOnFinished(e -> {
+                showResult();
+                dealerVBox.setId(null);
+                });
+        dealerTimeline.play();
+    }
+
+    // Check if all players are busted
+    private boolean allPlayersBusted() {
+        return blackJack.getHuman().getTotal() > 21 &&
+                blackJack.getComputerOne().getTotal() > 21 &&
+                blackJack.getComputerTwo().getTotal() > 21;
+    }
+
+    // Show the final result after all players finish
     private void showResult() {
-        // Determine the winner
         blackJack.determineWinner(blackJack.getComputerOne());
         computerOneTotal.setText("Balance: " + blackJack.getComputerOne().getMoney());
-
         blackJack.determineWinner(blackJack.getComputerTwo());
         computerTwoTotal.setText("Balance: " + blackJack.getComputerTwo().getMoney());
-
         result.setText(blackJack.determineWinner(blackJack.getHuman()));
         result.setEditable(false);
         newGameMessage.setEditable(false);
         userTotal.setText("Balance: " + blackJack.getHuman().getMoney());
         userVBox.getChildren().addAll(result, newGameMessage);
-
         roundPlaying = false;
     }
 }
+
+

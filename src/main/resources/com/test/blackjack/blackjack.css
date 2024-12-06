@@ -50,11 +50,17 @@
 }
 
 #styled-vbox {
-    -fx-padding: 20;
+    -fx-padding: 10;
     -fx-border-color: white;
     -fx-border-width: 3;
-    -fx-border-radius: 15;
-    -fx-background-color: transparent; /* Background color */
-    -fx-background-radius: 15; /* Match background corners with border */
+    -fx-border-radius: 2;
+    -fx-background-color: transparent;
+}
+
+#message-area {
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-font-size: 30px;
+    -fx-font-family: "AppleMyungjo";
 }
 

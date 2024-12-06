@@ -57,7 +57,6 @@ public class Main extends Application {
         // Show the Blackjack main menu
         primaryStage.setScene(scene);
         primaryStage.setTitle("Blackjack Game");
-        primaryStage.setResizable(false);
         primaryStage.centerOnScreen();
         primaryStage.show();
     }
