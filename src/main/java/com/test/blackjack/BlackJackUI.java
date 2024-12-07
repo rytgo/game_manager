@@ -27,7 +27,6 @@ public class BlackJackUI {
     private final Button hit = new Button("Hit");
     private final Button stand = new Button("Stand");
     private final TextField messageField = new TextField("Choose a chip to select your bet");
-    private final Label newGameMessage = new Label("Press 'New Round' to start a new round");
     private final HBox userHand = new HBox(10);
     private final HBox computerOneHand = new HBox(10);
     private final HBox computerTwoHand = new HBox(10);
@@ -83,8 +82,7 @@ public class BlackJackUI {
         userBet.setText("Bet: $" + blackJack.getHuman().getBet());
         userTotal.setText("Balance: $1000");
         userVBox.setAlignment(Pos.CENTER);
-        newGameMessage.setId("custom-label");
-        userVBox.getChildren().addAll(userLabel, userBet, userTotal, newGameMessage);
+        userVBox.getChildren().addAll(userLabel, userBet, userTotal);
 
         // dealerVBox
         Label dealerLabel = new Label("Dealer");
@@ -208,8 +206,7 @@ public class BlackJackUI {
             // Hide Hit and Stand buttons
             userVBox.getChildren().remove(hitAndStand);
 
-            // Remove the result and new game message
-            userVBox.getChildren().remove(newGameMessage);
+            // Remove the result
             userVBox.getChildren().remove(result);
             computerOneVBox.getChildren().remove(resultOne);
             computerTwoVBox.getChildren().remove(resultTwo);
@@ -610,8 +607,6 @@ public class BlackJackUI {
         customResult(blackJack.getComputerOne(), resultOne, computerOneTotal, computerOneVBox);
         customResult(blackJack.getComputerTwo(), resultTwo, computerTwoTotal, computerTwoVBox);
         customResult(blackJack.getHuman(), result, userTotal, userVBox);
-        newGameMessage.setId("custom-label");
-        userVBox.getChildren().add(newGameMessage);
         roundPlaying = false;
 
         if (blackJack.getHuman().getMoney() <= 0) {
@@ -651,6 +646,10 @@ public class BlackJackUI {
                 userTotal.setText("Balance: $1000");
                 computerOneTotal.setText("Balance: $1000");
                 computerTwoTotal.setText("Balance: $1000");
+
+                userBet.setText("Bet: $0");
+                computerOneBet.setText("Bet: $0");
+                computerTwoBet.setText("Bet: $0");
 
                 // Remove the result
                 userVBox.getChildren().remove(result);

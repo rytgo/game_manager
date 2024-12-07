@@ -73,18 +73,19 @@ abstract class Player {
 
         // Calculate initial total and count aces
         total = 0;
-        for (Card card : hand) {
+        for (Card card : this.getHand()) {
             total += card.getValue();
             if (card.getRank().equals("a")) {
                 aceCount++;
             }
         }
 
-        // Adjust for aces if total > 21
+        // Adjust for aces if total > 21 and we need to treat them as 1
         while (total > 21 && aceCount > 0) {
             total -= 10; // Reduce ace value from 11 to 1
             aceCount--;
         }
         return total;
     }
+
 }

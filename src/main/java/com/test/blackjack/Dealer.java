@@ -13,18 +13,20 @@ public class Dealer extends Player {
     @Override
     public void play(Deck deck) {
         // Draw cards until total is 17 or higher
-        while (total <= 16) {
+        while (calculateTotal() <= 16) {
             Card card = deck.dealCard();
             hand.add(card);
             total = calculateTotal();
         }
 
         // Handle soft 17 rule: If total is 17 and hand contains an Ace, dealer must hit
-        if (total == 17 && hasAceInHand()) {
+        if (calculateTotal() == 17 && hasAceInHand() && hand.size() == 2) {
             // Soft 17 rule, dealer hits
-            Card card = deck.dealCard();
-            hand.add(card);
-            total = calculateTotal();
+            do {
+                Card cardOne = deck.dealCard();
+                hand.add(cardOne);
+                total = calculateTotal();
+            } while (calculateTotal() <= 16);
         }
     }
 
