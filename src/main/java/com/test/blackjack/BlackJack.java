@@ -13,7 +13,7 @@ public class BlackJack {
 
     public BlackJack() {
         deck = new Deck();
-        human = new Human("userName", new ArrayList<Card>(), 10);
+        human = new Human("userName", new ArrayList<Card>(), 1000);
         computerOne = new Computer("Computer 1", new ArrayList<Card>(), 1000);
         computerTwo = new Computer("Computer 2", new ArrayList<Card>(), 1000);
         dealer = new Dealer("Dealer", new ArrayList<Card>());
@@ -149,6 +149,6 @@ public class BlackJack {
         dealer.getHand().clear();
         computerOne.setMoney(1000);
         computerTwo.setMoney(1000);
-        human.setMoney(10);
+        human.setMoney(1000);
     }
 }
