@@ -14,7 +14,7 @@ public class BlackJack {
 
     public BlackJack() {
         deck = new Deck();
-        human = new Human("userName", new ArrayList<Card>(), 500, 0);
+        human = new Human("userName", new ArrayList<Card>(), 1000, 0);
         computerOne = new Computer("Computer 1", new ArrayList<Card>(), 1000, 0);
         computerTwo = new Computer("Computer 2", new ArrayList<Card>(), 1000, 0);
         dealer = new Dealer("Dealer", new ArrayList<Card>());

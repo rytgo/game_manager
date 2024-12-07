@@ -176,6 +176,26 @@ public class BlackJackUI {
         // Set the action for the Save Game button
         saveGame.setOnAction(e -> {
             String saveState = saveState();
+
+            // Create an Alert of type INFORMATION
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Save Game");
+            alert.setHeaderText("Copy the save state string below to save your game state");
+
+            // Create a TextArea for the save state and make it non-editable
+            TextArea saveStateArea = new TextArea(saveState);
+            saveStateArea.setEditable(false);
+            saveStateArea.setWrapText(true);
+
+            // Set a preferred size for the TextArea
+            saveStateArea.setPrefWidth(400);
+            saveStateArea.setPrefHeight(200);
+
+            // Add the TextArea to the alert's content
+            alert.getDialogPane().setContent(saveStateArea);
+
+            // Show the alert and wait for the user's interaction
+            alert.showAndWait();
         });
 
         // Initialize a new round
@@ -237,6 +257,9 @@ public class BlackJackUI {
 
         // Start Game button function
         startGame.setOnAction(e -> {
+
+            // Set current turn to the user
+            blackJack.setTurn(getUserName());
 
             // Highlight user is playing
             userVBox.setId("styled-vbox");
@@ -470,6 +493,7 @@ public class BlackJackUI {
             callback.run();  // Call the next player or dealer turn
         });
         playerTimeline.play();
+        blackJack.setTurn(player.getName());
     }
 
     // Create a timeline for a specific player's turn
@@ -539,6 +563,8 @@ public class BlackJackUI {
 
     // Dealer's turn logic
     private void dealerPlay() {
+        blackJack.setTurn(blackJack.getDealer().getName());
+
         if (allPlayersBusted()) {
             revealDealerCard();
             showResult();
@@ -604,6 +630,8 @@ public class BlackJackUI {
 
     // Helper method to show the result of the game
     private void showResult() {
+        blackJack.setTurn(null);
+
         customResult(blackJack.getComputerOne(), resultOne, computerOneTotal, computerOneVBox);
         customResult(blackJack.getComputerTwo(), resultTwo, computerTwoTotal, computerTwoVBox);
         customResult(blackJack.getHuman(), result, userTotal, userVBox);
@@ -683,7 +711,7 @@ public class BlackJackUI {
         saveState.append("Dealer-hand:").append(formatHand(blackJack.getDealer().getHand()));
 
         // Save whose turn it is
-        saveState.append("Turn:").append(getCurrentPlayer());
+        saveState.append("Turn:").append(blackJack.getTurn());
 
         return saveState.toString();
     }
@@ -693,27 +721,6 @@ public class BlackJackUI {
         return hand.stream()
                 .map(card -> card.getRank() + card.getSuit())
                 .collect(Collectors.joining(","));
-    }
-
-    // Helper method to get the current player's name
-    public String getCurrentPlayer() {
-        for (VBox playerVBox : List.of(userVBox, computerOneVBox, computerTwoVBox, dealerVBox)) {
-            if (playerVBox.getId().equals("styled-vbox")) {
-                return playerVBox.getChildren().get(0).toString();
-            }
-        }
-        return "";
-    }
-
-    // Helper method to set the current player
-    public void setCurrentPlayer(String currentPlayer) {
-        for (VBox playerVBox : List.of(userVBox, computerOneVBox, computerTwoVBox, dealerVBox)) {
-            if (playerVBox.getChildren().getFirst().toString().equals(currentPlayer)) {
-                playerVBox.setId("styled-vbox");
-            } else {
-                playerVBox.setId(null);
-            }
-        }
     }
 
     // Update the UI based on the loaded state
@@ -731,7 +738,7 @@ public class BlackJackUI {
                 loadDealerState(data, blackJack.getDealer());
             } else if (data.startsWith("Turn:")) {
                 String turn = data.split(":")[1];
-                setCurrentPlayer(turn);
+                blackJack.setTurn(turn);
             }
         }
 
@@ -791,7 +798,7 @@ public class BlackJackUI {
 
         // Update turn indicator
         for (VBox playerVBox : List.of(userVBox, computerOneVBox, computerTwoVBox, dealerVBox)) {
-            if (playerVBox.getChildren().getFirst().toString().equals(getCurrentPlayer())) {
+            if (playerVBox.getChildren().getFirst().toString().equals(blackJack.getTurn())) {
                 playerVBox.setId("styled-vbox");
             } else {
                 playerVBox.setId(null);
