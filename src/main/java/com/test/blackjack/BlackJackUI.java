@@ -225,6 +225,9 @@ public class BlackJackUI {
         // Start Game button function
         startGame.setOnAction(e -> {
 
+            // Highlight user is playing
+            userVBox.setId("styled-vbox");
+
             roundPlaying = true;
 
             // Hide start game, message field and chips
@@ -397,6 +400,9 @@ public class BlackJackUI {
     public void notUserPlay() {
         userVBox.getChildren().remove(hitAndStand);
 
+        // Un-highlight user is playing
+        userVBox.setId(null);
+
         // Start the computer and dealer turns in sequence
         playComputerTurn(blackJack.getComputerOne(), computerOneHand, computerOneVBox, () ->
                 playComputerTurn(blackJack.getComputerTwo(), computerTwoHand, computerTwoVBox, this::dealerPlay));
@@ -466,7 +472,7 @@ public class BlackJackUI {
         timeline.getKeyFrames().add(new KeyFrame(
                 Duration.millis(cardDelay * (player.getHand().size() - 1) + 500),
                 event -> {
-                    String message = player.calculateTotal() > 21 ? player.getName() + " busted!" : player.getName() + " stands!";
+                    String message = player.calculateTotal() > 21 ? player.getName() + " is busted!" : player.getName() + " stands!";
                     messageArea = new Label(message);
                     messageArea.setId("custom-label");
                     playerVBox.getChildren().add(messageArea);
