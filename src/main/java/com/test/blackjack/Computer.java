@@ -3,8 +3,8 @@ package com.test.blackjack;
 import java.util.List;
 
 public class Computer extends Player {
-    public Computer(String name, List<Card> hand, int money) {
-        super(name, money);
+    public Computer(String name, List<Card> hand, int money, int bet) {
+        super(name, money, bet);
         this.hand = hand;
     }
 

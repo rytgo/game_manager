@@ -13,9 +13,9 @@ public class BlackJack {
 
     public BlackJack() {
         deck = new Deck();
-        human = new Human("userName", new ArrayList<Card>(), 1000);
-        computerOne = new Computer("Computer 1", new ArrayList<Card>(), 1000);
-        computerTwo = new Computer("Computer 2", new ArrayList<Card>(), 1000);
+        human = new Human("userName", new ArrayList<Card>(), 1000, 0);
+        computerOne = new Computer("Computer 1", new ArrayList<Card>(), 1000, 0);
+        computerTwo = new Computer("Computer 2", new ArrayList<Card>(), 1000, 0);
         dealer = new Dealer("Dealer", new ArrayList<Card>());
         players.addAll(List.of(human, computerOne, computerTwo, dealer));
     }

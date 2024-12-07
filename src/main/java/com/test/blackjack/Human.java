@@ -5,8 +5,8 @@ import java.util.List;
 public class Human extends Player {
     private String userChoice;
 
-    public Human(String name, List<Card> hand, int money) {
-        super(name, money);
+    public Human(String name, List<Card> hand, int money, int bet) {
+        super(name, money, bet);
         this.hand = hand;
     }
 
