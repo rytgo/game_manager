@@ -9,12 +9,18 @@ abstract class Player {
     protected int bet;
     protected int total;
 
-    protected Player(String name, int money) {
+    protected Player(String name, int money, int bet) {
         this.name = name;
         this.money = money;
+        this.bet = bet;
     }
 
     public Player(String name) {
+        this.name = name;
+    }
+
+    // Setter for name
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -41,6 +47,11 @@ abstract class Player {
     // Getter for hand
     protected List<Card> getHand() {
         return hand;
+    }
+
+    // Setter for hand
+    protected void setHand(List<Card> hand) {
+        this.hand = hand;
     }
 
     // Getter for initial total
