@@ -53,7 +53,6 @@ public class Main extends Application {
             primaryStage.centerOnScreen();
         });
 
-
         // Show the Blackjack main menu
         primaryStage.setScene(scene);
         primaryStage.setTitle("Blackjack Game");

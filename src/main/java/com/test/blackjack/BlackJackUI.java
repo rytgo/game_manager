@@ -2,21 +2,21 @@ package com.test.blackjack;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.scene.control.Label;
-import javafx.scene.control.Button;
 import javafx.util.Duration;
 
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class BlackJackUI {
     private final BlackJack blackJack = new BlackJack();
@@ -41,8 +41,8 @@ public class BlackJackUI {
     private final VBox computerTwoVBox = new VBox(10);
     private final VBox dealerVBox = new VBox(10);
     private Label messageArea = new Label();
-    private Label resultOne = new Label();
-    private Label resultTwo = new Label();
+    private final Label resultOne = new Label();
+    private final Label resultTwo = new Label();
 
     public BlackJackUI(String userName) {
         this.userName = userName;
@@ -72,7 +72,8 @@ public class BlackJackUI {
         Label userBet = new Label("Bet: $0");
         userTotal.setText("Balance: $1000");
         userVBox.setAlignment(Pos.CENTER);
-        userVBox.getChildren().addAll(userLabel, userBet, userTotal);
+        newGameMessage.setId("custom-label");
+        userVBox.getChildren().addAll(newGameMessage, userLabel, userBet, userTotal);
 
         // dealerVBox
         Label dealerLabel = new Label("Dealer");
@@ -163,11 +164,16 @@ public class BlackJackUI {
 
         root.getChildren().addAll(borderPane, chips, buttons);
 
-        // Initialize a new game
+        // Initialize a new round
         newRound.setOnAction(e -> {
 
+            if (blackJack.getHuman().getMoney() <= 0) {
+                showResetWindow();
+                return;
+            }
+
             if (roundPlaying) {
-                showAlert("Warning", "Round is not over!", "The round is not over. Finish the round before starting a new one.");
+                showAlert("Round is not over", "The round is not over. Finish the round before starting a new one.");
                 return;
             }
 
@@ -176,6 +182,7 @@ public class BlackJackUI {
             computerOneHand.getChildren().clear();
             computerTwoHand.getChildren().clear();
             dealerHand.getChildren().clear();
+            startGame.setVisible(false);
 
             // Reset bets and balances
             userBet.setText("Bet: $0");
@@ -206,8 +213,8 @@ public class BlackJackUI {
             AnchorPane.setLeftAnchor(messageField, 60.0);
             AnchorPane.setRightAnchor(messageField, 60.0);
 
-            // Reset the game
-            blackJack.resetGame();
+            // Reset the round
+            blackJack.resetRound();
 
             addChipClickHandler(chip10, 10, messageField, userBet, root);
             addChipClickHandler(chip20, 20, messageField, userBet, root);
@@ -264,7 +271,6 @@ public class BlackJackUI {
 
                 // Add each card in the player's hand to their UI HBox
                 for (Card card : player.getHand()) {
-                    System.out.println(card.getRank() + card.getSuit());   // Debugging
                     handUI.getChildren().add(createCardImage(card));
                 }
             }
@@ -299,7 +305,7 @@ public class BlackJackUI {
         hit.setOnAction(e -> {
             roundPlaying = true;
             if (blackJack.getHuman().getTotal() == 21) {
-                showAlert("Warning", "You have 21 or Blackjack!", "You have 21 or Blackjack! Stand to finish your turn.");
+                showAlert("You have 21 or Blackjack", "You have 21 or Blackjack! Stand to finish your turn.");
             } else {
                 blackJack.getHuman().play(blackJack.getDeck());
                 userHand.getChildren().add(createCardImage(blackJack.getHuman().getHand().getLast()));
@@ -315,7 +321,7 @@ public class BlackJackUI {
         stand.setOnAction(e -> {
             roundPlaying = true;
             if (blackJack.getHuman().getTotal() < 16) {
-                showAlert("Warning", "You must hit!", "You must hit! Your total is less than 16.");
+                showAlert("You must hit", "You must hit! Your total is less than 16.");
             } else {
                 notUserPlay();
             }
@@ -340,7 +346,11 @@ public class BlackJackUI {
     private void addChipClickHandler(ImageView chip, int betAmount, TextField messageField, Label userBet, AnchorPane root) {
         chip.setOnMouseClicked(e -> {
 
-            roundPlaying = true;
+            // Check if the user has enough money to bet
+            if (!blackJack.getHuman().isValidBet(betAmount)) {
+                showAlert("Invalid Bet", "You do not have enough money to bet $" + betAmount + ".");
+                return;
+            }
 
             // Show start game button
             startGame.setVisible(true);
@@ -368,17 +378,11 @@ public class BlackJackUI {
     }
 
     // Helper method for showing alert messages
-    private void showAlert(String title, String header, String content) {
+    private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
-        alert.setHeaderText(header);
+        alert.setHeaderText(null);
         alert.setContentText(content);
-
-        // Get the Stage of the Alert and set fixed size
-        Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-        alertStage.setWidth(400); // Set desired width
-        alertStage.setHeight(300); // Set desired height
-        alertStage.setResizable(false); // Disable resizing
 
         alert.showAndWait();
     }
@@ -547,6 +551,10 @@ public class BlackJackUI {
         newGameMessage.setId("custom-label");
         userVBox.getChildren().add(newGameMessage);
         roundPlaying = false;
+
+        if (blackJack.getHuman().getMoney() <= 0) {
+            showResetWindow();
+        }
     }
 
     // Helper method to custom the result label of the game
@@ -555,6 +563,39 @@ public class BlackJackUI {
         resultLabel.setId("custom-label");
         totalLabel.setText("Balance: $" + player.getMoney());
         playerVBox.getChildren().add(resultLabel);
+    }
+
+    // Reset the game if user balance is insufficient
+    public void showResetWindow() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Game Over");
+            alert.setHeaderText("You balance is insufficient to continue playing.");
+            alert.setContentText("Would you like to start a new game?");
+
+            ButtonType yes = new ButtonType("Yes");
+            ButtonType no = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(yes, no);
+
+            Optional<ButtonType> answer = alert.showAndWait();
+            if (answer.isPresent() && answer.get() == yes) {
+                blackJack.resetGame();
+                userHand.getChildren().clear();
+                computerOneHand.getChildren().clear();
+                computerTwoHand.getChildren().clear();
+                dealerHand.getChildren().clear();
+
+                userTotal.setText("Balance: $1000");
+                computerOneTotal.setText("Balance: $1000");
+                computerTwoTotal.setText("Balance: $1000");
+
+                // Remove the result
+                userVBox.getChildren().remove(result);
+                computerOneVBox.getChildren().remove(resultOne);
+                computerTwoVBox.getChildren().remove(resultTwo);
+            }
+        });
     }
 }
 
