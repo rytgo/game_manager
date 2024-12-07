@@ -18,4 +18,9 @@ public class Human extends Player {
         total = calculateTotal();
     }
 
+    // Check for valid bet amount
+    public boolean isValidBet(int amount) {
+        return amount > 0 && amount <= money;
+    }
+
 }

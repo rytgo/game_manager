@@ -13,7 +13,7 @@ public class BlackJack {
 
     public BlackJack() {
         deck = new Deck();
-        human = new Human("userName", new ArrayList<Card>(), 1000);
+        human = new Human("userName", new ArrayList<Card>(), 10);
         computerOne = new Computer("Computer 1", new ArrayList<Card>(), 1000);
         computerTwo = new Computer("Computer 2", new ArrayList<Card>(), 1000);
         dealer = new Dealer("Dealer", new ArrayList<Card>());
@@ -65,7 +65,7 @@ public class BlackJack {
         // Case 1: Player and Dealer both > 21 (both busted)
         if (dealerTotal > 21 && playerTotal > 21) {
             player.setMoney(player.getMoney() - playerBet); // Player loses bet
-            message = player.getName() + " busted!";
+            message = player.getName() + " lost!";
         }
         // Case 2: Player <= 21, Dealer > 21 (dealer busts)
         else if (dealerTotal > 21) {
@@ -75,19 +75,19 @@ public class BlackJack {
         // Case 3: Player > 21, Dealer <= 21 (player busts)
         else if (playerTotal > 21) {
             player.setMoney(player.getMoney() - playerBet); // Player loses bet
-            message = player.getName() + " busted!";
+            message = player.getName() + " lost!";
         }
         // Case 4: Dealer <= 21 && Player <= 21
         else {
             // Case 5: Player has Blackjack
             if (playerHasBlackjack && !dealerHasBlackjack) {
                 player.setMoney(player.getMoney() + playerBet); // Player wins bet
-                message = player.getName() + " have Blackjack! " + player.getName() + " won!";
+                message = player.getName() + " won!";
             }
             // Case 6: Dealer has Blackjack, Player doesn't
             else if (dealerHasBlackjack && !playerHasBlackjack) {
                 player.setMoney(player.getMoney() - playerBet); // Player loses bet
-                message = "Dealer has Blackjack! " + player.getName() + " lost!";
+                message = player.getName() + " lost!";
             }
             // Case 7: Both Player and Dealer have Blackjack (Push)
             else if (playerHasBlackjack) {
@@ -113,8 +113,8 @@ public class BlackJack {
         return message;
     }
 
-    // Reset the game
-    public void resetGame() {
+    // Reset the round
+    public void resetRound() {
         deck = new Deck();
         human.getHand().clear();
         computerOne.getHand().clear();
@@ -133,12 +133,22 @@ public class BlackJack {
         }
     }
 
-
     public Deck getDeck() {
         return this.deck;
     }
 
     public List<Player> getPlayers() {
         return players;
+    }
+
+    public void resetGame() {
+        deck = new Deck();
+        human.getHand().clear();
+        computerOne.getHand().clear();
+        computerTwo.getHand().clear();
+        dealer.getHand().clear();
+        computerOne.setMoney(1000);
+        computerTwo.setMoney(1000);
+        human.setMoney(10);
     }
 }
