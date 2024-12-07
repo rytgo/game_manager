@@ -486,9 +486,9 @@ public class BlackJackUI {
         if (player.getHand().size() == 2) {
             // Player stands immediately if they have Blackjack or >= 16
             if (player.calculateTotal() == 21) {
-                messageArea = new Label(getUserName() + " has Blackjack!");
+                messageArea = new Label(player.getName() + " has Blackjack!");
             } else if (player.calculateTotal() >= 16) {
-                messageArea = new Label(getUserName() + " stands!");
+                messageArea = new Label(player.getName() + " stands!");
             }
             messageArea.setId("custom-label");
             timeline.getKeyFrames().add(new KeyFrame(
@@ -507,7 +507,7 @@ public class BlackJackUI {
                         Duration.millis(cardDelay * (index - 1) + 300),
                         event -> {
                             hand.getChildren().add(createCardImage(player.getHand().get(index)));
-                            messageArea = new Label(getUserName() + " hits!");
+                            messageArea = new Label(player.getName() + " hits!");
                             messageArea.setId("custom-label");
                             playerBox.getChildren().add(messageArea);
                         }
@@ -528,7 +528,7 @@ public class BlackJackUI {
         timeline.getKeyFrames().add(new KeyFrame(
                 Duration.millis(cardDelay * (player.getHand().size() - 1) + 500),
                 event -> {
-                    String message = player.calculateTotal() > 21 ? getUserName() + " is busted!" : getUserName() + " stands!";
+                    String message = player.calculateTotal() > 21 ? player.getName() + " is busted!" : player.getName() + " stands!";
                     messageArea = new Label(message);
                     messageArea.setId("custom-label");
                     playerVBox.getChildren().add(messageArea);
