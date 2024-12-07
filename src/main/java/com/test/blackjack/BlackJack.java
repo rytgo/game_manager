@@ -10,10 +10,11 @@ public class BlackJack {
     private Computer computerTwo;
     private Dealer dealer;
     private List<Player> players = new ArrayList<>();
+    private String turn;
 
     public BlackJack() {
         deck = new Deck();
-        human = new Human("userName", new ArrayList<Card>(), 1000, 0);
+        human = new Human("userName", new ArrayList<Card>(), 500, 0);
         computerOne = new Computer("Computer 1", new ArrayList<Card>(), 1000, 0);
         computerTwo = new Computer("Computer 2", new ArrayList<Card>(), 1000, 0);
         dealer = new Dealer("Dealer", new ArrayList<Card>());
@@ -35,6 +36,16 @@ public class BlackJack {
 
     public Dealer getDealer() {
         return dealer;
+    }
+
+    // Get the current turn
+    public String getTurn() {
+        return turn;
+    }
+
+    // Set the current turn
+    public void setTurn(String turn) {
+        this.turn = turn;
     }
 
     public void dealCard() {
