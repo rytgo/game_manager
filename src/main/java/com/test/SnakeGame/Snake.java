@@ -1,5 +1,6 @@
 package com.test.SnakeGame;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -29,8 +30,9 @@ public class Snake {
         newHead.setY(body.get(0).getY() + directionY * TILE_SIZE);
 
         body.add(0, newHead);  // Add the new head to the front of the snake
-
-        body.remove(body.size() - 1);   //remove the last segment of the snake ot keep its length
+        if (body.size() > 1){
+            body.remove(body.size() - 1);   //remove the last segment of the snake ot keep its length
+        }
     }
 
     public void grow() {
@@ -73,12 +75,27 @@ public class Snake {
 
     // TODO: Fix bug with food here
     public boolean checkCollisionWithSelf() {
+        Rectangle head = getHead();
         // Check if the snake's head collides with any part of its body
         for (int i = 1; i < body.size(); i++) {
-            if (getHead().getBoundsInParent().intersects(body.get(i).getBoundsInParent())) {
+            Rectangle segment = body.get(i);
+            if (head.getX() == segment.getX() && head.getY() == segment.getY()) {
                 return true;
             }
         }
         return false;
+    }
+
+    // Draw snake on canvas
+    public void render(GraphicsContext gc) {
+        for (int i = 0; i < body.size(); i++) {
+            Rectangle segment = body.get(i);
+            if (i == 0) {  // Head is rendered in lime green
+                gc.setFill(Color.LIME);
+            } else {
+                gc.setFill(Color.WHITE);  // Body is white
+            }
+            gc.fillRect(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight());
+        }
     }
 }

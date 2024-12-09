@@ -36,21 +36,12 @@ public class SnakeGame {
         StackPane root = new StackPane();
         Scene scene = new Scene(root, 600, 400);
         
-        // Set the background image
-        Image backgroundImage = new Image("snakebackground.jpg");
-        BackgroundImage bgImage = new BackgroundImage(
-            backgroundImage,
-            BackgroundRepeat.NO_REPEAT,
-            BackgroundRepeat.NO_REPEAT,
-            BackgroundPosition.CENTER,
-            new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false)
-        );
-        root.setBackground(new Background(bgImage));
-
         // Initialize canvas
         canvas = new Canvas(600, 400);  // Set the size of the canvas
         gc = canvas.getGraphicsContext2D();     // Get the drawing context
         root.getChildren().add(canvas);     // Add the canvas to the root
+
+        drawGrid();
 
         // Initialize snake and food 
         snake = new Snake(300, 200);
@@ -125,11 +116,11 @@ public class SnakeGame {
     private void render(GraphicsContext gc) {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Clear previous frame
 
-        // Draw the snake
-        for (Rectangle segment : snake.getBody()) {
-            gc.setFill(Color.PURPLE);
-            gc.fillOval(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight());
-        }
+        // Draw the grid backgrond
+        drawGrid();
+        snake.render(gc);  // Render the snake
+        food.render(gc);  // Render the food
+        
     }
 
     private void renderGameOverMessage(Stage primaryStage){
@@ -158,5 +149,19 @@ public class SnakeGame {
         gameOverStage.setScene(gameOverScene);
         gameOverStage.setTitle("Game Over");
         gameOverStage.show();
+    }
+
+    // Draw the grid background
+    private void drawGrid() {
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(0.5);
+
+        for (int x = 0; x < canvas.getWidth(); x += 20) {
+            gc.strokeLine(x, 0, x, canvas.getHeight());
+        }
+
+        for (int y = 0; y < canvas.getHeight(); y += 20) {
+            gc.strokeLine(0, y, canvas.getWidth(), y);
+        }
     }
 }
