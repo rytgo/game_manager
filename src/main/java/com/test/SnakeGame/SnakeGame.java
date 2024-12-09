@@ -91,19 +91,20 @@ public class SnakeGame {
 
             // Increase speed after every 5 pts
             if (score % 5 == 0 && speed > 50_000_000) {   // Minimum speed limit
-                speed -= 200_000_000;   // increase speed by reducing the delay
+                speed -= 50_000_000;   // increase speed by reducing the delay
             }
         }
 
         // Check if the snake collides with itself
-        // TODO: Check condition of function
         if (snake.checkCollisionWithSelf()) {
             gameOver = true;
+            return;
         }
 
         // Check for boundary collisions
         if (head.getX() < 0 || head.getY() < 0 || head.getX() >= 600 || head.getY() >= 400) {
             gameOver = true;
+            return;
         }
     }
 

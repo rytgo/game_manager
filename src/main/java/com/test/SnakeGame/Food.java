@@ -10,6 +10,7 @@ public class Food {
     private static final int TILE_SIZE = 20;
     private Block foodBlock;
     private Snake snake;
+    private int attempts = 0;
 
     public Food(StackPane root, Snake snake) {
         this.snake = snake;
@@ -39,6 +40,8 @@ public class Food {
             // If position is valid, create the food block
             if (validPosition) {
                 foodBlock = new Block(x, y);  // Food as a block instead of a rectangle
+            } else if (++attempts > 100) { // Arbitrary max attempts
+                break;
             }
         } 
     }
