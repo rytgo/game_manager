@@ -56,7 +56,7 @@ public class Food {
 
     // Draw the food
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.GREEN);
+        gc.setFill(Color.RED);
         gc.fillRect(foodBlock.getX(), foodBlock.getY(), TILE_SIZE, TILE_SIZE);
     }
 }

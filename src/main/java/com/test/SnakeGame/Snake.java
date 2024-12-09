@@ -2,6 +2,7 @@ package com.test.SnakeGame;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.effect.Glow;
 
 public class Snake {
     private Block head;  // Head of the snake (first block)
@@ -88,9 +89,11 @@ public class Snake {
         Block current = head;
         while (current != null) {
             if (current == head) {  // Head is rendered in lime green
-                gc.setFill(Color.LIME);
+                gc.setFill(Color.WHITE);
+                gc.setEffect(new Glow(1.0));
             } else {
                 gc.setFill(Color.WHITE);  // Body is white
+                gc.setEffect(null);
             }
             current.render(gc);
             current = current.getNext();  // Move to the next block
