@@ -1,21 +1,15 @@
 package com.test.SnakeGame;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 public class Food {
     private static final int TILE_SIZE = 20;
-    private ImageView foodImageView;
-    private Rectangle food;
+    private Block foodBlock;
     private Snake snake;
-    private Image foodImage;
 
     public Food(StackPane root, Snake snake) {
         this.snake = snake;
@@ -30,20 +24,27 @@ public class Food {
             int x = random.nextInt((600 / TILE_SIZE)) * TILE_SIZE;
             int y = random.nextInt((400 / TILE_SIZE)) * TILE_SIZE;
 
-            // Check if the position overlaps with the snake
-            validPosition = snake.getBody().stream()
-                .noneMatch(segment -> segment.getX() == x && segment.getY() == y);
-            
-                if (validPosition) {
-                    food = new Rectangle(TILE_SIZE, TILE_SIZE, Color.GREEN);
-                    food.setX(x);
-                    food.setY(y);
+            // Check if the position overlaps with the snake's body (now using Block objects)
+            validPosition = true;
+            Block current = snake.getHead();  // Start checking from the head
+
+            while (current != null) {
+                if (current.getX() == x && current.getY() == y) {
+                    validPosition = false;  // Food position overlaps with a body segment
+                    break;
                 }
+                current = current.getNext();  // Move to the next segment in the snake's body
+            }
+
+            // If position is valid, create the food block
+            if (validPosition) {
+                foodBlock = new Block(x, y);  // Food as a block instead of a rectangle
+            }
         } 
     }
 
-    public Rectangle getFood() {
-        return food;
+    public Block getFoodBlock() {
+        return foodBlock;
     }
 
     public void reposition(StackPane root) {
@@ -53,6 +54,6 @@ public class Food {
     // Draw the food
     public void render(GraphicsContext gc) {
         gc.setFill(Color.GREEN);
-        gc.fillRect(food.getX(), food.getY(), food.getWidth(), food.getHeight());
+        gc.fillRect(foodBlock.getX(), foodBlock.getY(), TILE_SIZE, TILE_SIZE);
     }
 }

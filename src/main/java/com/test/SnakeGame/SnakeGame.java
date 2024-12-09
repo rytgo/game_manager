@@ -1,11 +1,5 @@
 package com.test.SnakeGame;
 
-import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -88,9 +82,9 @@ public class SnakeGame {
 
     private void checkCollisions() {
         // Check if snake eats food
-        Rectangle head = snake.getHead();
+        Block head = snake.getHead();
 
-        if (head.getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
+        if (head.getX() == food.getFoodBlock().getX() && head.getY() == food.getFoodBlock().getY()) {
             snake.grow();   //increase the length
             food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
             score++;    // Increment score
@@ -153,6 +147,9 @@ public class SnakeGame {
 
     // Draw the grid background
     private void drawGrid() {
+        gc.setFill(Color.BLACK);  // Fill the background with black
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Fill the entire canvas
+
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(0.5);
 
