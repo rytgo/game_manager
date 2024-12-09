@@ -9,12 +9,18 @@ abstract class Player {
     protected int bet;
     protected int total;
 
-    protected Player(String name, int money) {
+    protected Player(String name, int money, int bet) {
         this.name = name;
         this.money = money;
+        this.bet = bet;
     }
 
     public Player(String name) {
+        this.name = name;
+    }
+
+    // Setter for name
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -43,6 +49,11 @@ abstract class Player {
         return hand;
     }
 
+    // Setter for hand
+    protected void setHand(List<Card> hand) {
+        this.hand = hand;
+    }
+
     // Getter for initial total
     public int getTotal() {
         return total;
@@ -62,18 +73,19 @@ abstract class Player {
 
         // Calculate initial total and count aces
         total = 0;
-        for (Card card : hand) {
+        for (Card card : this.getHand()) {
             total += card.getValue();
             if (card.getRank().equals("a")) {
                 aceCount++;
             }
         }
 
-        // Adjust for aces if total > 21
+        // Adjust for aces if total > 21 and we need to treat them as 1
         while (total > 21 && aceCount > 0) {
             total -= 10; // Reduce ace value from 11 to 1
             aceCount--;
         }
         return total;
     }
+
 }

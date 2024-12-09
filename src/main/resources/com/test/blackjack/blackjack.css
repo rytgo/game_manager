@@ -39,12 +39,12 @@
 }
 
 .title {
-    -fx-font-size: 15px;
+    -fx-font-size: 20px;
     -fx-text-fill: white;
     -fx-font-family: "AppleMyungjo";
     -fx-font-weight: bolder;
     -fx-alignment: center;
-    -fx-background-color: #341539;
+    -fx-background-color: #6C3BAA;
     -fx-background-radius: 5px;
     -fx-padding: 10px 10px;
 }
@@ -62,5 +62,9 @@
     -fx-text-fill: white;
     -fx-font-family: "AppleMyungjo";
     -fx-font-weight: bolder;
+}
+
+.load-vbox {
+    -fx-background-color: #6C3BAA;
 }
 

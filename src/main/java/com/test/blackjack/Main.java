@@ -9,6 +9,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
@@ -21,7 +23,7 @@ public class Main extends Application {
 
         StackPane root = new StackPane();
         Scene scene = new Scene(root, 640, 480);
-        scene.getStylesheets().add(getClass().getResource("blackjack.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
 
         // Create background image for main menu
         ImageView backgroundImage = blackJackUI.setImageView("main_background.jpeg");
@@ -30,7 +32,7 @@ public class Main extends Application {
         root.getChildren().add(backgroundImage);
 
         // Add label for main menu
-        Label title = new Label("Main Menu");
+        Label title = new Label("Welcome to Blackjack!");
         StackPane.setAlignment(title, Pos.CENTER);
         title.getStyleClass().add("title");
         VBox holder = new VBox(10);
@@ -53,6 +55,11 @@ public class Main extends Application {
             primaryStage.centerOnScreen();
         });
 
+        // Set the action for the Load Game button
+        loadGame.setOnAction(e -> {
+            blackJackUI.loadGame(primaryStage);
+            primaryStage.centerOnScreen();
+        });
 
         // Show the Blackjack main menu
         primaryStage.setScene(scene);

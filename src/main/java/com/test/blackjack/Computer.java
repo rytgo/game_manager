@@ -3,15 +3,15 @@ package com.test.blackjack;
 import java.util.List;
 
 public class Computer extends Player {
-    public Computer(String name, List<Card> hand, int money) {
-        super(name, money);
+    public Computer(String name, List<Card> hand, int money, int bet) {
+        super(name, money, bet);
         this.hand = hand;
     }
 
     // Computer's turn to play
     @Override
     public void play(Deck deck) {
-        while (total < 16) {
+        while (calculateTotal() < 16) {
             Card card = deck.dealCard();
             hand.add(card);
             total = calculateTotal();
