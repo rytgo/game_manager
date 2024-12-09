@@ -50,4 +50,21 @@ public class Block {
     public void render(GraphicsContext gc) {
         gc.fillRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
     }
+
+    // Move the block: update position and set next block's position
+    public void move(int newX, int newY) {
+        // Update the block's position
+        this.x = newX;
+        this.y = newY;
+        this.rectangle.setX(newX);
+        this.rectangle.setY(newY);
+    }
+
+    // Move the snake (blocks will follow the one in front)
+    public void move() {
+        // If there is a next block, move it to the current block's position
+        if (next != null) {
+            next.move(this.x, this.y);  // Move the next block to the current block's position
+        }
+    }
 }

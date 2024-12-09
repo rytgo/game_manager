@@ -17,17 +17,16 @@ public class Snake {
     }
 
     public void move() {
-        // Move the snake in the current direction
-        Block newHead = new Block(head.getX() + directionX * TILE_SIZE, head.getY() + directionY * TILE_SIZE);
-        
-        // Set the new head as the head of the snake
-        newHead.setNext(head);  // New head points to the old head
-        head = newHead;  // Update the head of the snake
-
-        // Remove the tail (if not growing)
-        if (head.getNext() != null) {
-            tail = tail.getNext();  // Update tail to the second-to-last block
+        // Move the body: each block follows the one before it
+        Block current = head;
+        while (current != null) {
+            current.move();  // Move the block to the position of the previous one
+            current = current.getNext();
         }
+
+        // Move the head: update the position of the head (moving it in the current direction)
+        head.setPosition(head.getX() + directionX, head.getY() + directionY);
+    
     }
 
     public void grow() {
