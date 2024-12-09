@@ -38,3 +38,33 @@
     -fx-background-color: transparent;
 }
 
+.title {
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
+    -fx-alignment: center;
+    -fx-background-color: #6C3BAA;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px 10px;
+}
+
+#styled-vbox {
+    -fx-padding: 10;
+    -fx-border-color: white;
+    -fx-border-width: 3;
+    -fx-border-radius: 2;
+    -fx-background-color: transparent;
+}
+
+#custom-label {
+    -fx-font-size: 23px;
+    -fx-text-fill: white;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
+}
+
+.load-vbox {
+    -fx-background-color: #6C3BAA;
+}
+

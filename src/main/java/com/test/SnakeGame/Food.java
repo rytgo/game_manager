@@ -1,23 +1,17 @@
 package com.test.SnakeGame;
 
-import java.util.ArrayList;
 import java.util.Random;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 public class Food {
     private static final int TILE_SIZE = 20;
-    private ImageView foodImageView;
-    private Rectangle food;
+    private Block foodBlock;
     private Snake snake;
-    private Image foodImage;
 
     public Food(StackPane root, Snake snake) {
-        foodImage = new Image(getClass().getResource("/apple.jpg").toExternalForm());
         this.snake = snake;
         spawnFood(root);
     }
@@ -26,39 +20,40 @@ public class Food {
         Random random = new Random();
         boolean validPosition = false;
 
-        if (foodImageView != null) {
-            root.getChildren().remove(foodImageView);
-        }
-
         while (!validPosition) {
-            int x = random.nextInt(30) * TILE_SIZE;
-            int y = random.nextInt(20) * TILE_SIZE;
+            int x = random.nextInt((600 / TILE_SIZE)) * TILE_SIZE;
+            int y = random.nextInt((400 / TILE_SIZE)) * TILE_SIZE;
 
-            // Check if the position overlaps with the snake
-            validPosition = snake.getBody().stream()
-                .noneMatch(segment -> segment.getX() == x && segment.getY() == y);
-            
+            // Check if the position overlaps with the snake's body (now using Block objects)
+            validPosition = true;
+            Block current = snake.getHead();  // Start checking from the head
+
+            while (current != null) {
+                if (current.getX() == x && current.getY() == y) {
+                    validPosition = false;  // Food position overlaps with a body segment
+                    break;
+                }
+                current = current.getNext();  // Move to the next segment in the snake's body
+            }
+
+            // If position is valid, create the food block
             if (validPosition) {
-                // Create a new ImageView for the food
-                foodImageView = new ImageView(foodImage);
-                foodImageView.setFitWidth(TILE_SIZE);
-                foodImageView.setFitHeight(TILE_SIZE);
-
-                // Position the food at the generated coordinates
-                foodImageView.setTranslateX(x);
-                foodImageView.setTranslateY(y);
-
-                // Add the ImageView to the root
-                root.getChildren().add(foodImageView);
+                foodBlock = new Block(x, y);  // Food as a block instead of a rectangle
             }
         } 
     }
 
-    public ImageView getFood() {
-        return foodImageView;
+    public Block getFoodBlock() {
+        return foodBlock;
     }
 
     public void reposition(StackPane root) {
         spawnFood(root);  // Reposition food at a new random location
+    }
+
+    // Draw the food
+    public void render(GraphicsContext gc) {
+        gc.setFill(Color.GREEN);
+        gc.fillRect(foodBlock.getX(), foodBlock.getY(), TILE_SIZE, TILE_SIZE);
     }
 }

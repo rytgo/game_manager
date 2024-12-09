@@ -1,52 +1,39 @@
 package com.test.SnakeGame;
 
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-
-import java.util.ArrayList;
 
 public class Snake {
-    private ArrayList<Rectangle> body;
+    private Block head;  // Head of the snake (first block)
+    private Block tail;  // Tail of the snake (last block)
     private int directionX, directionY;
-    private static final int TILE_SIZE = 20;
+    public static final int TILE_SIZE = 20;
 
     public Snake(int startX, int startY) {
-        body = new ArrayList<>();
+        head = new Block(startX, startY);
+        tail = head;  // Initially, the head and tail are the same
         directionX = 1;     // Initial direction: moving right
         directionY = 0;
-
-        // Add the initial head of the snake
-        Rectangle head = new Rectangle(TILE_SIZE, TILE_SIZE, Color.WHITE);
-        head.setX(startX);
-        head.setY(startY);
-        body.add(head);
     }
 
     public void move() {
-        // Move the snake in the current direction
-        Rectangle newHead = new Rectangle(TILE_SIZE, TILE_SIZE, Color.WHITE);
-        newHead.setX(body.get(0).getX() + directionX * TILE_SIZE);
-        newHead.setY(body.get(0).getY() + directionY * TILE_SIZE);
+        // Move the body: each block follows the one before it
+        Block current = head;
+        while (current != null) {
+            current.move();  // Move the block to the position of the previous one
+            current = current.getNext();
+        }
 
-        body.add(0, newHead);  // Add the new head to the front of the snake
-
-        body.remove(body.size() - 1);   //remove the last segment of the snake ot keep its length
+        // Move the head: update the position of the head (moving it in the current direction)
+        head.setPosition(head.getX() + directionX, head.getY() + directionY);
+    
     }
 
     public void grow() {
         // Add a new segment to the snake (does not remove the tail)
-        Rectangle newSegment = new Rectangle(TILE_SIZE, TILE_SIZE, Color.WHITE);
-        // Place new segment at the position of the last tail segment
-        newSegment.setX(body.get(body.size() - 1).getX());
-        newSegment.setY(body.get(body.size() - 1).getY());
-        body.add(newSegment);
-    }
-
-    public void moveTail() {
-        // Remove the last segment (tail) of the snake
-        Rectangle tail = body.remove(body.size() - 1);
-        // Update the graphical representation
-        tail.setVisible(false);
+        Block newSegment = new Block(tail.getX(), tail.getY());  // Position at the last tail
+        tail.setNext(newSegment);  // Link the current tail to the new segment
+        tail = newSegment;  // Update the tail to the new segment
     }
 
     public void setDirection(int x, int y) {
@@ -62,23 +49,38 @@ public class Snake {
     public int getDirectionY() {
         return directionY;
     }
-
-    public ArrayList<Rectangle> getBody() {
-        return body;
+    
+    public Block getHead() {
+        return head;
     }
 
-    public Rectangle getHead() {
-        return body.get(0);
+    public Block getTail() {
+        return tail;
     }
 
     // TODO: Fix bug with food here
     public boolean checkCollisionWithSelf() {
-        // Check if the snake's head collides with any part of its body
-        for (int i = 1; i < body.size(); i++) {
-            if (getHead().getBoundsInParent().intersects(body.get(i).getBoundsInParent())) {
-                return true;
+        Block current = head.getNext();  // Start from the second block
+        while (current != null) {
+            if (head.getX() == current.getX() && head.getY() == current.getY()) {
+                return true;  // Collision with self
             }
+            current = current.getNext();
         }
         return false;
+    }
+
+    // Draw snake on canvas
+    public void render(GraphicsContext gc) {
+        Block current = head;
+        while (current != null) {
+            if (current == head) {  // Head is rendered in lime green
+                gc.setFill(Color.LIME);
+            } else {
+                gc.setFill(Color.WHITE);  // Body is white
+            }
+            current.render(gc);
+            current = current.getNext();  // Move to the next block
+        }
     }
 }

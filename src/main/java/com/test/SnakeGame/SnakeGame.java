@@ -1,11 +1,5 @@
 package com.test.SnakeGame;
 
-import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -36,21 +30,12 @@ public class SnakeGame {
         StackPane root = new StackPane();
         Scene scene = new Scene(root, 600, 400);
         
-        // Set the background image
-        Image backgroundImage = new Image("snakebackground.jpg");
-        BackgroundImage bgImage = new BackgroundImage(
-            backgroundImage,
-            BackgroundRepeat.NO_REPEAT,
-            BackgroundRepeat.NO_REPEAT,
-            BackgroundPosition.CENTER,
-            new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, false)
-        );
-        root.setBackground(new Background(bgImage));
-
         // Initialize canvas
         canvas = new Canvas(600, 400);  // Set the size of the canvas
         gc = canvas.getGraphicsContext2D();     // Get the drawing context
         root.getChildren().add(canvas);     // Add the canvas to the root
+
+        drawGrid();
 
         // Initialize snake and food 
         snake = new Snake(300, 200);
@@ -97,9 +82,9 @@ public class SnakeGame {
 
     private void checkCollisions() {
         // Check if snake eats food
-        Rectangle head = snake.getHead();
+        Block head = snake.getHead();
 
-        if (snake.getHead().getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
+        if (head.getX() == food.getFoodBlock().getX() && head.getY() == food.getFoodBlock().getY()) {
             snake.grow();   //increase the length
             food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
             score++;    // Increment score
@@ -125,11 +110,11 @@ public class SnakeGame {
     private void render(GraphicsContext gc) {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Clear previous frame
 
-        // Draw the snake
-        for (Rectangle segment : snake.getBody()) {
-            gc.setFill(Color.PURPLE);
-            gc.fillOval(segment.getX(), segment.getY(), segment.getWidth(), segment.getHeight());
-        }
+        // Draw the grid backgrond
+        drawGrid();
+        snake.render(gc);  // Render the snake
+        food.render(gc);  // Render the food
+        
     }
 
     private void renderGameOverMessage(Stage primaryStage){
@@ -138,7 +123,7 @@ public class SnakeGame {
         Scene gameOverScene = new Scene(gameOverRoot, 300, 200);
 
         javafx.scene.control.Label gameOverLabel = new javafx.scene.control.Label("Game Over! Score: " + score);
-        gameOverLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: red;");
+        gameOverLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: black;");
         
         javafx.scene.control.Button playAgainButton = new javafx.scene.control.Button("Play Again");
         playAgainButton.setOnAction(e -> {
@@ -158,5 +143,22 @@ public class SnakeGame {
         gameOverStage.setScene(gameOverScene);
         gameOverStage.setTitle("Game Over");
         gameOverStage.show();
+    }
+
+    // Draw the grid background
+    private void drawGrid() {
+        gc.setFill(Color.BLACK);  // Fill the background with black
+        gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Fill the entire canvas
+
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(0.5);
+
+        for (int x = 0; x < canvas.getWidth(); x += 20) {
+            gc.strokeLine(x, 0, x, canvas.getHeight());
+        }
+
+        for (int y = 0; y < canvas.getHeight(); y += 20) {
+            gc.strokeLine(0, y, canvas.getWidth(), y);
+        }
     }
 }
