@@ -17,23 +17,36 @@ public class Snake {
     }
 
     public void move() {
-        // Move the body: each block follows the one before it
-        Block current = head;
+        int prevX = head.getX();
+        int prevY = head.getY();
+
+        head.setPosition(head.getX() + directionX * TILE_SIZE, head.getY() + directionY * TILE_SIZE);
+
+        Block current = head.getNext();
         while (current != null) {
-            current.move();  // Move the block to the position of the previous one
+            int tempX = current.getX();
+            int tempY = current.getY();
+            current.setPosition(prevX, prevY);
+            prevX = tempX;
+            prevY = tempY;
             current = current.getNext();
         }
-
-        // Move the head: update the position of the head (moving it in the current direction)
-        head.setPosition(head.getX() + directionX, head.getY() + directionY);
-    
     }
 
     public void grow() {
-        // Add a new segment to the snake (does not remove the tail)
-        Block newSegment = new Block(tail.getX(), tail.getY());  // Position at the last tail
-        tail.setNext(newSegment);  // Link the current tail to the new segment
-        tail = newSegment;  // Update the tail to the new segment
+        // Determine the position for the new segment based on the tail's current
+        // position and direction
+        int newX = tail.getX() - directionX * TILE_SIZE;
+        int newY = tail.getY() - directionY * TILE_SIZE;
+
+        // Create a new segment at the calculated position
+        Block newSegment = new Block(newX, newY);
+
+        // Link the new segment to the current tail
+        tail.setNext(newSegment);
+
+        // Update the tail reference to the new segment
+        tail = newSegment;
     }
 
     public void setDirection(int x, int y) {
