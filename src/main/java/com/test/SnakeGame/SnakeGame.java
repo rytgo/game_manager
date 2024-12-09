@@ -99,7 +99,7 @@ public class SnakeGame {
         // Check if snake eats food
         Rectangle head = snake.getHead();
 
-        if (snake.getHead().getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
+        if (head.getBoundsInParent().intersects(food.getFood().getBoundsInParent())) {
             snake.grow();   //increase the length
             food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
             score++;    // Increment score

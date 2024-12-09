@@ -31,8 +31,8 @@ public class Food {
         }
 
         while (!validPosition) {
-            int x = random.nextInt(30) * TILE_SIZE;
-            int y = random.nextInt(20) * TILE_SIZE;
+            int x = random.nextInt((600 / TILE_SIZE)) * TILE_SIZE;
+            int y = random.nextInt((400 / TILE_SIZE)) * TILE_SIZE;
 
             // Check if the position overlaps with the snake
             validPosition = snake.getBody().stream()
@@ -45,8 +45,8 @@ public class Food {
                 foodImageView.setFitHeight(TILE_SIZE);
 
                 // Position the food at the generated coordinates
-                foodImageView.setTranslateX(x);
-                foodImageView.setTranslateY(y);
+                foodImageView.setTranslateX(x - 300);
+                foodImageView.setTranslateY(y - 200);
 
                 // Add the ImageView to the root
                 root.getChildren().add(foodImageView);
