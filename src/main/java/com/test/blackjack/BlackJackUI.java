@@ -1,9 +1,9 @@
 package com.test.blackjack;
 
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -49,6 +49,9 @@ public class BlackJackUI {
     private final Label computerOneBet = new Label();
     private final Label computerTwoBet = new Label();
     private final AnchorPane root = new AnchorPane();
+    private Timeline timeline;
+    private Timeline dealerTimeline;
+    private Timeline playerTimeline;
 
     public BlackJackUI(String userName) {
         this.userName = userName;
@@ -178,9 +181,14 @@ public class BlackJackUI {
             String saveState = saveState();
 
             // Create an Alert of type INFORMATION
+            pauseTimelines();
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Save Game");
             alert.setHeaderText("Copy the save state string below to save your game state");
+
+            // Make sure the alert blocks other windows
+            alert.initModality(Modality.APPLICATION_MODAL);
 
             // Create a TextArea for the save state and make it non-editable
             TextArea saveStateArea = new TextArea(saveState);
@@ -196,6 +204,19 @@ public class BlackJackUI {
 
             // Show the alert and wait for the user's interaction
             alert.showAndWait();
+
+            Stage mainMenuStage = (Stage) root.getScene().getWindow();
+            mainMenuStage.close();
+            new Main().start(new Stage());
+
+//            resumeTimelines();
+        });
+
+        // Set the action for the Back to Main Menu button
+        backToMainMenu.setOnAction(e -> {
+            Stage mainMenuStage = (Stage) root.getScene().getWindow();
+            mainMenuStage.close();
+            new Main().start(new Stage());
         });
 
         // Initialize a new round
@@ -393,6 +414,8 @@ public class BlackJackUI {
             String saveStateString = saveStateArea.getText();
             loadState(saveStateString);
             loadStage.close();
+            resumeTimelines();
+
         });
 
         // Create a VBox to hold the label, save state area, and load button
@@ -463,6 +486,9 @@ public class BlackJackUI {
         alert.setHeaderText(null);
         alert.setContentText(content);
 
+        // Make sure the alert blocks other windows
+        alert.initModality(Modality.APPLICATION_MODAL);
+
         alert.showAndWait();
     }
 
@@ -486,7 +512,7 @@ public class BlackJackUI {
 
     // Helper method to handle computer turn and callback after completion
     private void playComputerTurn(Player player, HBox hand, VBox playerBox, Runnable callback) {
-        Timeline playerTimeline = createPlayerTimeline(player, hand, playerBox);
+        playerTimeline = createPlayerTimeline(player, hand, playerBox);
         playerTimeline.setOnFinished(e -> {
             playerBox.setId(null);
             playerBox.getChildren().remove(messageArea);
@@ -498,7 +524,7 @@ public class BlackJackUI {
 
     // Create a timeline for a specific player's turn
     private Timeline createPlayerTimeline(Player player, HBox hand, VBox playerBox) {
-        Timeline timeline = new Timeline();
+        timeline = new Timeline();
         int cardDelay = 2000;  // Delay for card animations
 
         playerBox.setId("styled-vbox");
@@ -571,7 +597,7 @@ public class BlackJackUI {
             return;
         }
 
-        Timeline dealerTimeline = new Timeline();
+        dealerTimeline = new Timeline();
         dealerVBox.setId("styled-vbox");
 
         blackJack.getDealer().play(blackJack.getDeck());
@@ -658,12 +684,16 @@ public class BlackJackUI {
             alert.setHeaderText("You balance is insufficient to continue playing.");
             alert.setContentText("Would you like to start a new game?");
 
+            // Make sure the alert blocks other windows
+            alert.initModality(Modality.APPLICATION_MODAL);
+
             ButtonType yes = new ButtonType("Yes");
             ButtonType no = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
 
             alert.getButtonTypes().setAll(yes, no);
 
             Optional<ButtonType> answer = alert.showAndWait();
+
             if (answer.isPresent() && answer.get() == yes) {
                 blackJack.resetGame();
                 userHand.getChildren().clear();
@@ -692,23 +722,26 @@ public class BlackJackUI {
         StringBuilder saveState = new StringBuilder();
 
         // Save each player's hand, balance, and bet
-        saveState.append("Name:").append(getUserName()).append("|")
-                .append("Human-hand:").append(formatHand(blackJack.getHuman().getHand()))
+        saveState.append("User-name:").append(getUserName())
+                .append(";Human-hand:").append(formatHand(blackJack.getHuman().getHand()))
                 .append(";Balance:").append(blackJack.getHuman().getMoney())
                 .append(";Bet:").append(blackJack.getHuman().getBet())
                 .append("|");
 
-        saveState.append("Computer-1-hand:").append(formatHand(blackJack.getComputerOne().getHand()))
+        saveState.append("Computer-1-name:").append(blackJack.getComputerOne().getName())
+                .append(";Computer-1-hand:").append(formatHand(blackJack.getComputerOne().getHand()))
                 .append(";Balance:").append(blackJack.getComputerOne().getMoney())
                 .append(";Bet:").append(blackJack.getComputerOne().getBet())
                 .append("|");
 
-        saveState.append("Computer-2-hand:").append(formatHand(blackJack.getComputerTwo().getHand()))
+        saveState.append("Computer-2-name:").append(blackJack.getComputerTwo().getName())
+                .append(";Computer-2-hand:").append(formatHand(blackJack.getComputerTwo().getHand()))
                 .append(";Balance:").append(blackJack.getComputerTwo().getMoney())
                 .append(";Bet:").append(blackJack.getComputerTwo().getBet())
                 .append("|");
 
-        saveState.append("Dealer-hand:").append(formatHand(blackJack.getDealer().getHand()));
+        saveState.append("Dealer-name:").append(blackJack.getDealer().getName())
+                .append(";Dealer-hand:").append(formatHand(blackJack.getDealer().getHand()));
 
         // Save whose turn it is
         saveState.append("Turn:").append(blackJack.getTurn());
@@ -728,13 +761,13 @@ public class BlackJackUI {
         String[] playerData = saveStateString.split("\\|");
 
         for (String data : playerData) {
-            if (data.startsWith("Human-hand:")) {
+            if (data.startsWith("User-name:")) {
                 loadPlayerState(data, blackJack.getHuman());
-            } else if (data.startsWith("Computer-1-hand:")) {
+            } else if (data.startsWith("Computer-1-name:")) {
                 loadPlayerState(data, blackJack.getComputerOne());
-            } else if (data.startsWith("Computer-2-hand:")) {
+            } else if (data.startsWith("Computer-2-name:")) {
                 loadPlayerState(data, blackJack.getComputerTwo());
-            } else if (data.startsWith("Dealer-hand:")) {
+            } else if (data.startsWith("Dealer-name:")) {
                 loadDealerState(data, blackJack.getDealer());
             } else if (data.startsWith("Turn:")) {
                 String turn = data.split(":")[1];
@@ -754,18 +787,19 @@ public class BlackJackUI {
         player.setName(name);
 
         // Parse hand
-        String handString = parts[0].split(":")[1];
+        String handString = parts[1].split(":")[1]; // Correctly extract hand
         List<Card> hand = parseHand(handString);
         player.setHand(hand);
 
         // Parse balance
-        int balance = Integer.parseInt(parts[1].split(":")[1]);
+        int balance = Integer.parseInt(parts[2].split(":")[1]); // Correctly extract balance
         player.setMoney(balance);
 
         // Parse bet
-        int bet = Integer.parseInt(parts[2].split(":")[1]);
+        int bet = Integer.parseInt(parts[3].split(":")[1]); // Correctly extract bet
         player.setBet(bet);
     }
+
 
     // Helper to load dealer's state
     private void loadDealerState(String data, Dealer dealer) {
@@ -778,8 +812,11 @@ public class BlackJackUI {
     private List<Card> parseHand(String handString) {
         return Arrays.stream(handString.split(","))
                 .map(cardStr -> {
-                    String rank = cardStr.substring(0, cardStr.length() - 1);  // Extract the rank
-                    String suit = cardStr.substring(cardStr.length() - 1);  // Extract the suit
+                    // Extract the rank as the first character
+                    String rank = cardStr.substring(0, 1);  // The first character is the rank
+                    // Extract the suit as the rest of the string
+                    String suit = cardStr.substring(1);     // The rest of the string is the suit
+
                     int value = cardValue(rank);  // Get the numeric value of the card
                     return new Card(suit, rank, value);  // Create a new Card object with rank, suit, and value
                 })
@@ -876,6 +913,35 @@ public class BlackJackUI {
         };
     }
 
+    private void pauseTimelines() {
+        if (timeline != null && timeline.getStatus() == Animation.Status.RUNNING) {
+            timeline.pause();
+        }
+
+        if (dealerTimeline != null && dealerTimeline.getStatus() == Animation.Status.RUNNING) {
+            dealerTimeline.pause();
+        }
+
+        if (playerTimeline != null && playerTimeline.getStatus() == Animation.Status.RUNNING) {
+            playerTimeline.pause();
+        }
+    }
+
+    private void resumeTimelines() {
+        Platform.runLater(() -> {
+            if (timeline != null && timeline.getStatus() == Animation.Status.PAUSED) {
+                timeline.play();
+            }
+
+            if (dealerTimeline != null && dealerTimeline.getStatus() == Animation.Status.PAUSED) {
+                dealerTimeline.play();
+            }
+
+            if (playerTimeline != null && playerTimeline.getStatus() == Animation.Status.PAUSED) {
+                playerTimeline.play();
+            }
+        });
+    }
 }
 
 
