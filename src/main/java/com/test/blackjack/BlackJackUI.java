@@ -4,6 +4,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -62,12 +63,8 @@ public class BlackJackUI {
         return userName;
     }
 
-    // Getter for UI hand
-    public HBox getUserHand() {
-        return userHand;
-    }
-
     public void start(Stage stage) {
+
         Scene scene = new Scene(root, 1280, 920);
 
         // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
@@ -228,7 +225,7 @@ public class BlackJackUI {
             }
 
             if (roundPlaying) {
-                showAlert("Round is not over", "The round is not over. Finish the round before starting a new one.");
+                showAlert(Alert.AlertType.INFORMATION, "Round is not over", "The round is not over. Finish the round before starting a new one.");
                 return;
             }
 
@@ -279,6 +276,8 @@ public class BlackJackUI {
         // Start Game button function
         startGame.setOnAction(e -> {
 
+            blackJack.dealCard(); // Deal cards to all players
+
             // Set current turn to the user
             blackJack.setTurn(getUserName());
 
@@ -301,8 +300,7 @@ public class BlackJackUI {
             computerTwoBet.setText("Bet: $" + betTwo);
             blackJack.getComputerTwo().setBet(betTwo);
 
-            // Deal 8 cards to 4 players
-            blackJack.dealCard();
+
 
             List<HBox> playerHands = List.of(userHand, computerOneHand, computerTwoHand, dealerHand);
 
@@ -365,7 +363,7 @@ public class BlackJackUI {
         hit.setOnAction(e -> {
             roundPlaying = true;
             if (blackJack.getHuman().getTotal() == 21) {
-                showAlert("You have 21 or Blackjack", "You have 21 or Blackjack! Stand to finish your turn.");
+                showAlert(Alert.AlertType.INFORMATION, "You have 21 or Blackjack", "You have 21 or Blackjack! Stand to finish your turn.");
             } else {
                 blackJack.getHuman().play(blackJack.getDeck());
                 userHand.getChildren().add(createCardImage(blackJack.getHuman().getHand().getLast()));
@@ -381,7 +379,7 @@ public class BlackJackUI {
         stand.setOnAction(e -> {
             roundPlaying = true;
             if (blackJack.getHuman().getTotal() < 16) {
-                showAlert("You must hit", "You must hit! Your total is less than 16.");
+                showAlert(Alert.AlertType.INFORMATION, "You must hit", "You must hit! Your total is less than 16.");
             } else {
                 notUserPlay();
             }
@@ -394,12 +392,7 @@ public class BlackJackUI {
     }
 
     // Load game function
-    public void loadGame(Stage stage) {
-        Stage loadStage = new Stage();
-        loadStage.initModality(Modality.APPLICATION_MODAL);
-        loadStage.initOwner(stage);
-        loadStage.setTitle("Load Game");
-
+    public void loadGame(Stage primaryStage) {
         // Create a label to instruct the user
         Label enterSaveStateLabel = new Label("Enter save state string here:");
 
@@ -412,10 +405,11 @@ public class BlackJackUI {
         // Set the action for the load button
         loadButton.setOnAction(e -> {
             String saveStateString = saveStateArea.getText();
-            loadState(saveStateString);
-            loadStage.close();
-            resumeTimelines();
+            loadState(saveStateString);  // Load the game state
 
+            updateUI(primaryStage); // Ensure UI reflects the loaded state
+
+            ((Stage) loadButton.getScene().getWindow()).close();
         });
 
         // Create a VBox to hold the label, save state area, and load button
@@ -430,10 +424,14 @@ public class BlackJackUI {
         Scene loadScene = new Scene(loadVBox, 640, 480);
         loadScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
 
-        // Set the scene for the load stage
+        // Create a modal window for the save state input
+        Stage loadStage = new Stage();
+        loadStage.initModality(Modality.APPLICATION_MODAL);
+        loadStage.initOwner(primaryStage);
+        loadStage.setTitle("Load Game");
         loadStage.setScene(loadScene);
         loadStage.show();
-    }
+}
 
     // Helper method to set ImageView for images
     public ImageView setImageView(String imageName) {
@@ -450,7 +448,7 @@ public class BlackJackUI {
 
             // Check if the user has enough money to bet
             if (!blackJack.getHuman().isValidBet(betAmount)) {
-                showAlert("Invalid Bet", "You do not have enough money to bet $" + betAmount + ".");
+                showAlert(Alert.AlertType.INFORMATION,"Invalid bet", "You do not have enough money to bet $" + betAmount + ".");
                 return;
             }
 
@@ -480,8 +478,8 @@ public class BlackJackUI {
     }
 
     // Helper method for showing alert messages
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    private void showAlert(Alert.AlertType alertType, String title, String content) {
+        Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
@@ -741,7 +739,10 @@ public class BlackJackUI {
                 .append("|");
 
         saveState.append("Dealer-name:").append(blackJack.getDealer().getName())
-                .append(";Dealer-hand:").append(formatHand(blackJack.getDealer().getHand()));
+                .append(";Dealer-hand:").append(formatHand(blackJack.getDealer().getHand()))
+                .append(";Balance:").append(blackJack.getDealer().getMoney())
+                .append(";Bet:").append(blackJack.getDealer().getBet())
+                .append("|");
 
         // Save whose turn it is
         saveState.append("Turn:").append(blackJack.getTurn());
@@ -760,6 +761,8 @@ public class BlackJackUI {
     public void loadState(String saveStateString) {
         String[] playerData = saveStateString.split("\\|");
 
+        System.out.println(Arrays.toString(playerData));
+
         for (String data : playerData) {
             if (data.startsWith("User-name:")) {
                 loadPlayerState(data, blackJack.getHuman());
@@ -771,79 +774,454 @@ public class BlackJackUI {
                 loadDealerState(data, blackJack.getDealer());
             } else if (data.startsWith("Turn:")) {
                 String turn = data.split(":")[1];
+                System.out.println(turn);
                 blackJack.setTurn(turn);
             }
         }
+    }
 
-        updateUI(); // Ensure UI reflects the loaded state
+    // Helper method to update the UI based on the current game state
+    public void updateUI(Stage stage) {
+        root.getChildren().clear();
+        Scene scene = new Scene(root, 1280, 920);
+
+        // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
+        Button newRound = new Button("New Round");
+        Button saveGame = new Button("Save Game");
+        Button backToMainMenu = new Button("Main Menu");
+
+        // Set button styles
+        HBox buttons = new HBox();
+        buttons.getChildren().addAll(newRound, saveGame, backToMainMenu);
+
+        // Create VBox to hold the players' spots
+        // userVBox
+        Label userLabel = new Label(getUserName());
+        userBet.setText("Bet: $" + blackJack.getHuman().getBet());
+        userTotal.setText("Balance: $1000");
+        userVBox.setAlignment(Pos.CENTER);
+        userVBox.getChildren().addAll(userLabel, userBet, userTotal);
+
+        // dealerVBox
+        Label dealerLabel = new Label("Dealer");
+        dealerVBox.setAlignment(Pos.CENTER);
+        dealerVBox.getChildren().add(dealerLabel);
+
+        // computerOneVBox
+        Label computerOneLabel = new Label("Computer 1");
+        computerOneBet.setText("Bet: $" + blackJack.getComputerOne().getBet());
+        computerOneTotal.setText("Balance: $1000");
+        computerOneVBox.setAlignment(Pos.CENTER);
+        computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
+
+        // computerTwoVBox
+        Label computerTwoLabel = new Label("Computer 2");
+        computerTwoBet.setText("Bet: " + blackJack.getComputerTwo().getBet());
+        computerTwoTotal.setText("Balance: $1000");
+        computerTwoVBox.setAlignment(Pos.CENTER);
+        computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
+
+        // Create deck and background images
+        ImageView backImage = setImageView("back.png");
+        ImageView backgroundImage = setImageView("background.png");
+
+        // Set deck image size
+        backImage.setFitHeight(120);
+        backImage.setFitWidth(85);
+
+        // Create a BorderPane to hold the players' spots
+        BorderPane borderPane = new BorderPane();
+        borderPane.setBottom(userVBox);
+        borderPane.setLeft(computerTwoVBox);
+        borderPane.setRight(computerOneVBox);
+        borderPane.setTop(dealerVBox);
+
+        // Set the background image size
+        backgroundImage.setFitHeight(1911);
+        backgroundImage.setFitWidth(1940);
+
+        root.getChildren().add(backgroundImage);
+
+        // Set chip images and labels for each chip
+        VBox chip10Box = new VBox();
+        ImageView chip10 = setImageView("10-chip.png");
+        Label chip10Label = new Label("10");
+        chip10Box.getChildren().addAll(chip10, chip10Label);
+        chip10Box.setAlignment(Pos.CENTER);
+
+        VBox chip20Box = new VBox();
+        ImageView chip20 = setImageView("20-chip.png");
+        Label chip20Label = new Label("20");
+        chip20Box.getChildren().addAll(chip20, chip20Label);
+        chip20Box.setAlignment(Pos.CENTER);
+
+        VBox chip50Box = new VBox();
+        ImageView chip50 = setImageView("50-chip.png");
+        Label chip50Label = new Label("50");
+        chip50Box.getChildren().addAll(chip50, chip50Label);
+        chip50Box.setAlignment(Pos.CENTER);
+
+        VBox chip100Box = new VBox();
+        ImageView chip100 = setImageView("100-chip.png");
+        Label chip100Label = new Label("100");
+        chip100Box.getChildren().addAll(chip100, chip100Label);
+        chip100Box.setAlignment(Pos.CENTER);
+
+        // Set chip image size
+        chip10.setFitHeight(60);
+        chip20.setFitHeight(60);
+        chip50.setFitHeight(60);
+        chip100.setFitHeight(60);
+
+        // Create an HBox for chips
+        HBox chips = new HBox(chip10Box, chip20Box, chip50Box, chip100Box);
+        chips.getStyleClass().add("chips");
+
+        // Set the CSS file for the scene
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
+
+        AnchorPane.setTopAnchor(borderPane, 20.0);
+        AnchorPane.setBottomAnchor(borderPane, 20.0);
+        AnchorPane.setLeftAnchor(borderPane, 20.0);
+        AnchorPane.setRightAnchor(borderPane, 20.0);
+
+        AnchorPane.setTopAnchor(chips, 10.0);
+        AnchorPane.setBottomAnchor(chips, 10.0);
+        AnchorPane.setRightAnchor(chips, -50.0);
+
+        root.getChildren().addAll(borderPane, chips, buttons);
+
+        // Set the action for the Save Game button
+        saveGame.setOnAction(e -> {
+            String saveState = saveState();
+
+            // Create an Alert of type INFORMATION
+            pauseTimelines();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Save Game");
+            alert.setHeaderText("Copy the save state string below to save your game state");
+
+            // Make sure the alert blocks other windows
+            alert.initModality(Modality.APPLICATION_MODAL);
+
+            // Create a TextArea for the save state and make it non-editable
+            TextArea saveStateArea = new TextArea(saveState);
+            saveStateArea.setEditable(false);
+            saveStateArea.setWrapText(true);
+
+            // Set a preferred size for the TextArea
+            saveStateArea.setPrefWidth(400);
+            saveStateArea.setPrefHeight(200);
+
+            // Add the TextArea to the alert's content
+            alert.getDialogPane().setContent(saveStateArea);
+
+            // Show the alert and wait for the user's interaction
+            alert.showAndWait();
+
+            Stage mainMenuStage = (Stage) root.getScene().getWindow();
+            mainMenuStage.close();
+            new Main().start(new Stage());
+        });
+
+        if (blackJack.getHuman().getMoney() <= 0) {
+            showResetWindow();
+            return;
+        }
+
+        if (roundPlaying) {
+            showAlert(Alert.AlertType.INFORMATION,"Round is not over", "The round is not over. Finish the round before starting a new one.");
+            return;
+        }
+
+        // Hide Hit and Stand buttons
+        userVBox.getChildren().remove(hitAndStand);
+
+        // Show the chips and message field and start game button
+        chips.setVisible(true);
+        messageField.setVisible(true);
+
+        // Show a message about selecting a bet
+        messageField.setEditable(false);
+        messageField.setId("custom-label");
+        if (!root.getChildren().contains(messageField)) {
+            root.getChildren().add(messageField);
+        }
+
+        AnchorPane.setBottomAnchor(messageField, 180.0);
+        AnchorPane.setLeftAnchor(messageField, 60.0);
+        AnchorPane.setRightAnchor(messageField, 60.0);
+
+        addChipClickHandler(chip10, 10, messageField, userBet, root);
+        addChipClickHandler(chip20, 20, messageField, userBet, root);
+        addChipClickHandler(chip50, 50, messageField, userBet, root);
+        addChipClickHandler(chip100, 100, messageField, userBet, root);
+
+        // Set current turn to the user
+        blackJack.setTurn(blackJack.getTurn());
+
+        // Highlight the current player whose turn it is
+        String currentTurn = blackJack.getTurn(); // Get the name of the player whose turn it is
+
+        for (Player player : blackJack.getPlayers()) {
+            VBox correspondingVBox = null;
+
+            // Match the player to their VBox
+            if (player.getName().equals(getUserName())) {
+                correspondingVBox = userVBox;
+            } else if (player.getName().equals("Computer 1")) {
+                correspondingVBox = computerOneVBox;
+            } else if (player.getName().equals("Computer 2")) {
+                correspondingVBox = computerTwoVBox;
+            } else if (player.getName().equals("Dealer")) {
+                correspondingVBox = dealerVBox;
+            }
+
+            if (correspondingVBox != null) {
+                // Set the ID for the player's VBox if it's their turn
+                if (player.getName().equals(currentTurn)) {
+                    correspondingVBox.setId("styled-vbox"); // Highlight the VBox
+                } else {
+                    correspondingVBox.setId(null); // Reset styles for other VBoxes
+                }
+            }
+        }
+
+        roundPlaying = true;
+
+        // Hide start game, message field and chips
+        startGame.setVisible(false);
+        messageField.setVisible(false);
+        chips.setVisible(false);
+
+        // Random bet for computers
+        int betOne = blackJack.getComputerOne().randomBet();
+        computerOneBet.setText("Bet: $" + betOne);
+        blackJack.getComputerOne().setBet(betOne);
+
+        int betTwo = blackJack.getComputerTwo().randomBet();
+        computerTwoBet.setText("Bet: $" + betTwo);
+        blackJack.getComputerTwo().setBet(betTwo);
+
+        List<HBox> playerHands = List.of(userHand, computerOneHand, computerTwoHand, dealerHand);
+
+        if (!userVBox.getChildren().contains(userHand)) {
+            userVBox.getChildren().add(userHand);
+        }
+
+        if (!computerOneVBox.getChildren().contains(computerOneHand)) {
+            computerOneVBox.getChildren().add(computerOneHand);
+        }
+
+        if (!computerTwoVBox.getChildren().contains(computerTwoHand)) {
+            computerTwoVBox.getChildren().add(computerTwoHand);
+        }
+
+        if (!dealerVBox.getChildren().contains(dealerHand)) {
+            dealerVBox.getChildren().add(dealerHand);
+        }
+
+        List<Player> players = blackJack.getPlayers();
+
+        // Iterate over players and their corresponding HBoxes
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
+            HBox handUI = playerHands.get(i); // Get the corresponding HBox
+
+            handUI.getChildren().clear();
+
+            // Add each card in the player's hand to their UI HBox
+            for (Card card : player.getHand()) {
+                handUI.getChildren().add(createCardImage(card));
+            }
+        }
+
+        // Set alignment for all HBoxes
+        userHand.setAlignment(Pos.CENTER);
+        computerOneHand.setAlignment(Pos.CENTER);
+        computerTwoHand.setAlignment(Pos.CENTER);
+        dealerHand.setAlignment(Pos.CENTER);
+
+        // Create Hit and Stand buttons
+        if (!userVBox.getChildren().contains(hitAndStand)) {
+            if (hitAndStand.getChildren().isEmpty()) {
+                hitAndStand.getChildren().addAll(hit, stand);
+            }
+            userVBox.getChildren().add(hitAndStand);
+            hitAndStand.setAlignment(Pos.CENTER);
+        }
+
+        // Calculate the total for all players
+        blackJack.getHuman().calculateTotal();
+        blackJack.getComputerOne().calculateTotal();
+        blackJack.getComputerTwo().calculateTotal();
+        blackJack.getDealer().calculateTotal();
+
+        // Initialize a new round
+        newRound.setOnAction(e -> {
+
+            if (blackJack.getHuman().getMoney() <= 0) {
+                showResetWindow();
+                return;
+            }
+
+            if (roundPlaying) {
+                showAlert(Alert.AlertType.INFORMATION, "Round is not over", "The round is not over. Finish the round before starting a new one.");
+                return;
+            }
+
+            // Remove the previous game UI elements
+            userHand.getChildren().clear();
+            computerOneHand.getChildren().clear();
+            computerTwoHand.getChildren().clear();
+            dealerHand.getChildren().clear();
+            startGame.setVisible(false);
+
+            // Reset bets and balances
+            userBet.setText("Bet: $0");
+            computerOneBet.setText("Bet: $0");
+            computerTwoBet.setText("Bet: $0");
+
+            // Hide Hit and Stand buttons
+            userVBox.getChildren().remove(hitAndStand);
+
+            // Remove the result
+            userVBox.getChildren().remove(result);
+            computerOneVBox.getChildren().remove(resultOne);
+            computerTwoVBox.getChildren().remove(resultTwo);
+
+            // Show the chips and message field and start game button
+            chips.setVisible(true);
+            messageField.setVisible(true);
+
+            // Show a message about selecting a bet
+            messageField.setEditable(false);
+            messageField.setId("custom-label");
+            if (!root.getChildren().contains(messageField)) {
+                root.getChildren().add(messageField);
+            }
+
+            AnchorPane.setBottomAnchor(messageField, 180.0);
+            AnchorPane.setLeftAnchor(messageField, 60.0);
+            AnchorPane.setRightAnchor(messageField, 60.0);
+
+            // Reset the round
+            blackJack.resetRound();
+
+            addChipClickHandler(chip10, 10, messageField, userBet, root);
+            addChipClickHandler(chip20, 20, messageField, userBet, root);
+            addChipClickHandler(chip50, 50, messageField, userBet, root);
+            addChipClickHandler(chip100, 100, messageField, userBet, root);
+        });
+
+        // Hit button function
+        hit.setOnAction(e -> {
+            roundPlaying = true;
+            if (blackJack.getHuman().getTotal() == 21) {
+                showAlert(Alert.AlertType.INFORMATION, "You have 21 or Blackjack", "You have 21 or Blackjack! Stand to finish your turn.");
+            } else {
+                blackJack.getHuman().play(blackJack.getDeck());
+                userHand.getChildren().add(createCardImage(blackJack.getHuman().getHand().getLast()));
+
+                // If the user busts, auto lose
+                if (blackJack.getHuman().getTotal() > 21) {
+                    notUserPlay();
+                }
+            }
+        });
+
+        // Stand button function
+        stand.setOnAction(e -> {
+            roundPlaying = true;
+            if (blackJack.getHuman().getTotal() < 16) {
+                showAlert(Alert.AlertType.INFORMATION,"You must hit", "You must hit! Your total is less than 16.");
+            } else {
+                notUserPlay();
+            }
+        });
+
+        stage.setScene(scene);
+        stage.show();
+        resumeTimelines();
     }
 
     // Helper to load a player's state
     private void loadPlayerState(String data, Player player) {
         String[] parts = data.split(";");
 
-        // Parse name
-        String name = parts[0].split(":")[1];
-        player.setName(name);
+        if (parts.length < 4) {
+            throw new IllegalArgumentException("Invalid data format for player state: " + data);
+        }
 
-        // Parse hand
-        String handString = parts[1].split(":")[1]; // Correctly extract hand
-        List<Card> hand = parseHand(handString);
-        player.setHand(hand);
+        try {
+            // Parse name
+            String name = extractValue(parts[0]);
+            player.setName(name);
 
-        // Parse balance
-        int balance = Integer.parseInt(parts[2].split(":")[1]); // Correctly extract balance
-        player.setMoney(balance);
+            // Parse hand
+            String handString = extractValue(parts[1]); // Correctly extract hand
+            List<Card> hand = parseHand(handString);
+            player.setHand(hand);
 
-        // Parse bet
-        int bet = Integer.parseInt(parts[3].split(":")[1]); // Correctly extract bet
-        player.setBet(bet);
+            // Parse balance
+            int balance = Integer.parseInt(extractValue(parts[2])); // Correctly extract balance
+            player.setMoney(balance);
+
+            // Parse bet
+            int bet = Integer.parseInt(extractValue(parts[3])); // Correctly extract bet
+            player.setBet(bet);
+
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error parsing player data: " + data, e);
+        }
     }
 
+    // Helper method to extract the value from a key-value pair
+    private String extractValue(String part) {
+        return part.split(":")[1].trim();
+    }
 
-    // Helper to load dealer's state
-    private void loadDealerState(String data, Dealer dealer) {
-        String handString = data.split(":")[1];
-        List<Card> hand = parseHand(handString);
-        dealer.setHand(hand);
+    // Load dealer state
+    private void loadDealerState(String section, Dealer dealer) {
+        String[] attributes = section.split(";");
+        for (String attribute : attributes) {
+            if (attribute.startsWith("Dealer-name:")) {
+                String name = attribute.split(":")[1];
+                dealer.setName(name);
+            } else if (attribute.startsWith("Dealer-hand:")) {
+                String handString = attribute.split(":")[1];
+                List<Card> hand = parseHand(handString);
+                dealer.setHand(hand);
+            }
+        }
     }
 
     // Helper to parse a hand from a string
     private List<Card> parseHand(String handString) {
         return Arrays.stream(handString.split(","))
                 .map(cardStr -> {
-                    // Extract the rank as the first character
-                    String rank = cardStr.substring(0, 1);  // The first character is the rank
-                    // Extract the suit as the rest of the string
-                    String suit = cardStr.substring(1);     // The rest of the string is the suit
+                    // Check if the rank is a two-character number (like "10")
+                    String rank;
+                    String suit;
 
-                    int value = cardValue(rank);  // Get the numeric value of the card
-                    return new Card(suit, rank, value);  // Create a new Card object with rank, suit, and value
+                    // Check for two-character rank (i.e., "10" to "10")
+                    if (cardStr.length() > 2 && Character.isDigit(cardStr.charAt(1))) {
+                        // The rank is the first two characters (e.g., "10")
+                        rank = cardStr.substring(0, 2);
+                        // The suit is the rest of the string (after "10")
+                        suit = cardStr.substring(2);
+                    } else {
+                        // The rank is the first character (e.g., "a", "k")
+                        rank = cardStr.substring(0, 1);
+                        // The suit is the rest of the string
+                        suit = cardStr.substring(1);
+                    }
+
+                    int value = cardValue(rank); // Get the numeric value of the card
+                    return new Card(suit, rank, value); // Create a new Card object with rank, suit, and value
                 })
                 .collect(Collectors.toList());
-    }
-
-    // Helper method to update the UI based on the current game state
-    private void updateUI() {
-        // Update player's hand UI
-        updatePlayerUI(blackJack.getHuman(), userVBox);
-        updatePlayerUI(blackJack.getComputerOne(), computerOneVBox);
-        updatePlayerUI(blackJack.getComputerTwo(), computerTwoVBox);
-
-        // Update dealer's hand UI
-        updateDealerUI(blackJack.getDealer(), dealerVBox);
-
-        // Update turn indicator
-        for (VBox playerVBox : List.of(userVBox, computerOneVBox, computerTwoVBox, dealerVBox)) {
-            if (playerVBox.getChildren().getFirst().toString().equals(blackJack.getTurn())) {
-                playerVBox.setId("styled-vbox");
-            } else {
-                playerVBox.setId(null);
-            }
-        }
-
-        // Refresh UI to reflect changes
-        root.requestLayout();
     }
 
     // Helper method to load the players UI
@@ -903,15 +1281,26 @@ public class BlackJackUI {
 
     // Help method to get card value
     private int cardValue(String rank) {
+        rank = rank.toLowerCase(); // Normalize to lowercase for consistency
         return switch (rank) {
-            case "a" ->  // Ace
-                    11;
-            case "j", "q", "k" -> // Face cards
-                    10;
-            default ->  // Numeric cards (2-10)
-                    Integer.parseInt(rank);
+            case "a" -> 11; // Ace
+            case "j", "q", "k" -> 10; // Face cards
+            default -> {
+                // Validate and parse numeric ranks
+                try {
+                    int value = Integer.parseInt(rank);
+                    if (value >= 2 && value <= 10) {
+                        yield value; // Valid numeric rank
+                    } else {
+                        throw new IllegalArgumentException("Invalid rank value: " + rank);
+                    }
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Invalid rank format: " + rank, e);
+                }
+            }
         };
     }
+
 
     private void pauseTimelines() {
         if (timeline != null && timeline.getStatus() == Animation.Status.RUNNING) {
@@ -942,6 +1331,8 @@ public class BlackJackUI {
             }
         });
     }
+
+
 }
 
 
