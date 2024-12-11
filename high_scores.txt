@@ -1,2 +1,2 @@
 test:BlackJack=1000:Snake=1000
-dez:BlackJack=1000:Snake=1000
+mario:BlackJack=1000:Snake=1000
