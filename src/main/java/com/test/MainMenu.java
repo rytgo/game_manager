@@ -1,5 +1,6 @@
 package com.test;
 
+import com.test.blackjack.BlackjackMainMenu;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -23,6 +24,26 @@ public class MainMenu {
         this.highScoresManager = highScoresManager;
         this.loginManager = loginManager;
         this.user = user;
+    }
+
+    // Getter for highScoresManager
+    public HighScoresManager getHighScoresManager() {
+        return highScoresManager;
+    }
+
+    // Getter for loginManager
+    public LoginManager getLoginManager() {
+        return loginManager;
+    }
+
+    // Getter for user
+    public String getUser() {
+        return user;
+    }
+
+    // Getter fpr root
+    public VBox getRoot() {
+        return launchMainMenu(new Stage());
     }
 
     // Set a callback for logout
@@ -113,7 +134,7 @@ public class MainMenu {
 
     // Call Blackjack game for blackjackButton
     blackjackButton.setOnAction(e -> {
-        com.test.blackjack.MainMenu blackJackUI = new com.test.blackjack.MainMenu(user);
+        BlackjackMainMenu blackJackUI = new BlackjackMainMenu(user);
         blackJackUI.start(stage);
     });
 

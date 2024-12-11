@@ -1,5 +1,6 @@
 package com.test.blackjack;
 
+import com.test.App;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import com.test.MainMenu;
 
 public class BlackJackUI {
     private final BlackJack blackJack = new BlackJack();
@@ -52,7 +54,8 @@ public class BlackJackUI {
     private Timeline timeline;
     private Timeline dealerTimeline;
     private Timeline playerTimeline;
-    private MainMenu main;
+    private BlackjackMainMenu main;
+    private App mainMenu = new App();
 
     public BlackJackUI(String userName) {
         this.userName = userName;
@@ -204,7 +207,7 @@ public class BlackJackUI {
 
             Stage mainMenuStage = (Stage) root.getScene().getWindow();
             mainMenuStage.close();
-            main = new MainMenu(main.userName());
+            main = new BlackjackMainMenu(main.userName());
             main.start(new Stage());
 //            resumeTimelines();
         });
@@ -213,8 +216,12 @@ public class BlackJackUI {
         backToMainMenu.setOnAction(e -> {
             Stage mainMenuStage = (Stage) root.getScene().getWindow();
             mainMenuStage.close();
-           main = new MainMenu(main.userName());
-            main.start(new Stage());
+            Stage newStage = new Stage();
+            mainMenu.getUpdatedMainMenu().launchMainMenu(newStage);
+            Scene newScene = new Scene(mainMenu.getUpdatedMainMenu().launchMainMenu(new Stage()));
+            newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
+            stage.setScene(newScene);
+            stage.show();
         });
 
         // Initialize a new round
@@ -923,7 +930,7 @@ public class BlackJackUI {
 
             Stage mainMenuStage = (Stage) root.getScene().getWindow();
             mainMenuStage.close();
-            main = new MainMenu(main.userName());
+            main = new BlackjackMainMenu(main.userName());
             main.start(new Stage());
         });
 
