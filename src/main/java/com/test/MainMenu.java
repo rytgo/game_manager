@@ -1,7 +1,9 @@
 package com.test;
 
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -39,59 +41,79 @@ public class MainMenu {
                 .limit(5) // Get the top 5
                 .collect(Collectors.toList());
     }
-
+    
     public VBox launchMainMenu(Stage stage) {
-        VBox root = new VBox();
-        root.getStyleClass().add("container");
+    VBox root = new VBox();
+    root.getStyleClass().add("container");
 
-        Label title = new Label("Main Menu - Welcome " + user);
-        title.getStyleClass().add("label");
+    Label title = new Label("Main Menu - Welcome " + user);
+    title.getStyleClass().add("main-title");
 
-        HBox scoresBox = new HBox();
-        VBox blackjackScores = new VBox();
-        VBox snakeScores = new VBox();
+    GridPane gridPane = new GridPane();
+    gridPane.setHgap(20);
+    gridPane.setVgap(10);
+    gridPane.setAlignment(Pos.CENTER);
 
-        Label blackjackTitle = new Label("BlackJack High Scores: ");
-        Label snakeTitle = new Label("Snake High Scores: ");
+    // High Scores Section
+    VBox highScoresBox = new VBox();
+    highScoresBox.getStyleClass().add("high-scores-container");
+    Label highScoresTitle = new Label("High Scores");
+    highScoresTitle.getStyleClass().add("section-title");
 
-        blackjackScores.getChildren().add(blackjackTitle);
-        snakeScores.getChildren().add(snakeTitle);
+    HBox scoresBox = new HBox(20);
+    VBox blackjackScores = new VBox();
+    VBox snakeScores = new VBox();
 
-        // Get top 5 scores for each game
-        List<Map.Entry<String, Integer>> blackjackTopScores = getTopScores("BlackJack");
-        List<Map.Entry<String, Integer>> snakeTopScores = getTopScores("Snake");
+    Label blackjackTitle = new Label("BlackJack:");
+    Label snakeTitle = new Label("Snake:");
 
-        // Populate BlackJack scores
-        for (int i = 0; i < blackjackTopScores.size(); i++) {
-            Map.Entry<String, Integer> entry = blackjackTopScores.get(i);
-            Label scoreLabel = new Label((i + 1) + ". " + entry.getKey() + ": " + entry.getValue());
-            blackjackScores.getChildren().add(scoreLabel);
-        }
+    blackjackScores.getChildren().add(blackjackTitle);
+    snakeScores.getChildren().add(snakeTitle);
 
-        // Populate Snake scores
-        for (int i = 0; i < snakeTopScores.size(); i++) {
-            Map.Entry<String, Integer> entry = snakeTopScores.get(i);
-            Label scoreLabel = new Label((i + 1) + ". " + entry.getKey() + ": " + entry.getValue());
-            snakeScores.getChildren().add(scoreLabel);
-        }
-
-        scoresBox.getChildren().addAll(blackjackScores, snakeScores);
-
-        // Add buttons for games
-        Button blackjackButton = new Button("Play BlackJack");
-        Button snakeButton = new Button("Play Snake");
-        blackjackButton.setOnAction(e -> System.out.println("Launching BlackJack game...")); // Placeholder
-        snakeButton.setOnAction(e -> System.out.println("Launching Snake game...")); // Placeholder
-
-        // Add logout button
-        Button logoutButton = new Button("Logout");
-        logoutButton.setOnAction(e -> {
-            if (onLogout != null) {
-                onLogout.accept(null); // Trigger the logout callback
-            }
-        });
-
-        root.getChildren().addAll(title, scoresBox, blackjackButton, snakeButton, logoutButton);
-        return root;
+    // Populate BlackJack scores
+    List<Map.Entry<String, Integer>> blackjackTopScores = getTopScores("BlackJack");
+    for (int i = 0; i < blackjackTopScores.size(); i++) {
+        Map.Entry<String, Integer> entry = blackjackTopScores.get(i);
+        Label scoreLabel = new Label((i + 1) + ". " + entry.getKey() + ": " + entry.getValue());
+        blackjackScores.getChildren().add(scoreLabel);
     }
+
+    // Populate Snake scores
+    List<Map.Entry<String, Integer>> snakeTopScores = getTopScores("Snake");
+    for (int i = 0; i < snakeTopScores.size(); i++) {
+        Map.Entry<String, Integer> entry = snakeTopScores.get(i);
+        Label scoreLabel = new Label((i + 1) + ". " + entry.getKey() + ": " + entry.getValue());
+        snakeScores.getChildren().add(scoreLabel);
+    }
+
+    scoresBox.getChildren().addAll(blackjackScores, snakeScores);
+    highScoresBox.getChildren().addAll(highScoresTitle, scoresBox);
+
+    // Game Buttons Section
+    VBox buttonsBox = new VBox(15);
+    buttonsBox.getStyleClass().add("buttons-container");
+
+    Button blackjackButton = new Button("Play BlackJack");
+    Button snakeButton = new Button("Play Snake");
+    blackjackButton.setOnAction(e -> System.out.println("Launching BlackJack game...")); // Placeholder
+    snakeButton.setOnAction(e -> System.out.println("Launching Snake game...")); // Placeholder
+
+    Button logoutButton = new Button("Logout");
+    logoutButton.setOnAction(e -> {
+        if (onLogout != null) {
+            onLogout.accept(null); // Trigger the logout callback
+        }
+    });
+
+    buttonsBox.getChildren().addAll(blackjackButton, snakeButton, logoutButton);
+
+    // Add both sections to the GridPane
+    gridPane.add(highScoresBox, 0, 0);
+    gridPane.add(buttonsBox, 1, 0);
+
+    root.getChildren().addAll(title, gridPane);
+    return root;
+}
+
+    
 }

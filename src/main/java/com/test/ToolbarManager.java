@@ -10,6 +10,7 @@ public class ToolbarManager {
 
     public MenuBar createToolbar(Stage stage, BorderPane rootLayout, MainMenu mainMenu) {
         MenuBar menuBar = new MenuBar();
+        menuBar.setId("toolbar");
 
         Menu navigationMenu = new Menu("Navigation");
 
