@@ -38,7 +38,9 @@ public class LoginManager {
             for (String line : lines) {
                 String[] parts = line.split(":");
                 if (parts.length == 2) {
-                    users.put(parts[0], parts[1]); // Store username and password in the map
+                    String username = parts[0];
+                    String decryptedPassword = Encryption.decrypt(parts[1]);
+                    users.put(username, decryptedPassword);
                 }
             }
         } catch (IOException e) {
@@ -66,8 +68,9 @@ public class LoginManager {
 
     private void saveUser(String username, String password) {
         try {
-            Files.write(Paths.get(fileName), (username + ":" + password + System.lineSeparator()).getBytes(),
-                    java.nio.file.StandardOpenOption.APPEND);
+            String encryptedPassword = Encryption.encrypt(password);
+            String line = username + ":" + encryptedPassword + System.lineSeparator();
+            Files.write(Paths.get(fileName), line.getBytes(), java.nio.file.StandardOpenOption.APPEND);
         } catch (IOException e) {
             System.out.println("Error saving user: " + e.getMessage());
         }
@@ -150,8 +153,10 @@ public class LoginManager {
 
             if (createAccount(username, password)) {
                 showAlert("Success", "Account created successfully!");
-                Scene scene = stage.getScene();
-                scene.setRoot(getLoginScreen(stage));
+                //Scene scene = stage.getScene();
+                //scene.setRoot(getLoginScreen(stage));
+                App app = new App();
+                app.start(stage);
             } else {
                 showAlert("Error", "Failed to create account. Username might already exist.");
             }
