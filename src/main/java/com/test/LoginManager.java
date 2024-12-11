@@ -73,6 +73,14 @@ public class LoginManager {
         }
     }
 
+    private void showAlert(String title, String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null); // No header
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     public VBox getLoginScreen(Stage stage) {
         VBox loginLayout = new VBox();
         loginLayout.getStyleClass().add("container");
@@ -97,7 +105,7 @@ public class LoginManager {
 
             if (authenticate(username, password)) {
                 System.out.println("Login successful!");
-                
+
                 // Initialize high scores for existing users if missing
                 highScoresManager.addUser(username);
 
@@ -105,7 +113,7 @@ public class LoginManager {
                     onLoginSuccess.accept(username); // Call the callback with the username
                 }
             } else {
-                System.out.println("Invalid username or password.");
+                showAlert("Error", "Invalid username or password.");
             }
         });
 
@@ -141,11 +149,11 @@ public class LoginManager {
             String password = passwordField.getText();
 
             if (createAccount(username, password)) {
-                System.out.println("Account created successfully!");
+                showAlert("Success", "Account created successfully!");
                 Scene scene = stage.getScene();
                 scene.setRoot(getLoginScreen(stage));
             } else {
-                System.out.println("Failed to create account. Username might already exist.");
+                showAlert("Error", "Failed to create account. Username might already exist.");
             }
         });
 
@@ -158,3 +166,4 @@ public class LoginManager {
         return createAccountLayout;
     }
 }
+
