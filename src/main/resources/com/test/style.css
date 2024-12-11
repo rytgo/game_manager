@@ -59,3 +59,25 @@ VBox.container, GridPane.container {
     -fx-alignment: center;
 }
 
+#toolbar {
+    -fx-background-color: #FAFAFA;
+    -fx-padding: 10px;
+    -fx-border-color: #CCCCCC;
+    -fx-border-width: 1px;
+}
+
+#main-menu-button {
+    -fx-background-color: #B19CD9;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-size: 14px; /* Smaller font size */
+    -fx-background-radius: 5px;
+    -fx-padding: 10px 20px; /* Reduced padding */
+    -fx-pref-width: 120px;
+    -fx-pref-height: 70px;
+}
+
+#main-menu-button:hover {
+    -fx-background-color: #957DAD;
+}
