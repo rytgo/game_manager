@@ -14,10 +14,12 @@
 }
 
 .section-title {
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #555;
-    -fx-padding: 5px 0;
+    -fx-font-size: 20px;
+    -fx-text-fill: #B19CD9;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
+    -fx-background-radius: 5px;
+    -fx-padding: 0px 5px;
 }
 
 .buttons-container {
@@ -31,15 +33,16 @@
 }
 
 .button {
-    -fx-background-color: #4285F4;
-    -fx-text-fill: white;
+    -fx-background-color: #B19CD9;
+    -fx-text-fill: black;
     -fx-font-weight: bold;
+    -fx-font-family: "AppleMyungjo";
     -fx-background-radius: 5px;
     -fx-padding: 10px 20px;
 }
 
 .button:hover {
-    -fx-background-color: #3367D6;
+    -fx-background-color: #957DAD;
 }
 
 .text-field, .password-field {
