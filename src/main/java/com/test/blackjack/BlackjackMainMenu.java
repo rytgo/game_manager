@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public record MainMenu(String userName) {
+public record BlackjackMainMenu(String userName) {
 
     public void start(Stage primaryStage) {
         // Create BlackJackUI instance

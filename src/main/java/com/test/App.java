@@ -6,11 +6,18 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class App extends Application {
+    private MainMenu updatedMainMenu;
+    private HighScoresManager highScoresManager = new HighScoresManager("high_scores.txt");
+    private LoginManager loginManager = new LoginManager("user_accounts.txt", highScoresManager);
+
+    // Getter for updatedMainMenu
+    public MainMenu getUpdatedMainMenu() {
+        return new MainMenu(highScoresManager, loginManager, loginManager.getUser());
+    }
 
     @Override
     public void start(Stage stage) {
-        HighScoresManager highScoresManager = new HighScoresManager("high_scores.txt");
-        LoginManager loginManager = new LoginManager("user_accounts.txt", highScoresManager);
+
         ToolbarManager toolbarManager = new ToolbarManager();
 
         BorderPane rootLayout = new BorderPane();
@@ -20,7 +27,7 @@ public class App extends Application {
 
         // Define the behavior for successful login
         loginManager.setOnLoginSuccess(username -> {
-            MainMenu updatedMainMenu = new MainMenu(highScoresManager, loginManager, username);
+            updatedMainMenu = new MainMenu(highScoresManager, loginManager, username);
 
             // Add the toolbar (only once, after login)
             rootLayout.setTop(toolbarManager.createToolbar(stage, rootLayout, updatedMainMenu));

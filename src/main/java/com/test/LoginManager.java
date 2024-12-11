@@ -173,5 +173,9 @@ public class LoginManager {
         createAccountLayout.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField, createAccountButton, backButton);
         return createAccountLayout;
     }
+
+    public String getUser() {
+        return users.keySet().iterator().next();
+    }
 }
 
