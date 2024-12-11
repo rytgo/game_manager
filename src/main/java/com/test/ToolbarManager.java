@@ -1,28 +1,30 @@
 package com.test;
 
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.stage.Stage;
+import javafx.scene.control.Button;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 public class ToolbarManager {
 
-    public MenuBar createToolbar(Stage stage, BorderPane rootLayout, MainMenu mainMenu) {
-        MenuBar menuBar = new MenuBar();
-        menuBar.setId("toolbar");
+    public HBox createToolbar(Stage stage, BorderPane rootLayout, MainMenu mainMenu) {
+        // Create an HBox for the toolbar
+        HBox toolbar = new HBox();
+        toolbar.setId("toolbar"); // Apply styling via CSS
+        toolbar.setSpacing(10); // Add some spacing between elements
+        toolbar.setPadding(new javafx.geometry.Insets(10)); // Add padding
+        toolbar.setAlignment(javafx.geometry.Pos.CENTER_LEFT); // Align to the left
 
-        Menu navigationMenu = new Menu("Navigation");
+        // Create the Main Menu button
+        Button mainMenuButton = new Button("Main Menu");
+        mainMenuButton.setId("main-menu-button"); // Add a CSS ID for styling
 
-        MenuItem mainMenuItem = new MenuItem("Main Menu");
-        mainMenuItem.setOnAction(e -> {
-            // Set only the center content to the MainMenu
-            rootLayout.setCenter(mainMenu.launchMainMenu(stage));
-        });
+        // Set the action for the Main Menu button
+        mainMenuButton.setOnAction(e -> rootLayout.setCenter(mainMenu.launchMainMenu(stage)));
 
-        navigationMenu.getItems().add(mainMenuItem);
-        menuBar.getMenus().add(navigationMenu);
+        // Add the button to the toolbar
+        toolbar.getChildren().add(mainMenuButton);
 
-        return menuBar;
+        return toolbar;
     }
 }

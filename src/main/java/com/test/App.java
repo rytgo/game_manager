@@ -14,7 +14,7 @@ public class App extends Application {
         ToolbarManager toolbarManager = new ToolbarManager();
 
         BorderPane rootLayout = new BorderPane();
-        Scene scene = new Scene(rootLayout, 640, 480);
+        Scene scene = new Scene(rootLayout, 800, 600);
         scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         rootLayout.setCenter(loginManager.getLoginScreen(stage));
 
