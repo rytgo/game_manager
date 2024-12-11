@@ -4,7 +4,6 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -53,6 +52,7 @@ public class BlackJackUI {
     private Timeline timeline;
     private Timeline dealerTimeline;
     private Timeline playerTimeline;
+    private MainMenu main;
 
     public BlackJackUI(String userName) {
         this.userName = userName;
@@ -204,8 +204,8 @@ public class BlackJackUI {
 
             Stage mainMenuStage = (Stage) root.getScene().getWindow();
             mainMenuStage.close();
-            new Main().start(new Stage());
-
+            main = new MainMenu(main.userName());
+            main.start(new Stage());
 //            resumeTimelines();
         });
 
@@ -213,7 +213,8 @@ public class BlackJackUI {
         backToMainMenu.setOnAction(e -> {
             Stage mainMenuStage = (Stage) root.getScene().getWindow();
             mainMenuStage.close();
-            new Main().start(new Stage());
+           main = new MainMenu(main.userName());
+            main.start(new Stage());
         });
 
         // Initialize a new round
@@ -922,7 +923,8 @@ public class BlackJackUI {
 
             Stage mainMenuStage = (Stage) root.getScene().getWindow();
             mainMenuStage.close();
-            new Main().start(new Stage());
+            main = new MainMenu(main.userName());
+            main.start(new Stage());
         });
 
         if (blackJack.getHuman().getMoney() <= 0) {

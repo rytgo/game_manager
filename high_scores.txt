@@ -1,2 +1,4 @@
+a:BlackJack=1000:Snake=1000
+bbb:BlackJack=1000:Snake=1000
 test:BlackJack=1000:Snake=1000
 mario:BlackJack=1000:Snake=1000
