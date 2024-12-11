@@ -158,8 +158,11 @@ public class LoginManager {
         });
 
         backButton.setOnAction(e -> {
-            Scene scene = stage.getScene();
-            scene.setRoot(getLoginScreen(stage));
+            //Scene scene = stage.getScene();
+            //scene.setRoot(getLoginScreen(stage));
+            //setOnLoginSuccess(this.onLoginSuccess);
+            App app = new App();
+            app.start(stage);
         });
 
         createAccountLayout.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField, createAccountButton, backButton);
