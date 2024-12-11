@@ -111,6 +111,12 @@ public class MainMenu {
     gridPane.add(highScoresBox, 0, 0);
     gridPane.add(buttonsBox, 1, 0);
 
+    // Call Blackjack game for blackjackButton
+    blackjackButton.setOnAction(e -> {
+        com.test.blackjack.MainMenu blackJackUI = new com.test.blackjack.MainMenu(user);
+        blackJackUI.start(stage);
+    });
+
     root.getChildren().addAll(title, gridPane);
     return root;
 }
