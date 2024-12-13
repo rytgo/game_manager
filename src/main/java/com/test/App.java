@@ -5,6 +5,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class App extends Application {
     private MainMenu updatedMainMenu;
     private HighScoresManager highScoresManager;
@@ -23,7 +25,7 @@ public class App extends Application {
 
         BorderPane rootLayout = new BorderPane();
         Scene scene = new Scene(rootLayout, 800, 600);
-        scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
         rootLayout.setCenter(loginManager.getLoginScreen(stage));
 
         // Define the behavior for successful login
