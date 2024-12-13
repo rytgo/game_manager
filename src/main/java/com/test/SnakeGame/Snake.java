@@ -13,8 +13,11 @@ public class Snake {
     public Snake(int startX, int startY) {
         head = new Block(startX, startY);
         tail = head;  // Initially, the head and tail are the same
-        directionX = 1;     // Initial direction: moving right
-        directionY = 0;
+        
+        // Randomize starting direction
+        int[] directions = {-1, 1};
+        directionX = directions[(int) (Math.random() * 2)];
+        directionY = directionX == 0 ? directions[(int) (Math.random() * 2)] : 0;
     }
 
     public void move() {
@@ -72,7 +75,6 @@ public class Snake {
         return tail;
     }
 
-    // TODO: Fix bug with food here
     public boolean checkCollisionWithSelf() {
         Block current = head.getNext();  // Start from the second block
         while (current != null) {

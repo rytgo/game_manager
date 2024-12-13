@@ -5,12 +5,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.scene.control.Label;
 
 public class SnakeGame {
     private Snake snake;
@@ -18,22 +19,40 @@ public class SnakeGame {
     private StackPane root;
     private boolean gameOver = false;
     private int score = 0;
-
+    private boolean isPaused = false;
 
     private Canvas canvas;
     private GraphicsContext gc;
+
+    private Label scoreLabel;  // Label for displaying the score
 
     private long lastUpdate = 0;    //tracks time since last movement
     private int speed = 200_000_000;    // initial speed in nanosecs
 
     public void start(Stage primaryStage) {
-        StackPane root = new StackPane();
+        root = new StackPane();
         Scene scene = new Scene(root, 600, 400);
         
         // Initialize canvas
         canvas = new Canvas(600, 400);  // Set the size of the canvas
         gc = canvas.getGraphicsContext2D();     // Get the drawing context
         root.getChildren().add(canvas);     // Add the canvas to the root
+
+        // Add the score label
+        scoreLabel = new Label("Score: 0");
+        scoreLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7);");
+        StackPane.setAlignment(scoreLabel, Pos.TOP_LEFT);
+        scoreLabel.setTranslateX(10);  // Add padding from the left
+        scoreLabel.setTranslateY(10);  // Add padding from the top
+        root.getChildren().add(scoreLabel);
+
+        // Add pause instruction
+        Label pauseInstruction = new Label("Pause: Press ESC");
+        pauseInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7);");
+        StackPane.setAlignment(pauseInstruction, Pos.TOP_RIGHT);
+        pauseInstruction.setTranslateX(-10);  // Add padding from the right
+        pauseInstruction.setTranslateY(10);   // Add padding from the top
+        root.getChildren().add(pauseInstruction);
 
         drawGrid();
 
@@ -45,14 +64,18 @@ public class SnakeGame {
         // Handle keyboard input for snake direction
         scene.setOnKeyPressed(event -> {
             KeyCode code = event.getCode();
-            if (code == KeyCode.UP && snake.getDirectionY() != 1) {
-                snake.setDirection(0, -1);
-            } else if (code == KeyCode.DOWN && snake.getDirectionY() != -1) {
-                snake.setDirection(0, 1);
-            } else if (code == KeyCode.LEFT && snake.getDirectionX() != 1) {
-                snake.setDirection(-1, 0);
-            } else if (code == KeyCode.RIGHT && snake.getDirectionX() != -1) {
-                snake.setDirection(1, 0);
+            if (code == KeyCode.ESCAPE) {
+                togglePause(primaryStage);
+            } else if (!isPaused) {
+                if (code == KeyCode.UP && snake.getDirectionY() != 1) {
+                    snake.setDirection(0, -1);
+                } else if (code == KeyCode.DOWN && snake.getDirectionY() != -1) {
+                    snake.setDirection(0, 1);
+                } else if (code == KeyCode.LEFT && snake.getDirectionX() != 1) {
+                    snake.setDirection(-1, 0);
+                } else if (code == KeyCode.RIGHT && snake.getDirectionX() != -1) {
+                    snake.setDirection(1, 0);
+                }
             }
         });
 
@@ -60,16 +83,16 @@ public class SnakeGame {
         AnimationTimer gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!gameOver) {
+                if (gameOver) {
+                    stop();
+                    renderGameOverMessage(primaryStage);
+                } else if (!isPaused) {
                     if (now - lastUpdate >= speed) {
                         snake.move();
                         checkCollisions();
                         render(gc);
                         lastUpdate = now;
                     }
-                } else {
-                    stop();
-                    renderGameOverMessage(primaryStage);
                 }
             }
         };
@@ -80,6 +103,49 @@ public class SnakeGame {
         primaryStage.show();
     }
 
+    private void togglePause(Stage primaryStage) {
+
+        if (gameOver) {
+            return;
+        }
+
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            VBox pauseMenu = new VBox(20);
+            pauseMenu.setAlignment(Pos.CENTER);
+
+            // Dim background
+            Canvas overlay = new Canvas(600, 400);
+            GraphicsContext overlayGc = overlay.getGraphicsContext2D();
+            overlayGc.setFill(Color.rgb(0, 0, 0, 0.7));
+            overlayGc.fillRect(0, 0, overlay.getWidth(), overlay.getHeight());
+            root.getChildren().add(overlay);
+
+            // Add "Paused" label
+            javafx.scene.control.Label pauseLabel = new javafx.scene.control.Label("Game Paused");
+            pauseLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: white;");
+
+            // Add Resume button
+            Button resumeButton = new Button("Resume");
+            resumeButton.setStyle(
+                "-fx-font-size: 24px; " +
+                "-fx-padding: 10 20 10 20; " +
+                "-fx-background-color: #00ff00; " +
+                "-fx-text-fill: black;" 
+            );
+
+            resumeButton.setOnAction(e -> {
+                isPaused = false;
+                root.getChildren().remove(overlay);
+                root.getChildren().remove(pauseMenu);
+            });
+
+            pauseMenu.getChildren().addAll(pauseLabel, resumeButton);
+            root.getChildren().add(pauseMenu);
+        }
+    }
+
     private void checkCollisions() {
         // Check if snake eats food
         Block head = snake.getHead();
@@ -87,11 +153,13 @@ public class SnakeGame {
         if (head.getX() == food.getFoodBlock().getX() && head.getY() == food.getFoodBlock().getY()) {
             snake.grow();   //increase the length
             food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
-            score++;    // Increment score
+            score += 10;    // Increment score
+
+            scoreLabel.setText("Score: " + score);
 
             // Increase speed after every 5 pts
-            if (score % 5 == 0 && speed > 50_000_000) {   // Minimum speed limit
-                speed -= 50_000_000;   // increase speed by reducing the delay
+            if (score % 50 == 0 && speed > 50_000_000) {   // Minimum speed limit
+                speed -= 10_000_000;   // increase speed by reducing the delay
             }
         }
 
@@ -124,9 +192,15 @@ public class SnakeGame {
         Scene gameOverScene = new Scene(gameOverRoot, 300, 200);
 
         javafx.scene.control.Label gameOverLabel = new javafx.scene.control.Label("Game Over! Score: " + score);
-        gameOverLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: black;");
+        gameOverLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
         
         javafx.scene.control.Button playAgainButton = new javafx.scene.control.Button("Play Again");
+        playAgainButton.setStyle(
+            "-fx-font-size: 24px; " + 
+            "-fx-padding: 10 20 10 20; " +
+            "-fx-background-color: #00ff00; " +
+            "-fx-text-fill: black;"
+        );
         playAgainButton.setOnAction(e -> {
             // Reset the game state
             gameOver = false;
@@ -151,7 +225,7 @@ public class SnakeGame {
         gc.setFill(Color.BLACK);  // Fill the background with black
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Fill the entire canvas
 
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(Color.GREEN);
         gc.setLineWidth(0.5);
 
         for (int x = 0; x < canvas.getWidth(); x += 20) {
