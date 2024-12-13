@@ -96,27 +96,6 @@ public class BlackJackUI {
         // Display chips and message to tell user to select a chip
         displayChipsAndMessage();
 
-        // Start Game button function
-        startGame.setOnAction(e -> {
-
-            blackJack.dealCard(); // Deal cards to all players
-
-            // Set current turn to the user
-            blackJack.setTurn(getUserName());
-
-            // Highlight user is playing
-            userVBox.setId("styled-vbox");
-
-            startRound();
-
-            dealerHand.getChildren().remove(1);  // Remove the second card from the dealer's hand
-            dealerHand.getChildren().add(backImage);  // Add the back image to the dealer's hand
-        });
-
-        // Display Hit and Stand buttons
-        setHit();
-        setStand();
-
         // Set the stage
         stage.setTitle("Blackjack Game");
         stage.setScene(scene);
@@ -895,6 +874,28 @@ public class BlackJackUI {
 
             // Display chips and message to tell user to select a chip
             displayChipsAndMessage();
+
+            // Start Game button function
+            startGame.setOnAction(event -> {
+
+                blackJack.dealCard(); // Deal cards to all players
+
+                // Set current turn to the user
+                blackJack.setTurn(getUserName());
+
+                // Highlight user is playing
+                userVBox.setId("styled-vbox");
+
+                startRound();
+
+                dealerHand.getChildren().remove(1);  // Remove the second card from the dealer's hand
+                dealerHand.getChildren().add(backImage);  // Add the back image to the dealer's hand
+
+                // Display Hit and Stand buttons
+                setHit();
+                setStand();
+            });
+
         });
     }
 
