@@ -6,11 +6,22 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.test/com.game.SnakeGame.Main",
+            "projectName": "game_manager"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}",
+            "modulePaths": [
+                "${workspaceFolder}/out",
+                "${workspaceFolder}/lib"
+            ],
             "classPaths": [
-                "lib/*", // Includes all JAR files in the lib folder
+                "lib/*",
                 "src/main/java"
             ]
         },
@@ -21,7 +32,7 @@
             "mainClass": "com.test/com.test.App",
             "projectName": "game_manager",
             "classPaths": [
-                "lib/*", // Includes all JAR files in the lib folder
+                "lib/*",
                 "src/main/java"
             ]
         },
@@ -32,7 +43,7 @@
             "mainClass": "com.test/com.test.SnakeGame.Main",
             "projectName": "game_manager",
             "classPaths": [
-                "lib/*", // Includes all JAR files in the lib folder
+                "lib/*",
                 "src/main/java"
             ]
         }

@@ -20,6 +20,12 @@
             <artifactId>javafx-graphics</artifactId>
             <version>23.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.11.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -41,7 +47,7 @@
                         <!-- Usage: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.test.App</mainClass>
+                            <mainClass>com.game.App</mainClass>
                         </configuration>
                     </execution>
                 </executions>
