@@ -11,11 +11,27 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public record BlackjackMainMenu(String userName, MainMenu menu) {
+public class BlackjackMainMenu {
+    private String userName;
+    private MainMenu menu;
+
+    public BlackjackMainMenu(String userName, MainMenu menu) {
+        this.userName = userName;
+        this.menu = menu;
+    }
+
+    // Getters
+    public String getName() {
+        return userName;
+    }
+
+    public MainMenu getMenu() {
+        return menu;
+    }
 
     public void start(Stage primaryStage) {
         // Create BlackJackUI instance
-        BlackJackUI blackJackUI = new BlackJackUI(this.userName, menu);
+        BlackJackUI blackJackUI = new BlackJackUI(this.userName, menu, this);
 
         StackPane root = new StackPane();
         Scene scene = new Scene(root, 640, 480);

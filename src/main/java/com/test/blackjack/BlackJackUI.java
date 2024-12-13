@@ -54,8 +54,8 @@ public class BlackJackUI {
     private Timeline timeline;
     private Timeline dealerTimeline;
     private Timeline playerTimeline;
-    private BlackjackMainMenu main;
-    private final MainMenu menu;
+    private BlackjackMainMenu blackjackMainMenu;
+    private final MainMenu mainMenu;
     private final HBox chips = new HBox();
     private final ImageView chip10 = setImageView("10-chip.png");
     private final ImageView chip20 = setImageView("20-chip.png");
@@ -66,9 +66,10 @@ public class BlackJackUI {
     private final ImageView backImage = setImageView("back.png");
     private final ImageView backgroundImage = setImageView("background.png");
 
-    public BlackJackUI(String userName, MainMenu menu) {
+    public BlackJackUI(String userName, MainMenu mainMenu, BlackjackMainMenu blackjackMainMenu) {
         this.userName = userName;
-        this.menu = menu;
+        this.mainMenu = mainMenu;
+        this.blackjackMainMenu = blackjackMainMenu;
     }
 
     // Getter for userName
@@ -137,10 +138,8 @@ public class BlackJackUI {
         loadButton.setOnAction(e -> {
             String saveStateString = saveStateArea.getText();
             loadState(saveStateString);  // Load the game state
-
+            primaryStage.close(); // Close the load window
             updateUI(primaryStage); // Ensure UI reflects the loaded state
-
-            ((Stage) loadButton.getScene().getWindow()).close();
         });
 
         // Create a VBox to hold the label, save state area, and load button
@@ -557,6 +556,7 @@ public class BlackJackUI {
         startRound();
 
         // Initialize a new round
+        buttons.getChildren().add(newRound);
         setNewRound();
 
         // Display Hit and Stand buttons
@@ -840,8 +840,8 @@ public class BlackJackUI {
 
             Stage mainMenuStage = (Stage) root.getScene().getWindow();
             mainMenuStage.close();
-            main = new BlackjackMainMenu(main.userName(), main.menu());
-            main.start(new Stage());
+            blackjackMainMenu = new BlackjackMainMenu(blackjackMainMenu.getName(), blackjackMainMenu.getMenu());
+            blackjackMainMenu.start(new Stage());
         });
 
         backToMainMenu.setOnAction(e -> {
@@ -849,9 +849,9 @@ public class BlackJackUI {
             BorderPane rootLayout = new BorderPane();
 
             ToolbarManager toolbarManager = new ToolbarManager();
-            rootLayout.setTop(toolbarManager.createToolbar(s, rootLayout, menu));
+            rootLayout.setTop(toolbarManager.createToolbar(s, rootLayout, mainMenu));
 
-            VBox menuVBox = menu.launchMainMenu(s);
+            VBox menuVBox = mainMenu.launchMainMenu(s);
             rootLayout.setCenter(menuVBox);
 
             Scene menuScene = new Scene(rootLayout, 800, 600);
