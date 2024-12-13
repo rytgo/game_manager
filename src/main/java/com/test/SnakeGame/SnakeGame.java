@@ -40,7 +40,7 @@ public class SnakeGame {
 
         // Add the score label
         scoreLabel = new Label("Score: 0");
-        scoreLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7);");
+        scoreLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7);");
         StackPane.setAlignment(scoreLabel, Pos.TOP_LEFT);
         scoreLabel.setTranslateX(10);  // Add padding from the left
         scoreLabel.setTranslateY(10);  // Add padding from the top
@@ -104,7 +104,7 @@ public class SnakeGame {
         isPaused = !isPaused;
 
         if (isPaused) {
-            VBox pauseMenu = new VBox(10);
+            VBox pauseMenu = new VBox(20);
             pauseMenu.setAlignment(Pos.CENTER);
 
             // Dim background
@@ -116,10 +116,17 @@ public class SnakeGame {
 
             // Add "Paused" label
             javafx.scene.control.Label pauseLabel = new javafx.scene.control.Label("Game Paused");
-            pauseLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+            pauseLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: white;");
 
             // Add Resume button
             Button resumeButton = new Button("Resume");
+            resumeButton.setStyle(
+                "-fx-font-size: 24px; " +
+                "-fx-padding: 10 20 10 20; " +
+                "-fx-background-color: #00ff00; " +
+                "-fx-text-fill: black;" 
+            );
+
             resumeButton.setOnAction(e -> {
                 isPaused = false;
                 root.getChildren().remove(overlay);
@@ -138,13 +145,13 @@ public class SnakeGame {
         if (head.getX() == food.getFoodBlock().getX() && head.getY() == food.getFoodBlock().getY()) {
             snake.grow();   //increase the length
             food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
-            score++;    // Increment score
+            score += 10;    // Increment score
 
             scoreLabel.setText("Score: " + score);
 
             // Increase speed after every 5 pts
-            if (score % 5 == 0 && speed > 50_000_000) {   // Minimum speed limit
-                speed -= 50_000_000;   // increase speed by reducing the delay
+            if (score % 50 == 0 && speed > 50_000_000) {   // Minimum speed limit
+                speed -= 10_000_000;   // increase speed by reducing the delay
             }
         }
 
@@ -204,7 +211,7 @@ public class SnakeGame {
         gc.setFill(Color.BLACK);  // Fill the background with black
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());  // Fill the entire canvas
 
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(Color.GREEN);
         gc.setLineWidth(0.5);
 
         for (int x = 0; x < canvas.getWidth(); x += 20) {
