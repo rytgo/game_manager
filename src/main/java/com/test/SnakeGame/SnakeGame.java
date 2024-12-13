@@ -46,6 +46,14 @@ public class SnakeGame {
         scoreLabel.setTranslateY(10);  // Add padding from the top
         root.getChildren().add(scoreLabel);
 
+        // Add pause instruction
+        Label pauseInstruction = new Label("Pause: Press ESC");
+        pauseInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7);");
+        StackPane.setAlignment(pauseInstruction, Pos.TOP_RIGHT);
+        pauseInstruction.setTranslateX(-10);  // Add padding from the right
+        pauseInstruction.setTranslateY(10);   // Add padding from the top
+        root.getChildren().add(pauseInstruction);
+
         drawGrid();
 
         // Initialize snake and food 
@@ -184,9 +192,15 @@ public class SnakeGame {
         Scene gameOverScene = new Scene(gameOverRoot, 300, 200);
 
         javafx.scene.control.Label gameOverLabel = new javafx.scene.control.Label("Game Over! Score: " + score);
-        gameOverLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: black;");
+        gameOverLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
         
         javafx.scene.control.Button playAgainButton = new javafx.scene.control.Button("Play Again");
+        playAgainButton.setStyle(
+            "-fx-font-size: 24px; " + 
+            "-fx-padding: 10 20 10 20; " +
+            "-fx-background-color: #00ff00; " +
+            "-fx-text-fill: black;"
+        );
         playAgainButton.setOnAction(e -> {
             // Reset the game state
             gameOver = false;
