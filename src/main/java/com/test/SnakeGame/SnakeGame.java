@@ -11,6 +11,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.scene.control.Label;
 
 public class SnakeGame {
     private Snake snake;
@@ -23,6 +24,8 @@ public class SnakeGame {
     private Canvas canvas;
     private GraphicsContext gc;
 
+    private Label scoreLabel;  // Label for displaying the score
+
     private long lastUpdate = 0;    //tracks time since last movement
     private int speed = 200_000_000;    // initial speed in nanosecs
 
@@ -34,6 +37,14 @@ public class SnakeGame {
         canvas = new Canvas(600, 400);  // Set the size of the canvas
         gc = canvas.getGraphicsContext2D();     // Get the drawing context
         root.getChildren().add(canvas);     // Add the canvas to the root
+
+        // Add the score label
+        scoreLabel = new Label("Score: 0");
+        scoreLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7);");
+        StackPane.setAlignment(scoreLabel, Pos.TOP_LEFT);
+        scoreLabel.setTranslateX(10);  // Add padding from the left
+        scoreLabel.setTranslateY(10);  // Add padding from the top
+        root.getChildren().add(scoreLabel);
 
         drawGrid();
 
@@ -128,6 +139,8 @@ public class SnakeGame {
             snake.grow();   //increase the length
             food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
             score++;    // Increment score
+
+            scoreLabel.setText("Score: " + score);
 
             // Increase speed after every 5 pts
             if (score % 5 == 0 && speed > 50_000_000) {   // Minimum speed limit
