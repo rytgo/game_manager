@@ -1,6 +1,6 @@
 package com.test.blackjack;
 
-import com.test.App;
+import com.test.ToolbarManager;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -55,10 +55,20 @@ public class BlackJackUI {
     private Timeline dealerTimeline;
     private Timeline playerTimeline;
     private BlackjackMainMenu main;
-    private App mainMenu = new App();
+    private final MainMenu menu;
+    private final HBox chips = new HBox();
+    private final ImageView chip10 = setImageView("10-chip.png");
+    private final ImageView chip20 = setImageView("20-chip.png");
+    private final ImageView chip50 = setImageView("50-chip.png");
+    private final ImageView chip100 = setImageView("100-chip.png");
+    private final HBox buttons = new HBox();
+    private final Button newRound = new Button("New Round");
+    private final ImageView backImage = setImageView("back.png");
+    private final ImageView backgroundImage = setImageView("background.png");
 
-    public BlackJackUI(String userName) {
+    public BlackJackUI(String userName, MainMenu menu) {
         this.userName = userName;
+        this.menu = menu;
     }
 
     // Getter for userName
@@ -70,216 +80,20 @@ public class BlackJackUI {
 
         Scene scene = new Scene(root, 1280, 920);
 
-        // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
-        Button newRound = new Button("New Round");
-        Button saveGame = new Button("Save Game");
-        Button backToMainMenu = new Button("Main Menu");
-
-        // Set button styles
-        HBox buttons = new HBox();
-        buttons.getChildren().addAll(newRound, saveGame, backToMainMenu);
-
-        // Create VBox to hold the players' spots
-        // userVBox
-        Label userLabel = new Label(getUserName());
-        userBet.setText("Bet: $" + blackJack.getHuman().getBet());
-        userTotal.setText("Balance: $1000");
-        userVBox.setAlignment(Pos.CENTER);
-        userVBox.getChildren().addAll(userLabel, userBet, userTotal);
-
-        // dealerVBox
-        Label dealerLabel = new Label("Dealer");
-        dealerVBox.setAlignment(Pos.CENTER);
-        dealerVBox.getChildren().add(dealerLabel);
-
-        // computerOneVBox
-        Label computerOneLabel = new Label("Computer 1");
-        computerOneBet.setText("Bet: $" + blackJack.getComputerOne().getBet());
-        computerOneTotal.setText("Balance: $1000");
-        computerOneVBox.setAlignment(Pos.CENTER);
-        computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
-
-        // computerTwoVBox
-        Label computerTwoLabel = new Label("Computer 2");
-        computerTwoBet.setText("Bet: " + blackJack.getComputerTwo().getBet());
-        computerTwoTotal.setText("Balance: $1000");
-        computerTwoVBox.setAlignment(Pos.CENTER);
-        computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
-
-        // Create deck and background images
-        ImageView backImage = setImageView("back.png");
-        ImageView backgroundImage = setImageView("background.png");
-
-        // Set deck image size
-        backImage.setFitHeight(120);
-        backImage.setFitWidth(85);
-
-        // Create a BorderPane to hold the players' spots
-        BorderPane borderPane = new BorderPane();
-        borderPane.setBottom(userVBox);
-        borderPane.setLeft(computerTwoVBox);
-        borderPane.setRight(computerOneVBox);
-        borderPane.setTop(dealerVBox);
-
-        // Set the background image size
-        backgroundImage.setFitHeight(1911);
-        backgroundImage.setFitWidth(1940);
-
-        root.getChildren().add(backgroundImage);
-
-        // Set chip images and labels for each chip
-        VBox chip10Box = new VBox();
-        ImageView chip10 = setImageView("10-chip.png");
-        Label chip10Label = new Label("10");
-        chip10Box.getChildren().addAll(chip10, chip10Label);
-        chip10Box.setAlignment(Pos.CENTER);
-
-        VBox chip20Box = new VBox();
-        ImageView chip20 = setImageView("20-chip.png");
-        Label chip20Label = new Label("20");
-        chip20Box.getChildren().addAll(chip20, chip20Label);
-        chip20Box.setAlignment(Pos.CENTER);
-
-        VBox chip50Box = new VBox();
-        ImageView chip50 = setImageView("50-chip.png");
-        Label chip50Label = new Label("50");
-        chip50Box.getChildren().addAll(chip50, chip50Label);
-        chip50Box.setAlignment(Pos.CENTER);
-
-        VBox chip100Box = new VBox();
-        ImageView chip100 = setImageView("100-chip.png");
-        Label chip100Label = new Label("100");
-        chip100Box.getChildren().addAll(chip100, chip100Label);
-        chip100Box.setAlignment(Pos.CENTER);
-
-        // Set chip image size
-        chip10.setFitHeight(60);
-        chip20.setFitHeight(60);
-        chip50.setFitHeight(60);
-        chip100.setFitHeight(60);
-
-        // Create an HBox for chips
-        HBox chips = new HBox(chip10Box, chip20Box, chip50Box, chip100Box);
-        chips.getStyleClass().add("chips");
-
         // Set the CSS file for the scene
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
 
-        AnchorPane.setTopAnchor(borderPane, 20.0);
-        AnchorPane.setBottomAnchor(borderPane, 20.0);
-        AnchorPane.setLeftAnchor(borderPane, 20.0);
-        AnchorPane.setRightAnchor(borderPane, 20.0);
+        // Initialize the game
+        initializeGame();
 
-        AnchorPane.setTopAnchor(chips, 10.0);
-        AnchorPane.setBottomAnchor(chips, 10.0);
-        AnchorPane.setRightAnchor(chips, -50.0);
+        // Add New Round button to buttons HBox
+        buttons.getChildren().addAll(newRound);
 
-        root.getChildren().addAll(borderPane, chips, buttons);
+        // Function the New Round button
+        setNewRound();
 
-        // Set the action for the Save Game button
-        saveGame.setOnAction(e -> {
-            String saveState = saveState();
-
-            // Create an Alert of type INFORMATION
-            pauseTimelines();
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Save Game");
-            alert.setHeaderText("Copy the save state string below to save your game state");
-
-            // Make sure the alert blocks other windows
-            alert.initModality(Modality.APPLICATION_MODAL);
-
-            // Create a TextArea for the save state and make it non-editable
-            TextArea saveStateArea = new TextArea(saveState);
-            saveStateArea.setEditable(false);
-            saveStateArea.setWrapText(true);
-
-            // Set a preferred size for the TextArea
-            saveStateArea.setPrefWidth(400);
-            saveStateArea.setPrefHeight(200);
-
-            // Add the TextArea to the alert's content
-            alert.getDialogPane().setContent(saveStateArea);
-
-            // Show the alert and wait for the user's interaction
-            alert.showAndWait();
-
-            Stage mainMenuStage = (Stage) root.getScene().getWindow();
-            mainMenuStage.close();
-            main = new BlackjackMainMenu(main.userName());
-            main.start(new Stage());
-//            resumeTimelines();
-        });
-
-        // Set the action for the Back to Main Menu button
-        backToMainMenu.setOnAction(e -> {
-            Stage mainMenuStage = (Stage) root.getScene().getWindow();
-            mainMenuStage.close();
-            Stage newStage = new Stage();
-            mainMenu.getUpdatedMainMenu().launchMainMenu(newStage);
-            Scene newScene = new Scene(mainMenu.getUpdatedMainMenu().launchMainMenu(new Stage()));
-            newScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
-            stage.setScene(newScene);
-            stage.show();
-        });
-
-        // Initialize a new round
-        newRound.setOnAction(e -> {
-
-            if (blackJack.getHuman().getMoney() <= 0) {
-                showResetWindow();
-                return;
-            }
-
-            if (roundPlaying) {
-                showAlert(Alert.AlertType.INFORMATION, "Round is not over", "The round is not over. Finish the round before starting a new one.");
-                return;
-            }
-
-            // Remove the previous game UI elements
-            userHand.getChildren().clear();
-            computerOneHand.getChildren().clear();
-            computerTwoHand.getChildren().clear();
-            dealerHand.getChildren().clear();
-            startGame.setVisible(false);
-
-            // Reset bets and balances
-            userBet.setText("Bet: $0");
-            computerOneBet.setText("Bet: $0");
-            computerTwoBet.setText("Bet: $0");
-
-            // Hide Hit and Stand buttons
-            userVBox.getChildren().remove(hitAndStand);
-
-            // Remove the result
-            userVBox.getChildren().remove(result);
-            computerOneVBox.getChildren().remove(resultOne);
-            computerTwoVBox.getChildren().remove(resultTwo);
-
-            // Show the chips and message field and start game button
-            chips.setVisible(true);
-            messageField.setVisible(true);
-
-            // Show a message about selecting a bet
-            messageField.setEditable(false);
-            messageField.setId("custom-label");
-            if (!root.getChildren().contains(messageField)) {
-                root.getChildren().add(messageField);
-            }
-
-            AnchorPane.setBottomAnchor(messageField, 180.0);
-            AnchorPane.setLeftAnchor(messageField, 60.0);
-            AnchorPane.setRightAnchor(messageField, 60.0);
-
-            // Reset the round
-            blackJack.resetRound();
-
-            addChipClickHandler(chip10, 10, messageField, userBet, root);
-            addChipClickHandler(chip20, 20, messageField, userBet, root);
-            addChipClickHandler(chip50, 50, messageField, userBet, root);
-            addChipClickHandler(chip100, 100, messageField, userBet, root);
-        });
+        // Display chips and message to tell user to select a chip
+        displayChipsAndMessage();
 
         // Start Game button function
         startGame.setOnAction(e -> {
@@ -292,106 +106,15 @@ public class BlackJackUI {
             // Highlight user is playing
             userVBox.setId("styled-vbox");
 
-            roundPlaying = true;
-
-            // Hide start game, message field and chips
-            startGame.setVisible(false);
-            messageField.setVisible(false);
-            chips.setVisible(false);
-
-            // Random bet for computers
-            int betOne = blackJack.getComputerOne().randomBet();
-            computerOneBet.setText("Bet: $" + betOne);
-            blackJack.getComputerOne().setBet(betOne);
-
-            int betTwo = blackJack.getComputerTwo().randomBet();
-            computerTwoBet.setText("Bet: $" + betTwo);
-            blackJack.getComputerTwo().setBet(betTwo);
-
-
-
-            List<HBox> playerHands = List.of(userHand, computerOneHand, computerTwoHand, dealerHand);
-
-            if (!userVBox.getChildren().contains(userHand)) {
-                userVBox.getChildren().add(userHand);
-            }
-
-            if (!computerOneVBox.getChildren().contains(computerOneHand)) {
-                computerOneVBox.getChildren().add(computerOneHand);
-            }
-
-            if (!computerTwoVBox.getChildren().contains(computerTwoHand)) {
-                computerTwoVBox.getChildren().add(computerTwoHand);
-            }
-
-            if (!dealerVBox.getChildren().contains(dealerHand)) {
-                dealerVBox.getChildren().add(dealerHand);
-            }
-
-            List<Player> players = blackJack.getPlayers();
-
-            // Iterate over players and their corresponding HBoxes
-            for (int i = 0; i < players.size(); i++) {
-                Player player = players.get(i);
-                HBox handUI = playerHands.get(i); // Get the corresponding HBox
-
-                // Add each card in the player's hand to their UI HBox
-                for (Card card : player.getHand()) {
-                    handUI.getChildren().add(createCardImage(card));
-                }
-            }
-
-            // Set alignment for all HBoxes
-            userHand.setAlignment(Pos.CENTER);
-            computerOneHand.setAlignment(Pos.CENTER);
-            computerTwoHand.setAlignment(Pos.CENTER);
-            dealerHand.setAlignment(Pos.CENTER);
-
-
-            // Create Hit and Stand buttons
-            if (!userVBox.getChildren().contains(hitAndStand)) {
-                if (hitAndStand.getChildren().isEmpty()) {
-                    hitAndStand.getChildren().addAll(hit, stand);
-                }
-                userVBox.getChildren().add(hitAndStand);
-                hitAndStand.setAlignment(Pos.CENTER);
-            }
-
-            // Calculate the total for all players
-            blackJack.getHuman().calculateTotal();
-            blackJack.getComputerOne().calculateTotal();
-            blackJack.getComputerTwo().calculateTotal();
-            blackJack.getDealer().calculateTotal();
+            startRound();
 
             dealerHand.getChildren().remove(1);  // Remove the second card from the dealer's hand
             dealerHand.getChildren().add(backImage);  // Add the back image to the dealer's hand
         });
 
-        // Hit button function
-        hit.setOnAction(e -> {
-            roundPlaying = true;
-            if (blackJack.getHuman().getTotal() == 21) {
-                showAlert(Alert.AlertType.INFORMATION, "You have 21 or Blackjack", "You have 21 or Blackjack! Stand to finish your turn.");
-            } else {
-                blackJack.getHuman().play(blackJack.getDeck());
-                userHand.getChildren().add(createCardImage(blackJack.getHuman().getHand().getLast()));
-
-                // If the user busts, auto lose
-                if (blackJack.getHuman().getTotal() > 21) {
-                    notUserPlay();
-                }
-            }
-        });
-
-        // Stand button function
-        stand.setOnAction(e -> {
-            roundPlaying = true;
-            if (blackJack.getHuman().getTotal() < 16) {
-                showAlert(Alert.AlertType.INFORMATION, "You must hit", "You must hit! Your total is less than 16.");
-            } else {
-                notUserPlay();
-            }
-        });
+        // Display Hit and Stand buttons
+        setHit();
+        setStand();
 
         // Set the stage
         stage.setTitle("Blackjack Game");
@@ -453,10 +176,11 @@ public class BlackJackUI {
     // Helper method to add chip click handlers
     private void addChipClickHandler(ImageView chip, int betAmount, TextField messageField, Label userBet, AnchorPane root) {
         chip.setOnMouseClicked(e -> {
+            System.out.println("Chip clicked: " + betAmount);
 
             // Check if the user has enough money to bet
             if (!blackJack.getHuman().isValidBet(betAmount)) {
-                showAlert(Alert.AlertType.INFORMATION,"Invalid bet", "You do not have enough money to bet $" + betAmount + ".");
+                showAlert("Invalid bet", "You do not have enough money to bet $" + betAmount + ".");
                 return;
             }
 
@@ -486,8 +210,8 @@ public class BlackJackUI {
     }
 
     // Helper method for showing alert messages
-    private void showAlert(Alert.AlertType alertType, String title, String content) {
-        Alert alert = new Alert(alertType);
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
@@ -505,7 +229,7 @@ public class BlackJackUI {
     }
 
     // Helper method for computers and dealer to play and determine the winner
-    public void notUserPlay() {
+    private void notUserPlay() {
         userVBox.getChildren().remove(hitAndStand);
 
         // Un-highlight user is playing
@@ -528,7 +252,7 @@ public class BlackJackUI {
         blackJack.setTurn(player.getName());
     }
 
-    // Create a timeline for a specific player's turn
+    // Helper method to create a timeline for a specific player's turn
     private Timeline createPlayerTimeline(Player player, HBox hand, VBox playerBox) {
         timeline = new Timeline();
         int cardDelay = 2000;  // Delay for card animations
@@ -546,11 +270,11 @@ public class BlackJackUI {
             messageArea.setId("custom-label");
             timeline.getKeyFrames().add(new KeyFrame(
                     Duration.millis(cardDelay),
-                    event -> playerBox.getChildren().add(messageArea)
+                    e -> playerBox.getChildren().add(messageArea)
             ));
             timeline.getKeyFrames().add(new KeyFrame(
                     Duration.millis(cardDelay * 2), // Delay to allow the message to be visible
-                    event -> playerBox.getChildren().remove(messageArea)
+                    e -> playerBox.getChildren().remove(messageArea)
             ));
         } else {
             // Handle "Hit" animations
@@ -558,7 +282,7 @@ public class BlackJackUI {
                 int index = i;
                 timeline.getKeyFrames().add(new KeyFrame(
                         Duration.millis(cardDelay * (index - 1) + 300),
-                        event -> {
+                        e -> {
                             hand.getChildren().add(createCardImage(player.getHand().get(index)));
                             messageArea = new Label(player.getName() + " hits!");
                             messageArea.setId("custom-label");
@@ -568,7 +292,7 @@ public class BlackJackUI {
 
                 timeline.getKeyFrames().add(new KeyFrame(
                         Duration.millis(cardDelay * index),
-                        event -> playerBox.getChildren().remove(messageArea)
+                        e -> playerBox.getChildren().remove(messageArea)
                 ));
             }
             showStandMessage(player, playerBox, timeline, cardDelay);
@@ -576,11 +300,11 @@ public class BlackJackUI {
         return timeline;
     }
 
-    // Show the "Stand" or "Busted" message after a player's turn
+    // Helper method to show the "Stand" or "Busted" message after a player's turn
     private void showStandMessage(Player player, VBox playerVBox, Timeline timeline, int cardDelay) {
         timeline.getKeyFrames().add(new KeyFrame(
                 Duration.millis(cardDelay * (player.getHand().size() - 1) + 500),
-                event -> {
+                e -> {
                     String message = player.calculateTotal() > 21 ? player.getName() + " is busted!" : player.getName() + " stands!";
                     messageArea = new Label(message);
                     messageArea.setId("custom-label");
@@ -589,7 +313,7 @@ public class BlackJackUI {
         ));
         timeline.getKeyFrames().add(new KeyFrame(
                 Duration.millis(cardDelay * (player.getHand().size() + 1)),
-                event -> playerVBox.getChildren().remove(messageArea)
+                e -> playerVBox.getChildren().remove(messageArea)
         ));
     }
 
@@ -620,18 +344,18 @@ public class BlackJackUI {
             messageArea.setId("custom-label");
             dealerTimeline.getKeyFrames().add(new KeyFrame(
                     Duration.millis(cardDelay),
-                    event -> dealerVBox.getChildren().add(messageArea)
+                    e -> dealerVBox.getChildren().add(messageArea)
             ));
             dealerTimeline.getKeyFrames().add(new KeyFrame(
                     Duration.millis(cardDelay * 2), // Delay to allow the message to be visible
-                    event -> dealerVBox.getChildren().remove(messageArea)
+                    e -> dealerVBox.getChildren().remove(messageArea)
             ));
         } else {
             for (int i = 2; i < blackJack.getDealer().getHand().size(); i++) {
                 int index = i;
                 dealerTimeline.getKeyFrames().add(new KeyFrame(
                         Duration.millis(cardDelay * (index - 1) + 300),
-                        event -> {
+                        e -> {
                             dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(index)));
                             messageArea = new Label(blackJack.getDealer().getName() + " hits!");
                             messageArea.setId("custom-label");
@@ -641,7 +365,7 @@ public class BlackJackUI {
 
                 dealerTimeline.getKeyFrames().add(new KeyFrame(
                         Duration.millis(cardDelay * index),
-                        event -> dealerVBox.getChildren().remove(messageArea)
+                        e -> dealerVBox.getChildren().remove(messageArea)
                 ));
             }
             showStandMessage(blackJack.getDealer(), dealerVBox, dealerTimeline, cardDelay);
@@ -766,7 +490,7 @@ public class BlackJackUI {
     }
 
     // Update the UI based on the loaded state
-    public void loadState(String saveStateString) {
+    private void loadState(String saveStateString) {
         String[] playerData = saveStateString.split("\\|");
 
         System.out.println(Arrays.toString(playerData));
@@ -789,150 +513,14 @@ public class BlackJackUI {
     }
 
     // Helper method to update the UI based on the current game state
-    public void updateUI(Stage stage) {
+    private void updateUI(Stage stage) {
         root.getChildren().clear();
         Scene scene = new Scene(root, 1280, 920);
-
-        // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
-        Button newRound = new Button("New Round");
-        Button saveGame = new Button("Save Game");
-        Button backToMainMenu = new Button("Main Menu");
-
-        // Set button styles
-        HBox buttons = new HBox();
-        buttons.getChildren().addAll(newRound, saveGame, backToMainMenu);
-
-        // Create VBox to hold the players' spots
-        // userVBox
-        Label userLabel = new Label(getUserName());
-        userBet.setText("Bet: $" + blackJack.getHuman().getBet());
-        userTotal.setText("Balance: $1000");
-        userVBox.setAlignment(Pos.CENTER);
-        userVBox.getChildren().addAll(userLabel, userBet, userTotal);
-
-        // dealerVBox
-        Label dealerLabel = new Label("Dealer");
-        dealerVBox.setAlignment(Pos.CENTER);
-        dealerVBox.getChildren().add(dealerLabel);
-
-        // computerOneVBox
-        Label computerOneLabel = new Label("Computer 1");
-        computerOneBet.setText("Bet: $" + blackJack.getComputerOne().getBet());
-        computerOneTotal.setText("Balance: $1000");
-        computerOneVBox.setAlignment(Pos.CENTER);
-        computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
-
-        // computerTwoVBox
-        Label computerTwoLabel = new Label("Computer 2");
-        computerTwoBet.setText("Bet: " + blackJack.getComputerTwo().getBet());
-        computerTwoTotal.setText("Balance: $1000");
-        computerTwoVBox.setAlignment(Pos.CENTER);
-        computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
-
-        // Create deck and background images
-        ImageView backImage = setImageView("back.png");
-        ImageView backgroundImage = setImageView("background.png");
-
-        // Set deck image size
-        backImage.setFitHeight(120);
-        backImage.setFitWidth(85);
-
-        // Create a BorderPane to hold the players' spots
-        BorderPane borderPane = new BorderPane();
-        borderPane.setBottom(userVBox);
-        borderPane.setLeft(computerTwoVBox);
-        borderPane.setRight(computerOneVBox);
-        borderPane.setTop(dealerVBox);
-
-        // Set the background image size
-        backgroundImage.setFitHeight(1911);
-        backgroundImage.setFitWidth(1940);
-
-        root.getChildren().add(backgroundImage);
-
-        // Set chip images and labels for each chip
-        VBox chip10Box = new VBox();
-        ImageView chip10 = setImageView("10-chip.png");
-        Label chip10Label = new Label("10");
-        chip10Box.getChildren().addAll(chip10, chip10Label);
-        chip10Box.setAlignment(Pos.CENTER);
-
-        VBox chip20Box = new VBox();
-        ImageView chip20 = setImageView("20-chip.png");
-        Label chip20Label = new Label("20");
-        chip20Box.getChildren().addAll(chip20, chip20Label);
-        chip20Box.setAlignment(Pos.CENTER);
-
-        VBox chip50Box = new VBox();
-        ImageView chip50 = setImageView("50-chip.png");
-        Label chip50Label = new Label("50");
-        chip50Box.getChildren().addAll(chip50, chip50Label);
-        chip50Box.setAlignment(Pos.CENTER);
-
-        VBox chip100Box = new VBox();
-        ImageView chip100 = setImageView("100-chip.png");
-        Label chip100Label = new Label("100");
-        chip100Box.getChildren().addAll(chip100, chip100Label);
-        chip100Box.setAlignment(Pos.CENTER);
-
-        // Set chip image size
-        chip10.setFitHeight(60);
-        chip20.setFitHeight(60);
-        chip50.setFitHeight(60);
-        chip100.setFitHeight(60);
-
-        // Create an HBox for chips
-        HBox chips = new HBox(chip10Box, chip20Box, chip50Box, chip100Box);
-        chips.getStyleClass().add("chips");
 
         // Set the CSS file for the scene
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
 
-        AnchorPane.setTopAnchor(borderPane, 20.0);
-        AnchorPane.setBottomAnchor(borderPane, 20.0);
-        AnchorPane.setLeftAnchor(borderPane, 20.0);
-        AnchorPane.setRightAnchor(borderPane, 20.0);
-
-        AnchorPane.setTopAnchor(chips, 10.0);
-        AnchorPane.setBottomAnchor(chips, 10.0);
-        AnchorPane.setRightAnchor(chips, -50.0);
-
-        root.getChildren().addAll(borderPane, chips, buttons);
-
-        // Set the action for the Save Game button
-        saveGame.setOnAction(e -> {
-            String saveState = saveState();
-
-            // Create an Alert of type INFORMATION
-            pauseTimelines();
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Save Game");
-            alert.setHeaderText("Copy the save state string below to save your game state");
-
-            // Make sure the alert blocks other windows
-            alert.initModality(Modality.APPLICATION_MODAL);
-
-            // Create a TextArea for the save state and make it non-editable
-            TextArea saveStateArea = new TextArea(saveState);
-            saveStateArea.setEditable(false);
-            saveStateArea.setWrapText(true);
-
-            // Set a preferred size for the TextArea
-            saveStateArea.setPrefWidth(400);
-            saveStateArea.setPrefHeight(200);
-
-            // Add the TextArea to the alert's content
-            alert.getDialogPane().setContent(saveStateArea);
-
-            // Show the alert and wait for the user's interaction
-            alert.showAndWait();
-
-            Stage mainMenuStage = (Stage) root.getScene().getWindow();
-            mainMenuStage.close();
-            main = new BlackjackMainMenu(main.userName());
-            main.start(new Stage());
-        });
+        initializeGame();
 
         if (blackJack.getHuman().getMoney() <= 0) {
             showResetWindow();
@@ -940,32 +528,12 @@ public class BlackJackUI {
         }
 
         if (roundPlaying) {
-            showAlert(Alert.AlertType.INFORMATION,"Round is not over", "The round is not over. Finish the round before starting a new one.");
+            showAlert("Round is not over", "The round is not over. Finish the round before starting a new one.");
             return;
         }
 
-        // Hide Hit and Stand buttons
-        userVBox.getChildren().remove(hitAndStand);
-
-        // Show the chips and message field and start game button
-        chips.setVisible(true);
-        messageField.setVisible(true);
-
-        // Show a message about selecting a bet
-        messageField.setEditable(false);
-        messageField.setId("custom-label");
-        if (!root.getChildren().contains(messageField)) {
-            root.getChildren().add(messageField);
-        }
-
-        AnchorPane.setBottomAnchor(messageField, 180.0);
-        AnchorPane.setLeftAnchor(messageField, 60.0);
-        AnchorPane.setRightAnchor(messageField, 60.0);
-
-        addChipClickHandler(chip10, 10, messageField, userBet, root);
-        addChipClickHandler(chip20, 20, messageField, userBet, root);
-        addChipClickHandler(chip50, 50, messageField, userBet, root);
-        addChipClickHandler(chip100, 100, messageField, userBet, root);
+        // Display chips and message to tell user to select a chip
+        displayChipsAndMessage();
 
         // Set current turn to the user
         blackJack.setTurn(blackJack.getTurn());
@@ -974,18 +542,7 @@ public class BlackJackUI {
         String currentTurn = blackJack.getTurn(); // Get the name of the player whose turn it is
 
         for (Player player : blackJack.getPlayers()) {
-            VBox correspondingVBox = null;
-
-            // Match the player to their VBox
-            if (player.getName().equals(getUserName())) {
-                correspondingVBox = userVBox;
-            } else if (player.getName().equals("Computer 1")) {
-                correspondingVBox = computerOneVBox;
-            } else if (player.getName().equals("Computer 2")) {
-                correspondingVBox = computerTwoVBox;
-            } else if (player.getName().equals("Dealer")) {
-                correspondingVBox = dealerVBox;
-            }
+            VBox correspondingVBox = getvBox(player);
 
             if (correspondingVBox != null) {
                 // Set the ID for the player's VBox if it's their turn
@@ -997,162 +554,35 @@ public class BlackJackUI {
             }
         }
 
-        roundPlaying = true;
-
-        // Hide start game, message field and chips
-        startGame.setVisible(false);
-        messageField.setVisible(false);
-        chips.setVisible(false);
-
-        // Random bet for computers
-        int betOne = blackJack.getComputerOne().randomBet();
-        computerOneBet.setText("Bet: $" + betOne);
-        blackJack.getComputerOne().setBet(betOne);
-
-        int betTwo = blackJack.getComputerTwo().randomBet();
-        computerTwoBet.setText("Bet: $" + betTwo);
-        blackJack.getComputerTwo().setBet(betTwo);
-
-        List<HBox> playerHands = List.of(userHand, computerOneHand, computerTwoHand, dealerHand);
-
-        if (!userVBox.getChildren().contains(userHand)) {
-            userVBox.getChildren().add(userHand);
-        }
-
-        if (!computerOneVBox.getChildren().contains(computerOneHand)) {
-            computerOneVBox.getChildren().add(computerOneHand);
-        }
-
-        if (!computerTwoVBox.getChildren().contains(computerTwoHand)) {
-            computerTwoVBox.getChildren().add(computerTwoHand);
-        }
-
-        if (!dealerVBox.getChildren().contains(dealerHand)) {
-            dealerVBox.getChildren().add(dealerHand);
-        }
-
-        List<Player> players = blackJack.getPlayers();
-
-        // Iterate over players and their corresponding HBoxes
-        for (int i = 0; i < players.size(); i++) {
-            Player player = players.get(i);
-            HBox handUI = playerHands.get(i); // Get the corresponding HBox
-
-            handUI.getChildren().clear();
-
-            // Add each card in the player's hand to their UI HBox
-            for (Card card : player.getHand()) {
-                handUI.getChildren().add(createCardImage(card));
-            }
-        }
-
-        // Set alignment for all HBoxes
-        userHand.setAlignment(Pos.CENTER);
-        computerOneHand.setAlignment(Pos.CENTER);
-        computerTwoHand.setAlignment(Pos.CENTER);
-        dealerHand.setAlignment(Pos.CENTER);
-
-        // Create Hit and Stand buttons
-        if (!userVBox.getChildren().contains(hitAndStand)) {
-            if (hitAndStand.getChildren().isEmpty()) {
-                hitAndStand.getChildren().addAll(hit, stand);
-            }
-            userVBox.getChildren().add(hitAndStand);
-            hitAndStand.setAlignment(Pos.CENTER);
-        }
-
-        // Calculate the total for all players
-        blackJack.getHuman().calculateTotal();
-        blackJack.getComputerOne().calculateTotal();
-        blackJack.getComputerTwo().calculateTotal();
-        blackJack.getDealer().calculateTotal();
+        startRound();
 
         // Initialize a new round
-        newRound.setOnAction(e -> {
+        setNewRound();
 
-            if (blackJack.getHuman().getMoney() <= 0) {
-                showResetWindow();
-                return;
-            }
+        // Display Hit and Stand buttons
+        setHit();
+        setStand();
 
-            if (roundPlaying) {
-                showAlert(Alert.AlertType.INFORMATION, "Round is not over", "The round is not over. Finish the round before starting a new one.");
-                return;
-            }
-
-            // Remove the previous game UI elements
-            userHand.getChildren().clear();
-            computerOneHand.getChildren().clear();
-            computerTwoHand.getChildren().clear();
-            dealerHand.getChildren().clear();
-            startGame.setVisible(false);
-
-            // Reset bets and balances
-            userBet.setText("Bet: $0");
-            computerOneBet.setText("Bet: $0");
-            computerTwoBet.setText("Bet: $0");
-
-            // Hide Hit and Stand buttons
-            userVBox.getChildren().remove(hitAndStand);
-
-            // Remove the result
-            userVBox.getChildren().remove(result);
-            computerOneVBox.getChildren().remove(resultOne);
-            computerTwoVBox.getChildren().remove(resultTwo);
-
-            // Show the chips and message field and start game button
-            chips.setVisible(true);
-            messageField.setVisible(true);
-
-            // Show a message about selecting a bet
-            messageField.setEditable(false);
-            messageField.setId("custom-label");
-            if (!root.getChildren().contains(messageField)) {
-                root.getChildren().add(messageField);
-            }
-
-            AnchorPane.setBottomAnchor(messageField, 180.0);
-            AnchorPane.setLeftAnchor(messageField, 60.0);
-            AnchorPane.setRightAnchor(messageField, 60.0);
-
-            // Reset the round
-            blackJack.resetRound();
-
-            addChipClickHandler(chip10, 10, messageField, userBet, root);
-            addChipClickHandler(chip20, 20, messageField, userBet, root);
-            addChipClickHandler(chip50, 50, messageField, userBet, root);
-            addChipClickHandler(chip100, 100, messageField, userBet, root);
-        });
-
-        // Hit button function
-        hit.setOnAction(e -> {
-            roundPlaying = true;
-            if (blackJack.getHuman().getTotal() == 21) {
-                showAlert(Alert.AlertType.INFORMATION, "You have 21 or Blackjack", "You have 21 or Blackjack! Stand to finish your turn.");
-            } else {
-                blackJack.getHuman().play(blackJack.getDeck());
-                userHand.getChildren().add(createCardImage(blackJack.getHuman().getHand().getLast()));
-
-                // If the user busts, auto lose
-                if (blackJack.getHuman().getTotal() > 21) {
-                    notUserPlay();
-                }
-            }
-        });
-
-        // Stand button function
-        stand.setOnAction(e -> {
-            roundPlaying = true;
-            if (blackJack.getHuman().getTotal() < 16) {
-                showAlert(Alert.AlertType.INFORMATION,"You must hit", "You must hit! Your total is less than 16.");
-            } else {
-                notUserPlay();
-            }
-        });
-
+        // Set the stage
         stage.setScene(scene);
         stage.show();
         resumeTimelines();
+    }
+
+    private VBox getvBox(Player player) {
+        VBox correspondingVBox = null;
+
+        // Match the player to their VBox
+        if (player.getName().equals(getUserName())) {
+            correspondingVBox = userVBox;
+        } else if (player.getName().equals("Computer 1")) {
+            correspondingVBox = computerOneVBox;
+        } else if (player.getName().equals("Computer 2")) {
+            correspondingVBox = computerTwoVBox;
+        } else if (player.getName().equals("Dealer")) {
+            correspondingVBox = dealerVBox;
+        }
+        return correspondingVBox;
     }
 
     // Helper to load a player's state
@@ -1233,61 +663,6 @@ public class BlackJackUI {
                 .collect(Collectors.toList());
     }
 
-    // Helper method to load the players UI
-    private void updatePlayerUI(Player player, VBox playerVBox) {
-
-        playerVBox.getChildren().clear();  // Clear existing player UI
-
-        // Update the username label
-        Label name = new Label(player.getName());
-        name.setId("custom-label");
-
-        // Update the bet label
-        Label bet = new Label("Bet: $" + player.getBet());
-        bet.setId("custom-label");
-
-        // Update the balance label
-        Label balance = new Label("Balance: $" + player.getMoney());
-        balance.setId("custom-label");
-
-        playerVBox.getChildren().addAll(name, bet, balance);
-
-        // Update the hand images
-        userHand.getChildren().clear();  // Clear existing hand images for user
-        computerOneHand.getChildren().clear();  // Clear existing hand images for computer one
-        computerTwoHand.getChildren().clear();  // Clear existing hand images for computer two
-
-        // Create a new HBox to hold the player's hand
-        HBox handHBox = new HBox(10);
-
-        // For each card in the player's hand, create an ImageView
-        for (Card card : player.getHand()) {
-            handHBox.getChildren().add(createCardImage(card));
-        }
-
-        // Add the hand HBox to the player's VBox
-        playerVBox.getChildren().add(handHBox);
-    }
-
-    // Helper method to load the dealer UI
-    private void updateDealerUI(Dealer dealer, VBox dealerBox) {
-        dealerBox.getChildren().clear();
-
-        Label name = new Label(dealer.getName());
-        name.setId("custom-label");
-        dealerBox.getChildren().add(name);
-
-        HBox handHBox = new HBox(10);
-        if (dealer.getHand().size() == 2) {
-            handHBox.getChildren().add(createCardImage(dealer.getHand().get(0)));
-            handHBox.getChildren().add(setImageView("back.png"));
-        } else {
-            for (Card card : dealer.getHand()) {
-                handHBox.getChildren().add(createCardImage(card));
-            }
-        }
-    }
-
     // Help method to get card value
     private int cardValue(String rank) {
         rank = rank.toLowerCase(); // Normalize to lowercase for consistency
@@ -1309,7 +684,6 @@ public class BlackJackUI {
             }
         };
     }
-
 
     private void pauseTimelines() {
         if (timeline != null && timeline.getStatus() == Animation.Status.RUNNING) {
@@ -1341,7 +715,315 @@ public class BlackJackUI {
         });
     }
 
+    // Helper method to initialize the game
+    public void initializeGame() {
+        // Create buttons for New Game, Save Game, View Scores and Go back to Main Menu
+        Button saveGame = new Button("Save Game");
+        Button backToMainMenu = new Button("Main Menu");
 
+        buttons.getChildren().addAll(backToMainMenu, saveGame);
+
+        // Create VBox to hold the players' spots
+        // userVBox
+        Label userLabel = new Label(getUserName());
+        userBet.setText("Bet: $" + blackJack.getHuman().getBet());
+        userTotal.setText("Balance: $1000");
+        userVBox.setAlignment(Pos.CENTER);
+        userVBox.getChildren().addAll(userLabel, userBet, userTotal);
+
+        // dealerVBox
+        Label dealerLabel = new Label("Dealer");
+        dealerVBox.setAlignment(Pos.CENTER);
+        dealerVBox.getChildren().add(dealerLabel);
+
+        // computerOneVBox
+        Label computerOneLabel = new Label("Computer 1");
+        computerOneBet.setText("Bet: $" + blackJack.getComputerOne().getBet());
+        computerOneTotal.setText("Balance: $1000");
+        computerOneVBox.setAlignment(Pos.CENTER);
+        computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
+
+        // computerTwoVBox
+        Label computerTwoLabel = new Label("Computer 2");
+        computerTwoBet.setText("Bet: $" + blackJack.getComputerTwo().getBet());
+        computerTwoTotal.setText("Balance: $1000");
+        computerTwoVBox.setAlignment(Pos.CENTER);
+        computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
+
+        // Set deck image size
+        backImage.setFitHeight(120);
+        backImage.setFitWidth(85);
+
+        // Create a BorderPane to hold the players' spots
+        BorderPane borderPane = new BorderPane();
+        borderPane.setBottom(userVBox);
+        borderPane.setLeft(computerTwoVBox);
+        borderPane.setRight(computerOneVBox);
+        borderPane.setTop(dealerVBox);
+
+        // Set the background image size
+        backgroundImage.setFitHeight(1911);
+        backgroundImage.setFitWidth(1940);
+
+        root.getChildren().add(backgroundImage);
+
+        // Set chip images and labels for each chip
+        VBox chip10Box = new VBox();
+        Label chip10Label = new Label("10");
+        chip10Box.getChildren().addAll(chip10, chip10Label);
+        chip10Box.setAlignment(Pos.CENTER);
+
+        VBox chip20Box = new VBox();
+        Label chip20Label = new Label("20");
+        chip20Box.getChildren().addAll(chip20, chip20Label);
+        chip20Box.setAlignment(Pos.CENTER);
+
+        VBox chip50Box = new VBox();
+        Label chip50Label = new Label("50");
+        chip50Box.getChildren().addAll(chip50, chip50Label);
+        chip50Box.setAlignment(Pos.CENTER);
+
+        VBox chip100Box = new VBox();
+        Label chip100Label = new Label("100");
+        chip100Box.getChildren().addAll(chip100, chip100Label);
+        chip100Box.setAlignment(Pos.CENTER);
+
+        // Set chip image size
+        chip10.setFitHeight(60);
+        chip20.setFitHeight(60);
+        chip50.setFitHeight(60);
+        chip100.setFitHeight(60);
+
+        // Create an HBox for chips
+        chips.getChildren().addAll(chip10Box, chip20Box, chip50Box, chip100Box);
+        chips.getStyleClass().add("chips");
+
+        AnchorPane.setTopAnchor(borderPane, 20.0);
+        AnchorPane.setBottomAnchor(borderPane, 20.0);
+        AnchorPane.setLeftAnchor(borderPane, 20.0);
+        AnchorPane.setRightAnchor(borderPane, 20.0);
+
+        AnchorPane.setTopAnchor(chips, 10.0);
+        AnchorPane.setBottomAnchor(chips, 10.0);
+        AnchorPane.setRightAnchor(chips, -50.0);
+
+        root.getChildren().addAll(borderPane, chips, buttons);
+
+        // Set the action for the Save Game button
+        saveGame.setOnAction(e -> {
+            String saveState = saveState();
+
+            // Create an Alert of type INFORMATION
+            pauseTimelines();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Save Game");
+            alert.setHeaderText("Copy the save state string below to save your game state");
+
+            // Make sure the alert blocks other windows
+            alert.initModality(Modality.APPLICATION_MODAL);
+
+            // Create a TextArea for the save state and make it non-editable
+            TextArea saveStateArea = new TextArea(saveState);
+            saveStateArea.setEditable(false);
+            saveStateArea.setWrapText(true);
+
+            // Set a preferred size for the TextArea
+            saveStateArea.setPrefWidth(400);
+            saveStateArea.setPrefHeight(200);
+
+            // Add the TextArea to the alert's content
+            alert.getDialogPane().setContent(saveStateArea);
+
+            // Show the alert and wait for the user's interaction
+            alert.showAndWait();
+
+            Stage mainMenuStage = (Stage) root.getScene().getWindow();
+            mainMenuStage.close();
+            main = new BlackjackMainMenu(main.userName(), main.menu());
+            main.start(new Stage());
+        });
+
+        backToMainMenu.setOnAction(e -> {
+            Stage s = (Stage) root.getScene().getWindow();
+            BorderPane rootLayout = new BorderPane();
+
+            ToolbarManager toolbarManager = new ToolbarManager();
+            rootLayout.setTop(toolbarManager.createToolbar(s, rootLayout, menu));
+
+            VBox menuVBox = menu.launchMainMenu(s);
+            rootLayout.setCenter(menuVBox);
+
+            Scene menuScene = new Scene(rootLayout, 800, 600);
+            menuScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
+            s.setScene(menuScene);
+        });
+    }
+
+    // Helper method New Round Button
+    private void setNewRound() {
+        newRound.setOnAction(e -> {
+            if (blackJack.getHuman().getMoney() <= 0) {
+                showResetWindow();
+                return;
+            }
+
+            if (roundPlaying) {
+                showAlert("Round is not over", "The round is not over. Finish the round before starting a new one.");
+                return;
+            }
+
+            // Remove the previous game UI elements
+            userHand.getChildren().clear();
+            computerOneHand.getChildren().clear();
+            computerTwoHand.getChildren().clear();
+            dealerHand.getChildren().clear();
+            startGame.setVisible(false);
+
+            // Reset bets and balances
+            userBet.setText("Bet: $0");
+            computerOneBet.setText("Bet: $0");
+            computerTwoBet.setText("Bet: $0");
+
+            // Remove the result
+            userVBox.getChildren().remove(result);
+            computerOneVBox.getChildren().remove(resultOne);
+            computerTwoVBox.getChildren().remove(resultTwo);
+
+            // Reset the round
+            blackJack.resetRound();
+
+            // Display chips and message to tell user to select a chip
+            displayChipsAndMessage();
+        });
+    }
+
+    // Helper method to start the round
+    public void startRound() {
+        roundPlaying = true;
+
+        // Hide start game, message field and chips
+        startGame.setVisible(false);
+        messageField.setVisible(false);
+        chips.setVisible(false);
+
+        // Random bet for computers
+        int betOne = blackJack.getComputerOne().randomBet();
+        computerOneBet.setText("Bet: $" + betOne);
+        blackJack.getComputerOne().setBet(betOne);
+
+        int betTwo = blackJack.getComputerTwo().randomBet();
+        computerTwoBet.setText("Bet: $" + betTwo);
+        blackJack.getComputerTwo().setBet(betTwo);
+
+        List<HBox> playerHands = List.of(userHand, computerOneHand, computerTwoHand, dealerHand);
+
+        if (!userVBox.getChildren().contains(userHand)) {
+            userVBox.getChildren().add(userHand);
+        }
+
+        if (!computerOneVBox.getChildren().contains(computerOneHand)) {
+            computerOneVBox.getChildren().add(computerOneHand);
+        }
+
+        if (!computerTwoVBox.getChildren().contains(computerTwoHand)) {
+            computerTwoVBox.getChildren().add(computerTwoHand);
+        }
+
+        if (!dealerVBox.getChildren().contains(dealerHand)) {
+            dealerVBox.getChildren().add(dealerHand);
+        }
+
+        List<Player> players = blackJack.getPlayers();
+
+        // Iterate over players and their corresponding HBoxes
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
+            HBox handUI = playerHands.get(i); // Get the corresponding HBox
+
+            handUI.getChildren().clear();
+
+            // Add each card in the player's hand to their UI HBox
+            for (Card card : player.getHand()) {
+                handUI.getChildren().add(createCardImage(card));
+            }
+        }
+
+        // Set alignment for all HBoxes
+        userHand.setAlignment(Pos.CENTER);
+        computerOneHand.setAlignment(Pos.CENTER);
+        computerTwoHand.setAlignment(Pos.CENTER);
+        dealerHand.setAlignment(Pos.CENTER);
+
+        // Create Hit and Stand buttons
+        if (!userVBox.getChildren().contains(hitAndStand)) {
+            if (hitAndStand.getChildren().isEmpty()) {
+                hitAndStand.getChildren().addAll(hit, stand);
+            }
+            userVBox.getChildren().add(hitAndStand);
+            hitAndStand.setAlignment(Pos.CENTER);
+        }
+
+        // Calculate the total for all players
+        blackJack.getHuman().calculateTotal();
+        blackJack.getComputerOne().calculateTotal();
+        blackJack.getComputerTwo().calculateTotal();
+        blackJack.getDealer().calculateTotal();
+    }
+
+    // Helper method for Hit button
+    public void setHit() {
+        hit.setOnAction(e -> {
+            roundPlaying = true;
+            if (blackJack.getHuman().getTotal() == 21) {
+                showAlert("You have 21 or Blackjack", "You have 21 or Blackjack! Stand to finish your turn.");
+            } else {
+                blackJack.getHuman().play(blackJack.getDeck());
+                userHand.getChildren().add(createCardImage(blackJack.getHuman().getHand().getLast()));
+
+                // If the user busts, auto lose
+                if (blackJack.getHuman().getTotal() > 21) {
+                    notUserPlay();
+                }
+            }
+        });
+    }
+
+    // Helper method for Stand button
+    public void setStand() {
+        stand.setOnAction(e -> {
+            roundPlaying = true;
+            if (blackJack.getHuman().getTotal() < 16) {
+                showAlert("You must hit", "You must hit! Your total is less than 16.");
+            } else {
+                notUserPlay();
+            }
+        });
+    }
+
+    // Helper method to display chips and tell user to select a bet
+    private void displayChipsAndMessage() {
+        userVBox.getChildren().remove(hitAndStand);
+
+        // Show the chips and message field and start game button
+        chips.setVisible(true);
+        messageField.setVisible(true);
+
+        // Show a message about selecting a bet
+        messageField.setEditable(false);
+        messageField.setId("custom-label");
+        if (!root.getChildren().contains(messageField)) {
+            root.getChildren().add(messageField);
+        }
+
+        AnchorPane.setBottomAnchor(messageField, 180.0);
+        AnchorPane.setLeftAnchor(messageField, 60.0);
+        AnchorPane.setRightAnchor(messageField, 60.0);
+
+        addChipClickHandler(chip10, 10, messageField, userBet, root);
+        addChipClickHandler(chip20, 20, messageField, userBet, root);
+        addChipClickHandler(chip50, 50, messageField, userBet, root);
+        addChipClickHandler(chip100, 100, messageField, userBet, root);
+    }
 }
-
 

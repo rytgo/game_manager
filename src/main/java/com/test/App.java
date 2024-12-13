@@ -7,8 +7,8 @@ import javafx.stage.Stage;
 
 public class App extends Application {
     private MainMenu updatedMainMenu;
-    private HighScoresManager highScoresManager = new HighScoresManager("high_scores.txt");
-    private LoginManager loginManager = new LoginManager("user_accounts.txt", highScoresManager);
+    private HighScoresManager highScoresManager;
+    private LoginManager loginManager;
 
     // Getter for updatedMainMenu
     public MainMenu getUpdatedMainMenu() {
@@ -17,7 +17,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-
+        HighScoresManager highScoresManager = new HighScoresManager("high_scores.txt");
+        LoginManager loginManager = new LoginManager("user_accounts.txt", highScoresManager);
         ToolbarManager toolbarManager = new ToolbarManager();
 
         BorderPane rootLayout = new BorderPane();
