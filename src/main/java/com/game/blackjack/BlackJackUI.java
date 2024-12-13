@@ -219,9 +219,22 @@ public class BlackJackUI {
         // Un-highlight user is playing
         userVBox.setId(null);
 
-        // Start the computer and dealer turns in sequence
-        playComputerTurn(blackJack.getComputerOne(), computerOneHand, computerOneVBox, () ->
-                playComputerTurn(blackJack.getComputerTwo(), computerTwoHand, computerTwoVBox, this::dealerPlay));
+        // Determine whose turn it is dynamically
+        String currentTurn = blackJack.getTurn();
+
+        if (currentTurn.equals(blackJack.getComputerOne().getName())) {
+            playComputerTurn(blackJack.getComputerOne(), computerOneHand, computerOneVBox, () -> {
+                blackJack.setTurn(blackJack.getComputerTwo().getName());
+                notUserPlay(); // Continue with Computer Two's turn
+            });
+        } else if (currentTurn.equals(blackJack.getComputerTwo().getName())) {
+            playComputerTurn(blackJack.getComputerTwo(), computerTwoHand, computerTwoVBox, () -> {
+                blackJack.setTurn("Dealer");
+                notUserPlay(); // Continue with the dealer's turn
+            });
+        } else if (currentTurn.equals("Dealer")) {
+            dealerPlay(); // Handle the dealer's turn
+        }
     }
 
     // Helper method to handle computer turn and callback after completion
@@ -524,6 +537,10 @@ public class BlackJackUI {
 
         // Highlight the current player whose turn it is
         String currentTurn = blackJack.getTurn(); // Get the name of the player whose turn it is
+
+        if (currentTurn.equals("Computer 1") || currentTurn.equals("Computer 2") || currentTurn.equals("Dealer")) {
+            notUserPlay(); // Trigger computer or dealer logic
+        }
 
         for (Player player : blackJack.getPlayers()) {
             VBox correspondingVBox = getvBox(player);
