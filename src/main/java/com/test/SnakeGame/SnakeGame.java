@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -26,7 +27,7 @@ public class SnakeGame {
     private int speed = 200_000_000;    // initial speed in nanosecs
 
     public void start(Stage primaryStage) {
-        StackPane root = new StackPane();
+        root = new StackPane();
         Scene scene = new Scene(root, 600, 400);
         
         // Initialize canvas
@@ -45,11 +46,7 @@ public class SnakeGame {
         scene.setOnKeyPressed(event -> {
             KeyCode code = event.getCode();
             if (code == KeyCode.ESCAPE) {
-                isPaused = !isPaused;
-                if (isPaused) {
-                    gc.setFill(Color.WHITE);
-                    gc.fillText("Paused", canvas.getWidth() / 2 - 20, canvas.getHeight() / 2);
-                }
+                togglePause(primaryStage);
             } else if (!isPaused) {
                 if (code == KeyCode.UP && snake.getDirectionY() != 1) {
                     snake.setDirection(0, -1);
@@ -67,16 +64,16 @@ public class SnakeGame {
         AnimationTimer gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (!gameOver) {
+                if (gameOver) {
+                    stop();
+                    renderGameOverMessage(primaryStage);
+                } else if (!isPaused) {
                     if (now - lastUpdate >= speed) {
                         snake.move();
                         checkCollisions();
                         render(gc);
                         lastUpdate = now;
                     }
-                } else {
-                    stop();
-                    renderGameOverMessage(primaryStage);
                 }
             }
         };
@@ -85,6 +82,42 @@ public class SnakeGame {
         primaryStage.setScene(scene);
         primaryStage.setTitle("Snake Game");
         primaryStage.show();
+    }
+
+    private void togglePause(Stage primaryStage) {
+
+        if (gameOver) {
+            return;
+        }
+
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            VBox pauseMenu = new VBox(10);
+            pauseMenu.setAlignment(Pos.CENTER);
+
+            // Dim background
+            Canvas overlay = new Canvas(600, 400);
+            GraphicsContext overlayGc = overlay.getGraphicsContext2D();
+            overlayGc.setFill(Color.rgb(0, 0, 0, 0.7));
+            overlayGc.fillRect(0, 0, overlay.getWidth(), overlay.getHeight());
+            root.getChildren().add(overlay);
+
+            // Add "Paused" label
+            javafx.scene.control.Label pauseLabel = new javafx.scene.control.Label("Game Paused");
+            pauseLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white;");
+
+            // Add Resume button
+            Button resumeButton = new Button("Resume");
+            resumeButton.setOnAction(e -> {
+                isPaused = false;
+                root.getChildren().remove(overlay);
+                root.getChildren().remove(pauseMenu);
+            });
+
+            pauseMenu.getChildren().addAll(pauseLabel, resumeButton);
+            root.getChildren().add(pauseMenu);
+        }
     }
 
     private void checkCollisions() {
