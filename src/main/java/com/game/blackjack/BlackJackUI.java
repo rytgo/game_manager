@@ -162,6 +162,19 @@ public class BlackJackUI {
         chip.setOnMouseClicked(e -> {
             System.out.println("Chip clicked: " + betAmount);
 
+            // Random bet for computers
+            if (blackJack.getComputerOne().getBet() == 0) {
+                int betOne = blackJack.getComputerOne().randomBet();
+                computerOneBet.setText("Bet: $" + betOne);
+                blackJack.getComputerOne().setBet(betOne);
+            }
+
+            if (blackJack.getComputerTwo().getBet() == 0) {
+                int betTwo = blackJack.getComputerTwo().randomBet();
+                computerTwoBet.setText("Bet: $" + betTwo);
+                blackJack.getComputerTwo().setBet(betTwo);
+            }
+
             // Check if the user has enough money to bet
             if (!blackJack.getHuman().isValidBet(betAmount)) {
                 showAlert("Invalid bet", "You do not have enough money to bet $" + betAmount + ".");
@@ -429,17 +442,13 @@ public class BlackJackUI {
                 dealerHand.getChildren().clear();
 
                 userTotal.setText("Balance: $1000");
+                blackJack.getHuman().setMoney(1000);
                 computerOneTotal.setText("Balance: $1000");
+                blackJack.getComputerOne().setMoney(1000);
                 computerTwoTotal.setText("Balance: $1000");
+                blackJack.getComputerTwo().setMoney(1000);
 
-                userBet.setText("Bet: $0");
-                computerOneBet.setText("Bet: $0");
-                computerTwoBet.setText("Bet: $0");
-
-                // Remove the result
-                userVBox.getChildren().remove(result);
-                computerOneVBox.getChildren().remove(resultOne);
-                computerTwoVBox.getChildren().remove(resultTwo);
+                resetBet();
             }
         });
     }
@@ -538,10 +547,6 @@ public class BlackJackUI {
         // Highlight the current player whose turn it is
         String currentTurn = blackJack.getTurn(); // Get the name of the player whose turn it is
 
-        if (currentTurn.equals("Computer 1") || currentTurn.equals("Computer 2") || currentTurn.equals("Dealer")) {
-            notUserPlay(); // Trigger computer or dealer logic
-        }
-
         for (Player player : blackJack.getPlayers()) {
             VBox correspondingVBox = getvBox(player);
 
@@ -562,13 +567,17 @@ public class BlackJackUI {
         setNewRound();
 
         // Display Hit and Stand buttons
-        setHit();
-        setStand();
+        if (!blackJack.getTurn().equals(getUserName())) {
+            userVBox.getChildren().remove(hitAndStand);
+        }
+
+        if (currentTurn.equals("Computer 1") || currentTurn.equals("Computer 2") || currentTurn.equals("Dealer")) {
+            notUserPlay(); // Trigger computer or dealer logic
+        }
 
         // Set the stage
         stage.setScene(scene);
         stage.show();
-        resumeTimelines();
     }
 
     private VBox getvBox(Player player) {
@@ -888,14 +897,7 @@ public class BlackJackUI {
             startGame.setVisible(false);
 
             // Reset bets and balances
-            userBet.setText("Bet: $0");
-            computerOneBet.setText("Bet: $0");
-            computerTwoBet.setText("Bet: $0");
-
-            // Remove the result
-            userVBox.getChildren().remove(result);
-            computerOneVBox.getChildren().remove(resultOne);
-            computerTwoVBox.getChildren().remove(resultTwo);
+            resetBet();
 
             // Reset the round
             blackJack.resetRound();
@@ -916,15 +918,6 @@ public class BlackJackUI {
         startGame.setVisible(false);
         messageField.setVisible(false);
         chips.setVisible(false);
-
-        // Random bet for computers
-        int betOne = blackJack.getComputerOne().randomBet();
-        computerOneBet.setText("Bet: $" + betOne);
-        blackJack.getComputerOne().setBet(betOne);
-
-        int betTwo = blackJack.getComputerTwo().randomBet();
-        computerTwoBet.setText("Bet: $" + betTwo);
-        blackJack.getComputerTwo().setBet(betTwo);
 
         List<HBox> playerHands = List.of(userHand, computerOneHand, computerTwoHand, dealerHand);
 
@@ -979,6 +972,10 @@ public class BlackJackUI {
         blackJack.getComputerOne().calculateTotal();
         blackJack.getComputerTwo().calculateTotal();
         blackJack.getDealer().calculateTotal();
+
+        // Display Hit and Stand buttons
+        setHit();
+        setStand();
     }
 
     // Helper method for Hit button
@@ -993,6 +990,7 @@ public class BlackJackUI {
 
                 // If the user busts, auto lose
                 if (blackJack.getHuman().getTotal() > 21) {
+                    blackJack.setTurn("Computer 1");
                     notUserPlay();
                 }
             }
@@ -1006,6 +1004,7 @@ public class BlackJackUI {
             if (blackJack.getHuman().getTotal() < 16) {
                 showAlert("You must hit", "You must hit! Your total is less than 16.");
             } else {
+                blackJack.setTurn("Computer 1");
                 notUserPlay();
             }
         });
@@ -1058,6 +1057,21 @@ public class BlackJackUI {
             setHit();
             setStand();
         });
+    }
+
+    // Helper method to reset bet
+    private void resetBet() {
+        userBet.setText("Bet: $0");
+        blackJack.getHuman().setBet(0);
+        computerOneBet.setText("Bet: $0");
+        blackJack.getComputerOne().setBet(0);
+        computerTwoBet.setText("Bet: $0");
+        blackJack.getComputerTwo().setBet(0);
+
+        // Remove the result
+        userVBox.getChildren().remove(result);
+        computerOneVBox.getChildren().remove(resultOne);
+        computerTwoVBox.getChildren().remove(resultTwo);
     }
 }
 
