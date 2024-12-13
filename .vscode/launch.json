@@ -1,0 +1,51 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.test/com.game.SnakeGame.Main",
+            "projectName": "game_manager"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "modulePaths": [
+                "${workspaceFolder}/out",
+                "${workspaceFolder}/lib"
+            ],
+            "classPaths": [
+                "lib/*",
+                "src/main/java"
+            ]
+        },
+        {
+            "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "com.test/com.test.App",
+            "projectName": "game_manager",
+            "classPaths": [
+                "lib/*",
+                "src/main/java"
+            ]
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.test/com.test.SnakeGame.Main",
+            "projectName": "game_manager",
+            "classPaths": [
+                "lib/*",
+                "src/main/java"
+            ]
+        }
+    ]
+}
