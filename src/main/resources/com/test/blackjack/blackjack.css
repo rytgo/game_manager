@@ -68,3 +68,10 @@
     -fx-background-color: #6C3BAA;
 }
 
+#toolbar {
+    -fx-background-color: #FAFAFA;
+    -fx-padding: 10px;
+    -fx-border-color: #CCCCCC;
+    -fx-border-width: 1px;
+}
+
