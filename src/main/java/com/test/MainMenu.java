@@ -26,26 +26,6 @@ public class MainMenu {
         this.user = user;
     }
 
-    // Getter for highScoresManager
-    public HighScoresManager getHighScoresManager() {
-        return highScoresManager;
-    }
-
-    // Getter for loginManager
-    public LoginManager getLoginManager() {
-        return loginManager;
-    }
-
-    // Getter for user
-    public String getUser() {
-        return user;
-    }
-
-    // Getter fpr root
-    public VBox getRoot() {
-        return launchMainMenu(new Stage());
-    }
-
     // Set a callback for logout
     public void setOnLogout(Consumer<Void> onLogout) {
         this.onLogout = onLogout;
@@ -121,9 +101,8 @@ public class MainMenu {
 
     Button logoutButton = new Button("Logout");
     logoutButton.setOnAction(e -> {
-        if (onLogout != null) {
-            onLogout.accept(null); // Trigger the logout callback
-        }
+        App app = new App();
+        app.start(stage);
     });
 
     buttonsBox.getChildren().addAll(blackjackButton, snakeButton, logoutButton);
@@ -134,7 +113,7 @@ public class MainMenu {
 
     // Call Blackjack game for blackjackButton
     blackjackButton.setOnAction(e -> {
-        BlackjackMainMenu blackJackUI = new BlackjackMainMenu(user);
+        BlackjackMainMenu blackJackUI = new BlackjackMainMenu(user, this);
         blackJackUI.start(stage);
     });
 

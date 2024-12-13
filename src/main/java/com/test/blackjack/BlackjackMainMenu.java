@@ -1,5 +1,6 @@
 package com.test.blackjack;
 
+import com.test.MainMenu;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -10,11 +11,11 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
-public record BlackjackMainMenu(String userName) {
+public record BlackjackMainMenu(String userName, MainMenu menu) {
 
     public void start(Stage primaryStage) {
         // Create BlackJackUI instance
-        BlackJackUI blackJackUI = new BlackJackUI(this.userName);
+        BlackJackUI blackJackUI = new BlackJackUI(this.userName, menu);
 
         StackPane root = new StackPane();
         Scene scene = new Scene(root, 640, 480);
