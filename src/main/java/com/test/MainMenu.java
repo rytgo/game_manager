@@ -1,5 +1,6 @@
 package com.test;
 
+import com.test.SnakeGame.SnakeGame;
 import com.test.blackjack.BlackjackMainMenu;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -115,6 +116,12 @@ public class MainMenu {
     blackjackButton.setOnAction(e -> {
         BlackjackMainMenu blackJackUI = new BlackjackMainMenu(user, this);
         blackJackUI.start(stage);
+    });
+
+    // Call Snake game for snakeButton
+    snakeButton.setOnAction(e -> {
+        SnakeGame snakeGame = new SnakeGame(user, this);
+        snakeGame.start(stage);
     });
 
     root.getChildren().addAll(title, gridPane);
