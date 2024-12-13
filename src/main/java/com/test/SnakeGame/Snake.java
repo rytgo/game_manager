@@ -72,7 +72,6 @@ public class Snake {
         return tail;
     }
 
-    // TODO: Fix bug with food here
     public boolean checkCollisionWithSelf() {
         Block current = head.getNext();  // Start from the second block
         while (current != null) {

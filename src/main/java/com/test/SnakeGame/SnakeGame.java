@@ -9,7 +9,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class SnakeGame {
@@ -18,7 +17,7 @@ public class SnakeGame {
     private StackPane root;
     private boolean gameOver = false;
     private int score = 0;
-
+    private boolean isPaused = false;
 
     private Canvas canvas;
     private GraphicsContext gc;
@@ -45,14 +44,22 @@ public class SnakeGame {
         // Handle keyboard input for snake direction
         scene.setOnKeyPressed(event -> {
             KeyCode code = event.getCode();
-            if (code == KeyCode.UP && snake.getDirectionY() != 1) {
-                snake.setDirection(0, -1);
-            } else if (code == KeyCode.DOWN && snake.getDirectionY() != -1) {
-                snake.setDirection(0, 1);
-            } else if (code == KeyCode.LEFT && snake.getDirectionX() != 1) {
-                snake.setDirection(-1, 0);
-            } else if (code == KeyCode.RIGHT && snake.getDirectionX() != -1) {
-                snake.setDirection(1, 0);
+            if (code == KeyCode.ESCAPE) {
+                isPaused = !isPaused;
+                if (isPaused) {
+                    gc.setFill(Color.WHITE);
+                    gc.fillText("Paused", canvas.getWidth() / 2 - 20, canvas.getHeight() / 2);
+                }
+            } else if (!isPaused) {
+                if (code == KeyCode.UP && snake.getDirectionY() != 1) {
+                    snake.setDirection(0, -1);
+                } else if (code == KeyCode.DOWN && snake.getDirectionY() != -1) {
+                    snake.setDirection(0, 1);
+                } else if (code == KeyCode.LEFT && snake.getDirectionX() != 1) {
+                    snake.setDirection(-1, 0);
+                } else if (code == KeyCode.RIGHT && snake.getDirectionX() != -1) {
+                    snake.setDirection(1, 0);
+                }
             }
         });
 
