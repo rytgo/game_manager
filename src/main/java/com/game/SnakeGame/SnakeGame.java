@@ -1,5 +1,6 @@
 package com.game.SnakeGame;
 
+import com.test.MainMenu;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,14 +21,18 @@ public class SnakeGame {
     private boolean gameOver = false;
     private int score = 0;
     private boolean isPaused = false;
-
     private Canvas canvas;
     private GraphicsContext gc;
-
     private Label scoreLabel;  // Label for displaying the score
-
     private long lastUpdate = 0;    //tracks time since last movement
     private int speed = 200_000_000;    // initial speed in nanosecs
+    private String userName;
+    private MainMenu menu;
+
+    public SnakeGame(String userName, MainMenu menu) {
+        this.userName = userName;
+        this.menu = menu;
+    }
 
     public void start(Stage primaryStage) {
         root = new StackPane();

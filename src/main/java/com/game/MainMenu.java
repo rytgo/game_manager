@@ -1,5 +1,7 @@
-package com.game;
+package com.test;
 
+import com.test.SnakeGame.SnakeGame;
+import com.test.blackjack.BlackjackMainMenu;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import com.game.blackjack.BlackjackMainMenu;
 
 public class MainMenu {
     private HighScoresManager highScoresManager;
@@ -116,6 +116,12 @@ public class MainMenu {
     blackjackButton.setOnAction(e -> {
         BlackjackMainMenu blackJackUI = new BlackjackMainMenu(user, this);
         blackJackUI.start(stage);
+    });
+
+    // Call Snake game for snakeButton
+    snakeButton.setOnAction(e -> {
+        SnakeGame snakeGame = new SnakeGame(user, this);
+        snakeGame.start(stage);
     });
 
     root.getChildren().addAll(title, gridPane);
