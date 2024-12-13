@@ -5,12 +5,14 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -95,6 +97,9 @@ public class BlackJackUI {
 
         // Display chips and message to tell user to select a chip
         displayChipsAndMessage();
+
+        // Function the Start Game button
+        setStartGame();
 
         // Set the stage
         stage.setTitle("Blackjack Game");
@@ -701,6 +706,7 @@ public class BlackJackUI {
         Button backToMainMenu = new Button("Main Menu");
 
         buttons.getChildren().addAll(backToMainMenu, saveGame);
+        buttons.setId("toolbar");
 
         // Create VBox to hold the players' spots
         // userVBox
@@ -713,7 +719,7 @@ public class BlackJackUI {
         // dealerVBox
         Label dealerLabel = new Label("Dealer");
         dealerVBox.setAlignment(Pos.CENTER);
-        dealerVBox.getChildren().add(dealerLabel);
+        dealerVBox.getChildren().addAll(dealerLabel);
 
         // computerOneVBox
         Label computerOneLabel = new Label("Computer 1");
@@ -733,12 +739,16 @@ public class BlackJackUI {
         backImage.setFitHeight(120);
         backImage.setFitWidth(85);
 
+        // Set a VBox to hold buttons and dealerVBox
+        VBox buttonsAndDealer = new VBox();
+        buttonsAndDealer.getChildren().addAll(buttons, dealerVBox);
+
         // Create a BorderPane to hold the players' spots
         BorderPane borderPane = new BorderPane();
         borderPane.setBottom(userVBox);
         borderPane.setLeft(computerTwoVBox);
         borderPane.setRight(computerOneVBox);
-        borderPane.setTop(dealerVBox);
+        borderPane.setTop(buttonsAndDealer);
 
         // Set the background image size
         backgroundImage.setFitHeight(1911);
@@ -777,16 +787,16 @@ public class BlackJackUI {
         chips.getChildren().addAll(chip10Box, chip20Box, chip50Box, chip100Box);
         chips.getStyleClass().add("chips");
 
-        AnchorPane.setTopAnchor(borderPane, 20.0);
-        AnchorPane.setBottomAnchor(borderPane, 20.0);
-        AnchorPane.setLeftAnchor(borderPane, 20.0);
-        AnchorPane.setRightAnchor(borderPane, 20.0);
+        AnchorPane.setTopAnchor(borderPane, 0.0);
+        AnchorPane.setLeftAnchor(borderPane, 0.0);
+        AnchorPane.setRightAnchor(borderPane, 0.0);
+        AnchorPane.setBottomAnchor(borderPane, 0.0);
 
         AnchorPane.setTopAnchor(chips, 10.0);
         AnchorPane.setBottomAnchor(chips, 10.0);
         AnchorPane.setRightAnchor(chips, -50.0);
 
-        root.getChildren().addAll(borderPane, chips, buttons);
+        root.getChildren().addAll(borderPane, chips);
 
         // Set the action for the Save Game button
         saveGame.setOnAction(e -> {
@@ -834,7 +844,7 @@ public class BlackJackUI {
             rootLayout.setCenter(menuVBox);
 
             Scene menuScene = new Scene(rootLayout, 800, 600);
-            menuScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
+            menuScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
             s.setScene(menuScene);
         });
     }
@@ -875,27 +885,8 @@ public class BlackJackUI {
             // Display chips and message to tell user to select a chip
             displayChipsAndMessage();
 
-            // Start Game button function
-            startGame.setOnAction(event -> {
-
-                blackJack.dealCard(); // Deal cards to all players
-
-                // Set current turn to the user
-                blackJack.setTurn(getUserName());
-
-                // Highlight user is playing
-                userVBox.setId("styled-vbox");
-
-                startRound();
-
-                dealerHand.getChildren().remove(1);  // Remove the second card from the dealer's hand
-                dealerHand.getChildren().add(backImage);  // Add the back image to the dealer's hand
-
-                // Display Hit and Stand buttons
-                setHit();
-                setStand();
-            });
-
+            // Display Start Game button
+            setStartGame();
         });
     }
 
@@ -1025,6 +1016,30 @@ public class BlackJackUI {
         addChipClickHandler(chip20, 20, messageField, userBet, root);
         addChipClickHandler(chip50, 50, messageField, userBet, root);
         addChipClickHandler(chip100, 100, messageField, userBet, root);
+    }
+
+    // Helper method for Start Game button
+    private void setStartGame() {
+        // Start Game button function
+        startGame.setOnAction(event -> {
+
+            blackJack.dealCard(); // Deal cards to all players
+
+            // Set current turn to the user
+            blackJack.setTurn(getUserName());
+
+            // Highlight user is playing
+            userVBox.setId("styled-vbox");
+
+            startRound();
+
+            dealerHand.getChildren().remove(1);  // Remove the second card from the dealer's hand
+            dealerHand.getChildren().add(backImage);  // Add the back image to the dealer's hand
+
+            // Display Hit and Stand buttons
+            setHit();
+            setStand();
+        });
     }
 }
 
