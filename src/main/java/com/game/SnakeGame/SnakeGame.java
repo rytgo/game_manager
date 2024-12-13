@@ -1,6 +1,6 @@
 package com.game.SnakeGame;
 
-import com.test.MainMenu;
+import com.game.MainMenu;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -33,6 +33,27 @@ public class SnakeGame {
         this.userName = userName;
         this.menu = menu;
     }
+
+    // Getter for isPaused
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    // Setter for isPaused
+    public void setPaused(boolean paused) {
+        isPaused = paused;
+    }
+
+    // Getter for gameOver
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    // Setter for gameOver
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
 
     public void start(Stage primaryStage) {
         root = new StackPane();
@@ -108,7 +129,7 @@ public class SnakeGame {
         primaryStage.show();
     }
 
-    private void togglePause(Stage primaryStage) {
+    public void togglePause(Stage primaryStage) {
 
         if (gameOver) {
             return;
@@ -151,7 +172,7 @@ public class SnakeGame {
         }
     }
 
-    private void checkCollisions() {
+    public void checkCollisions() {
         // Check if snake eats food
         Block head = snake.getHead();
 

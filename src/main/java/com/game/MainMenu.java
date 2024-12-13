@@ -1,7 +1,7 @@
-package com.test;
+package com.game;
 
-import com.test.SnakeGame.SnakeGame;
-import com.test.blackjack.BlackjackMainMenu;
+import com.game.SnakeGame.SnakeGame;
+import com.game.blackjack.BlackjackMainMenu;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
