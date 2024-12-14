@@ -22,6 +22,16 @@
     -fx-padding: 0px 5px;
 }
 
+.buttons-container {
+    -fx-padding: 15px;
+    -fx-spacing: 10px;
+    -fx-border-color: #CCCCCC;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-background-color: #FAFAFA;
+    -fx-alignment: center;
+}
+
 .button {
     -fx-background-color: #B19CD9;
     -fx-text-fill: black;
