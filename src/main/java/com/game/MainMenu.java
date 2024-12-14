@@ -112,7 +112,7 @@ public class MainMenu {
 
     // Call Blackjack game for blackjackButton
     blackjackButton.setOnAction(e -> {
-        BlackjackMainMenu blackJackUI = new BlackjackMainMenu(user, this);
+        BlackjackMainMenu blackJackUI = new BlackjackMainMenu(user, this, this.highScoresManager);
         blackJackUI.start(stage);
     });
 
