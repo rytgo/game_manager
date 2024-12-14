@@ -75,7 +75,11 @@ public class SnakeGame {
         // Menu button
         Button menuButton = new Button("Main Menu");
         menuButton.setId("main-menu-button");
-        menuButton.setOnAction(e -> primaryStage.getScene().setRoot(menu.launchMainMenu(primaryStage)));
+        menuButton.setOnAction(e -> {
+            togglePause(root);
+            primaryStage.getScene().setRoot(menu.launchMainMenu(primaryStage));
+
+        });
     
         // Pause instruction
         Label pauseInstruction = new Label("Pause: Press ESC");
