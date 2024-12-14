@@ -263,6 +263,7 @@ public class BlackJackUI {
 
     // Helper method to handle computer turn and callback after completion
     private void playComputerTurn(Player player, HBox hand, VBox playerBox, Runnable callback) {
+        isDealerTurn = false;
         playerTimeline = createPlayerTimeline(player, hand, playerBox);
         playerTimeline.setOnFinished(e -> {
             playerBox.setId(null);
@@ -1087,6 +1088,8 @@ public class BlackJackUI {
     public void startRound() {
         roundPlaying = true;
 
+        isDealerTurn = false;
+
         // Hide start game, message field and chips
         startGame.setVisible(false);
         messageField.setVisible(false);
@@ -1117,13 +1120,21 @@ public class BlackJackUI {
             Player player = players.get(i);
             HBox handUI = playerHands.get(i); // Get the corresponding HBox
 
+            // Clear the player's UI hand container
             handUI.getChildren().clear();
 
-            // Add each card in the player's hand to their UI HBox
+            // Add card images to the HBox
             for (Card card : player.getHand()) {
-                handUI.getChildren().add(createCardImage(card));
+                ImageView cardImage = createCardImage(card);
+                handUI.getChildren().add(cardImage);
             }
         }
+
+        // Dealer-specific logic (if applicable)
+        if (!isDealerTurn) {
+            ((ImageView) dealerHand.getChildren().get(1)).setImage(backImage.getImage()); // Hide dealer's second card
+        }
+
 
         // Set alignment for all HBoxes
         userHand.setAlignment(Pos.CENTER);
@@ -1213,7 +1224,30 @@ public class BlackJackUI {
         // Start Game button function
         startGame.setOnAction(event -> {
 
+            isDealerTurn = false;
+
             blackJack.dealCard(); // Deal cards to all players
+
+
+            // Add cards to player's hands
+            for (Card card : blackJack.getHuman().getHand()) {
+                userHand.getChildren().add(createCardImage(card));
+            }
+
+            for (Card card : blackJack.getComputerOne().getHand()) {
+                computerOneHand.getChildren().add(createCardImage(card));
+            }
+
+            for (Card card : blackJack.getComputerTwo().getHand()) {
+                computerTwoHand.getChildren().add(createCardImage(card));
+            }
+
+            for (Card card : blackJack.getDealer().getHand()) {
+                dealerHand.getChildren().add(createCardImage(card));
+            }
+
+            // Replace the back of the dealer's second card with the back of the card
+            ((ImageView) dealerHand.getChildren().get(1)).setImage(backImage.getImage());
 
             // Set current turn to the user
             blackJack.setTurn(getUserName());
@@ -1222,9 +1256,6 @@ public class BlackJackUI {
             userVBox.setId("styled-vbox");
 
             startRound();
-
-            dealerHand.getChildren().remove(1);  // Remove the second card from the dealer's hand
-            dealerHand.getChildren().add(backImage);  // Add the back image to the dealer's hand
 
             // Display Hit and Stand buttons
             setHit();
