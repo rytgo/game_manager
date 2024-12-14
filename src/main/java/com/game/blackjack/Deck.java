@@ -42,4 +42,9 @@ public class Deck {
     public List<Card> getCards() {
         return cards;
     }
+
+    // Method to get the number of remaining cards
+    public int getRemainingCards() {
+        return cards.size();
+    }
 }
