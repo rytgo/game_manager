@@ -221,7 +221,7 @@ public class SnakeGame {
         }
 
         // Check for boundary collisions
-        if (head.getX() < 0 || head.getY() < 0 || head.getX() + 20 > canvas.getWidth() || head.getY() + 20 > canvas.getHeight()) {
+        if (head.getX() <= 0 || head.getY() <= 0 || head.getX() + 20 == canvas.getWidth() || head.getY() + 20 == canvas.getHeight()) {
             gameOver = true;
             return;
         }
