@@ -66,14 +66,14 @@ public class MainMenu {
     VBox blackjackScores = new VBox();
     VBox snakeScores = new VBox();
 
-    Label blackjackTitle = new Label("BlackJack:");
+    Label blackjackTitle = new Label("Blackjack:");
     Label snakeTitle = new Label("Snake:");
 
     blackjackScores.getChildren().add(blackjackTitle);
     snakeScores.getChildren().add(snakeTitle);
 
     // Populate BlackJack scores
-    List<Map.Entry<String, Integer>> blackjackTopScores = getTopScores("BlackJack");
+    List<Map.Entry<String, Integer>> blackjackTopScores = getTopScores("Blackjack");
     for (int i = 0; i < blackjackTopScores.size(); i++) {
         Map.Entry<String, Integer> entry = blackjackTopScores.get(i);
         Label scoreLabel = new Label((i + 1) + ". " + entry.getKey() + ": " + entry.getValue());
@@ -95,10 +95,8 @@ public class MainMenu {
     VBox buttonsBox = new VBox(15);
     buttonsBox.getStyleClass().add("buttons-container");
 
-    Button blackjackButton = new Button("Play BlackJack");
+    Button blackjackButton = new Button("Play Blackjack");
     Button snakeButton = new Button("Play Snake");
-    blackjackButton.setOnAction(e -> System.out.println("Launching BlackJack game...")); // Placeholder
-    snakeButton.setOnAction(e -> System.out.println("Launching Snake game...")); // Placeholder
 
     Button logoutButton = new Button("Logout");
     logoutButton.setOnAction(e -> {
