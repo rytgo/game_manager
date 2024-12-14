@@ -596,14 +596,7 @@ public class BlackJackUI {
             }
             dealerHand.setAlignment(Pos.CENTER);
 
-//            blackJack.getHuman().setMoney(blackJack.getHuman().getMoney());
-//            blackJack.getComputerOne().setMoney(blackJack.getComputerOne().getMoney());
-//            blackJack.getComputerTwo().setMoney(blackJack.getComputerTwo().getMoney());
-
             showResultUI();
-//            userTotal.setText("Balance: $" + blackJack.getHuman().getMoney());
-//            computerOneTotal.setText("Balance: $" + blackJack.getComputerOne().getMoney());
-//            computerTwoTotal.setText("Balance: $" + blackJack.getComputerTwo().getMoney());
 
             // Add New Round button to buttons HBox if not already present
             if (!buttons.getChildren().contains(newRound)) {
