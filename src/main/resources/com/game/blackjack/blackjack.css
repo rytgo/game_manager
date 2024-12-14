@@ -44,7 +44,7 @@
     -fx-font-family: "AppleMyungjo";
     -fx-font-weight: bolder;
     -fx-alignment: center;
-    -fx-background-color: #6C3BAA;
+    -fx-background-color: #957DAD;
     -fx-background-radius: 5px;
     -fx-padding: 10px 10px;
 }
@@ -65,13 +65,20 @@
 }
 
 .load-vbox {
-    -fx-background-color: #6C3BAA;
+    -fx-background-color: #CCB7E5;
 }
 
 #toolbar {
     -fx-background-color: #FAFAFA;
     -fx-padding: 10px;
-    -fx-border-color: #CCCCCC;
-    -fx-border-width: 1px;
+    -fx-border-color: #B19CD9;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;}
+
+#custom-label {
+    -fx-font-size: 23px;
+    -fx-text-fill: white;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
 }
 

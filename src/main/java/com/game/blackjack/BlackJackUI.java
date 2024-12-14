@@ -16,10 +16,7 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.game.MainMenu;
@@ -73,6 +70,7 @@ public class BlackJackUI {
         this.userName = userName;
         this.mainMenu = mainMenu;
         this.blackjackMainMenu = blackjackMainMenu;
+        blackJack.getHuman().setName(userName);
     }
 
     // Getter for userName
@@ -112,6 +110,7 @@ public class BlackJackUI {
     public void loadGame(Stage primaryStage) {
         // Create a label to instruct the user
         Label enterSaveStateLabel = new Label("Enter save state string here:");
+        enterSaveStateLabel.setId("custom-label");
 
         // Create a text area for the user to enter the save state
         TextArea saveStateArea = new TextArea();
@@ -136,7 +135,7 @@ public class BlackJackUI {
         loadVBox.getStyleClass().add("load-vbox");
 
         // Create the scene and set the CSS file
-        Scene loadScene = new Scene(loadVBox, 640, 480);
+        Scene loadScene = new Scene(loadVBox, 420, 320);
         loadScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
 
         // Create a modal window for the save state input
@@ -221,12 +220,16 @@ public class BlackJackUI {
 
     // Helper method to reveal the dealer's second card
     private void revealDealerCard() {
-        dealerHand.getChildren().remove(1);  // Remove the back image
-        dealerHand.getChildren().add(createCardImage(blackJack.getDealer().getHand().get(1)));  // Add the second card
+        ImageView image = new ImageView();
+        image = createCardImage(blackJack.getDealer().getHand().get(1));
+        ((ImageView) dealerHand.getChildren().get(1)).setImage(image.getImage());
     }
 
     // Helper method for computers and dealer to play and determine the winner
     private void notUserPlay() {
+        if (blackJack.getHuman().getHand() == null) {
+            return;
+        }
         userVBox.getChildren().remove(hitAndStand);
 
         // Un-highlight user is playing
@@ -248,6 +251,7 @@ public class BlackJackUI {
         } else if (currentTurn.equals("Dealer")) {
             dealerPlay(); // Handle the dealer's turn
         }
+
     }
 
     // Helper method to handle computer turn and callback after completion
@@ -402,11 +406,11 @@ public class BlackJackUI {
     private void showResult() {
         blackJack.setTurn(null);
 
-        isDealerTurn = false;
+        isDealerTurn = true;
 
+        customResult(blackJack.getHuman(), result, userTotal, userVBox);
         customResult(blackJack.getComputerOne(), resultOne, computerOneTotal, computerOneVBox);
         customResult(blackJack.getComputerTwo(), resultTwo, computerTwoTotal, computerTwoVBox);
-        customResult(blackJack.getHuman(), result, userTotal, userVBox);
         roundPlaying = false;
 
         if (blackJack.getHuman().getMoney() <= 0) {
@@ -447,14 +451,16 @@ public class BlackJackUI {
                 computerTwoHand.getChildren().clear();
                 dealerHand.getChildren().clear();
 
-                userTotal.setText("Balance: $1000");
                 blackJack.getHuman().setMoney(1000);
-                computerOneTotal.setText("Balance: $1000");
+                userTotal.setText("Balance: $" + blackJack.getHuman().getMoney());
                 blackJack.getComputerOne().setMoney(1000);
-                computerTwoTotal.setText("Balance: $1000");
+                computerOneTotal.setText("Balance: $" + blackJack.getComputerOne().getMoney());
                 blackJack.getComputerTwo().setMoney(1000);
+                computerTwoTotal.setText("Balance: $" + blackJack.getComputerTwo().getMoney());
 
                 resetBet();
+
+                displayChipsAndMessage();
             }
         });
     }
@@ -465,25 +471,25 @@ public class BlackJackUI {
 
         // Save each player's hand, balance, and bet
         saveState.append("User-name:").append(getUserName())
-                .append(";Human-hand:").append(formatHand(blackJack.getHuman().getHand()))
+                .append(";Human-hand:").append(blackJack.getHuman().getHand().isEmpty() ? "null" : formatHand(blackJack.getHuman().getHand()))
                 .append(";Balance:").append(blackJack.getHuman().getMoney())
                 .append(";Bet:").append(blackJack.getHuman().getBet())
                 .append("|");
 
         saveState.append("Computer-1-name:").append(blackJack.getComputerOne().getName())
-                .append(";Computer-1-hand:").append(formatHand(blackJack.getComputerOne().getHand()))
+                .append(";Computer-1-hand:").append(blackJack.getComputerOne().getHand().isEmpty() ? "null" : formatHand(blackJack.getComputerOne().getHand()))
                 .append(";Balance:").append(blackJack.getComputerOne().getMoney())
                 .append(";Bet:").append(blackJack.getComputerOne().getBet())
                 .append("|");
 
         saveState.append("Computer-2-name:").append(blackJack.getComputerTwo().getName())
-                .append(";Computer-2-hand:").append(formatHand(blackJack.getComputerTwo().getHand()))
+                .append(";Computer-2-hand:").append(blackJack.getComputerTwo().getHand().isEmpty() ? "null" : formatHand(blackJack.getComputerTwo().getHand()))
                 .append(";Balance:").append(blackJack.getComputerTwo().getMoney())
                 .append(";Bet:").append(blackJack.getComputerTwo().getBet())
                 .append("|");
 
         saveState.append("Dealer-name:").append(blackJack.getDealer().getName())
-                .append(";Dealer-hand:").append(formatHand(blackJack.getDealer().getHand()))
+                .append(";Dealer-hand:").append(blackJack.getDealer().getHand().isEmpty() ? "null" : formatHand(blackJack.getDealer().getHand()))
                 .append(";Balance:").append(blackJack.getDealer().getMoney())
                 .append(";Bet:").append(blackJack.getDealer().getBet())
                 .append("|");
@@ -531,6 +537,121 @@ public class BlackJackUI {
 
         // Set the CSS file for the scene
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
+
+        // Case 1: No turn and no bet and no start button
+        if (blackJack.getTurn().equals("null") && blackJack.getHuman().getBet() == 0) {
+            initializeGame();
+
+            // Add New Round button to buttons HBox if not already present
+            if (!buttons.getChildren().contains(newRound)) {
+                buttons.getChildren().addAll(newRound);
+            }
+
+            // Reset all player hands
+            initializeHands();
+
+            // Set up functionality for New Round and Start Game buttons
+            setStartGame();
+            setNewRound();
+            displayChipsAndMessage(); // Tell the user to select a chip
+
+            // Show the scene
+            stage.setScene(scene);
+            stage.show();
+            System.out.println(1);
+            return;
+
+            // Case 2: Result state
+        } else if (blackJack.getHuman().getHand() != null && blackJack.getTurn().equals("null") && !roundPlaying) {
+            initializeGame();
+
+            chips.setVisible(false);
+
+            for (Card card : blackJack.getHuman().getHand()) {
+                userHand.getChildren().add(createCardImage(card));
+                if (!userVBox.getChildren().contains(userHand)) {
+                    userVBox.getChildren().add(userHand);
+                }
+            }
+            userHand.setAlignment(Pos.CENTER);
+
+            for (Card card : blackJack.getComputerOne().getHand()) {
+                computerOneHand.getChildren().add(createCardImage(card));
+                if (!computerOneVBox.getChildren().contains(computerOneHand)) {
+                    computerOneVBox.getChildren().add(computerOneHand);
+                }
+            }
+
+            for (Card card : blackJack.getComputerTwo().getHand()) {
+                computerTwoHand.getChildren().add(createCardImage(card));
+                if (!computerTwoVBox.getChildren().contains(computerTwoHand)) {
+                    computerTwoVBox.getChildren().add(computerTwoHand);
+                }
+            }
+            for (Card card : blackJack.getDealer().getHand()) {
+                dealerHand.getChildren().add(createCardImage(card));
+                if (!dealerVBox.getChildren().contains(dealerHand)) {
+                    dealerVBox.getChildren().add(dealerHand);
+                }
+            }
+            dealerHand.setAlignment(Pos.CENTER);
+
+//            blackJack.getHuman().setMoney(blackJack.getHuman().getMoney());
+//            blackJack.getComputerOne().setMoney(blackJack.getComputerOne().getMoney());
+//            blackJack.getComputerTwo().setMoney(blackJack.getComputerTwo().getMoney());
+
+            showResultUI();
+//            userTotal.setText("Balance: $" + blackJack.getHuman().getMoney());
+//            computerOneTotal.setText("Balance: $" + blackJack.getComputerOne().getMoney());
+//            computerTwoTotal.setText("Balance: $" + blackJack.getComputerTwo().getMoney());
+
+            // Add New Round button to buttons HBox if not already present
+            if (!buttons.getChildren().contains(newRound)) {
+                buttons.getChildren().add(newRound);
+            }
+
+            setStartGame();
+            setNewRound();
+
+            // Show the scene
+            stage.setScene(scene);
+            stage.show();
+            System.out.println("Blackjack round is playing");
+            return;
+
+            // Case 3: No turn, yes bet, and round is not playing
+        } else if (blackJack.getTurn().equals("null") && blackJack.getHuman().getBet() != 0 && !roundPlaying) {
+            initializeGame();
+
+            // Add Start Game button to root if not already present
+            if (!root.getChildren().contains(startGame)) {
+                root.getChildren().add(startGame);
+                AnchorPane.setBottomAnchor(startGame, 250.0);
+                AnchorPane.setLeftAnchor(startGame, 30.0);
+                AnchorPane.setRightAnchor(startGame, 30.0);
+            }
+
+            // Ensure Start Game button is visible
+            startGame.setVisible(true);
+
+            // Add New Round button to buttons HBox if not already present
+            if (!buttons.getChildren().contains(newRound)) {
+                buttons.getChildren().add(newRound);
+            }
+
+            // Reset all player hands
+            initializeHands();
+
+            // Set up functionality for New Round and Start Game buttons
+            setStartGame();
+            setNewRound();
+
+            // Show the scene
+            stage.setScene(scene);
+            stage.show();
+            System.out.println("Blackjack round is not playing");
+            return;
+        }
 
         initializeGame();
 
@@ -586,6 +707,14 @@ public class BlackJackUI {
         stage.show();
     }
 
+    // Helper method to initialize hands
+    private void initializeHands() {
+        blackJack.getHuman().setHand(new ArrayList<>());
+        blackJack.getComputerOne().setHand(new ArrayList<>());
+        blackJack.getComputerTwo().setHand(new ArrayList<>());
+        blackJack.getDealer().setHand(new ArrayList<>());
+    }
+
     private VBox getvBox(Player player) {
         VBox correspondingVBox = null;
 
@@ -617,14 +746,18 @@ public class BlackJackUI {
 
             // Parse hand
             String handString = extractValue(parts[1]); // Correctly extract hand
-            List<Card> hand = parseHand(handString);
-            player.setHand(hand);
-            // Loop through the deck and remove the matching card
-            for (Card card : hand) {
-                for (int i = 0; i < blackJack.getDeck().getCards().size(); i++) {
-                    if (blackJack.getDeck().getCards().get(i).equals(card)) {
-                        blackJack.getDeck().getCards().remove(i);
-                        break;
+            if (handString.equals("null")) {
+                player.setHand(null);
+            } else {
+                List<Card> hand = parseHand(handString);
+                player.setHand(hand);
+                // Loop through the deck and remove the matching card
+                for (Card card : hand) {
+                    for (int i = 0; i < blackJack.getDeck().getCards().size(); i++) {
+                        if (blackJack.getDeck().getCards().get(i).equals(card)) {
+                            blackJack.getDeck().getCards().remove(i);
+                            break;
+                        }
                     }
                 }
             }
@@ -633,10 +766,24 @@ public class BlackJackUI {
             // Parse balance
             int balance = Integer.parseInt(extractValue(parts[2])); // Correctly extract balance
             player.setMoney(balance);
+            if (player.getName().equals(blackJack.getHuman().getName())) {
+                userTotal.setText("Balance: $" + balance);
+            } else if (player.getName().equals(blackJack.getComputerOne().getName())) {
+                computerOneTotal.setText("Balance: $" + balance);
+            } else if (player.getName().equals(blackJack.getComputerTwo().getName())) {
+                computerTwoTotal.setText("Balance: $" + balance);
+            }
 
             // Parse bet
             int bet = Integer.parseInt(extractValue(parts[3])); // Correctly extract bet
             player.setBet(bet);
+            if (player.getName().equals(blackJack.getHuman().getName())) {
+                userBet.setText("Bet: $" + bet);
+            } else if (player.getName().equals(blackJack.getComputerOne().getName())) {
+                computerOneBet.setText("Bet: $" + bet);
+            } else if (player.getName().equals(blackJack.getComputerTwo().getName())) {
+                computerTwoBet.setText("Bet: $" + bet);
+            }
 
         } catch (Exception e) {
             throw new IllegalArgumentException("Error parsing player data: " + data, e);
@@ -657,8 +804,12 @@ public class BlackJackUI {
                 dealer.setName(name);
             } else if (attribute.startsWith("Dealer-hand:")) {
                 String handString = attribute.split(":")[1];
-                List<Card> hand = parseHand(handString);
-                dealer.setHand(hand);
+                if (handString.equals("null")) {
+                    blackJack.getDealer().setHand(null);
+                } else {
+                    List<Card> hand = parseHand(handString);
+                    dealer.setHand(hand);
+                }
             }
         }
     }
@@ -755,7 +906,7 @@ public class BlackJackUI {
         // userVBox
         Label userLabel = new Label(getUserName());
         userBet.setText("Bet: $" + blackJack.getHuman().getBet());
-        userTotal.setText("Balance: $1000");
+        userTotal.setText("Balance: $" + blackJack.getHuman().getMoney());
         userVBox.setAlignment(Pos.CENTER);
         userVBox.getChildren().addAll(userLabel, userBet, userTotal);
 
@@ -767,14 +918,14 @@ public class BlackJackUI {
         // computerOneVBox
         Label computerOneLabel = new Label("Computer 1");
         computerOneBet.setText("Bet: $" + blackJack.getComputerOne().getBet());
-        computerOneTotal.setText("Balance: $1000");
+        computerOneTotal.setText("Balance: $" + blackJack.getComputerOne().getMoney());
         computerOneVBox.setAlignment(Pos.CENTER);
         computerOneVBox.getChildren().addAll(computerOneLabel, computerOneBet, computerOneTotal);
 
         // computerTwoVBox
         Label computerTwoLabel = new Label("Computer 2");
         computerTwoBet.setText("Bet: $" + blackJack.getComputerTwo().getBet());
-        computerTwoTotal.setText("Balance: $1000");
+        computerTwoTotal.setText("Balance: $" + blackJack.getComputerTwo().getMoney());
         computerTwoVBox.setAlignment(Pos.CENTER);
         computerTwoVBox.getChildren().addAll(computerTwoLabel, computerTwoBet, computerTwoTotal);
 
@@ -891,6 +1042,7 @@ public class BlackJackUI {
 
             Scene menuScene = new Scene(rootLayout, 800, 600);
             menuScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
+            s.setTitle("CS151 Game Manager");
             s.setScene(menuScene);
         });
     }
@@ -898,6 +1050,8 @@ public class BlackJackUI {
     // Helper method New Round Button
     private void setNewRound() {
         newRound.setOnAction(e -> {
+            isDealerTurn = false;
+
             if (blackJack.getHuman().getMoney() <= 0) {
                 showResetWindow();
                 return;
@@ -1113,7 +1267,6 @@ public class BlackJackUI {
     private void resetPlayerHands() {
         blackJack.getComputerOne().getHand().clear();
         blackJack.getComputerTwo().getHand().clear();
-        blackJack.getDealer().getHand().clear();
 
         for (ImageView cardImageViewOne : computerOneHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
                 blackJack.getComputerOne().getHand().add(getCardFromImage(cardImageViewOne));
@@ -1125,9 +1278,38 @@ public class BlackJackUI {
         }
         blackJack.getComputerTwo().calculateTotal();
 
-        for (ImageView cardImageViewDealer : dealerHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
+        if (isDealerTurn) {
+            blackJack.getDealer().getHand().clear();
+            for (ImageView cardImageViewDealer : dealerHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
                 blackJack.getDealer().getHand().add(getCardFromImage(cardImageViewDealer));
+            }
+            blackJack.getDealer().calculateTotal();
         }
     }
+
+    // Helper method to retrieve the result from UI
+    private void showResultUI() {
+        blackJack.setTurn(null);
+
+        isDealerTurn = true;
+
+        customResultUI(blackJack.getHuman(), result, userTotal, userVBox);
+        customResultUI(blackJack.getComputerOne(), resultOne, computerOneTotal, computerOneVBox);
+        customResultUI(blackJack.getComputerTwo(), resultTwo, computerTwoTotal, computerTwoVBox);
+        roundPlaying = false;
+
+        if (blackJack.getHuman().getMoney() <= 0) {
+            showResetWindow();
+        }
+    }
+
+    // Helper method to custom result from UI
+    private void customResultUI(Player player, Label resultLabel, Label totalLabel, VBox playerVBox) {
+        resultLabel.setText(blackJack.determineWinnerUI(player));
+        resultLabel.setId("custom-label");
+        totalLabel.setText("Balance: $" + player.getMoney());
+        playerVBox.getChildren().add(resultLabel);
+    }
+
 }
 

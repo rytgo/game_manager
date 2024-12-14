@@ -73,7 +73,7 @@ public class MainMenu {
     snakeScores.getChildren().add(snakeTitle);
 
     // Populate BlackJack scores
-    List<Map.Entry<String, Integer>> blackjackTopScores = getTopScores("Blackjack");
+    List<Map.Entry<String, Integer>> blackjackTopScores = getTopScores("BlackJack");
     for (int i = 0; i < blackjackTopScores.size(); i++) {
         Map.Entry<String, Integer> entry = blackjackTopScores.get(i);
         Label scoreLabel = new Label((i + 1) + ". " + entry.getKey() + ": " + entry.getValue());
