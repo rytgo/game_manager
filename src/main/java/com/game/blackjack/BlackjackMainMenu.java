@@ -16,10 +16,12 @@ import com.game.MainMenu;
 public class BlackjackMainMenu {
     private String userName;
     private MainMenu menu;
+    private HighScoresManager highScoresManager;
 
-    public BlackjackMainMenu(String userName, MainMenu menu) {
+    public BlackjackMainMenu(String userName, MainMenu menu, HighScoresManager highScoresManager) {
         this.userName = userName;
         this.menu = menu;
+        this.highScoresManager = highScoresManager;
     }
 
     // Getters
@@ -29,6 +31,10 @@ public class BlackjackMainMenu {
 
     public MainMenu getMenu() {
         return menu;
+    }
+
+    public HighScoresManager getHighScoresManager(){
+        return this.highScoresManager;
     }
 
     public void start(Stage primaryStage) {
