@@ -120,7 +120,7 @@ public class MainMenu {
 
     // Call Snake game for snakeButton
     snakeButton.setOnAction(e -> {
-        SnakeGame snakeGame = new SnakeGame(user, this);
+        SnakeGame snakeGame = new SnakeGame(user, this, this.highScoresManager);
         snakeGame.start(stage);
     });
 

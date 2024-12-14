@@ -1,5 +1,6 @@
 package com.game.SnakeGame;
 
+import com.game.HighScoresManager;
 import com.game.MainMenu;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
@@ -18,6 +19,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class SnakeGame {
@@ -34,10 +36,12 @@ public class SnakeGame {
     private int speed = 200_000_000;    // initial speed in nanosecs
     private String userName;
     private MainMenu menu;
+    private HighScoresManager highScoresManager;
 
-    public SnakeGame(String userName, MainMenu menu) {
+    public SnakeGame(String userName, MainMenu menu, HighScoresManager highScoresManager) {
         this.userName = userName;
         this.menu = menu;
+        this.highScoresManager = highScoresManager;
     }
 
     // Getter for isPaused
@@ -238,6 +242,15 @@ public class SnakeGame {
     }
 
     private void renderGameOverMessage(Stage primaryStage){
+        Map<String, Integer> userScores = highScoresManager.getUserScores(userName);
+        if (userScores != null) {
+            int currentHighScore = userScores.getOrDefault("Snake", 0);
+            if (score > currentHighScore) {
+                highScoresManager.updateScore(userName, "Snake", score);
+                System.out.println("New high score for Snake: " + score);
+        }
+    }
+    
         Stage gameOverStage = new Stage();
         StackPane gameOverRoot = new StackPane();
         Scene gameOverScene = new Scene(gameOverRoot, 300, 200);
