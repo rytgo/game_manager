@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="33885ebe-7a7a-46bc-9926-111a8935f660" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/SnakeGame/SnakeGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/SnakeGame/SnakeGame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackJackUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackJackUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/blackjack/Card.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/blackjack/Card.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,31 +76,11 @@
       <option name="presentableId" value="Default" />
       <updated>1734130798066</updated>
       <workItem from="1734130799229" duration="2994000" />
-      <workItem from="1734137221284" duration="14141000" />
+      <workItem from="1734137221284" duration="20149000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackJackUI.java</url>
-          <line>1095</line>
-          <properties class="com.game.blackjack.BlackJackUI" method="resetHands">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackJackUI.java</url>
-          <line>125</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

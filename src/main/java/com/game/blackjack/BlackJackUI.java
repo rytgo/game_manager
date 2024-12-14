@@ -4,14 +4,12 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -69,6 +67,7 @@ public class BlackJackUI {
     private final Button newRound = new Button("New Round");
     private final ImageView backImage = setImageView("back.png");
     private final ImageView backgroundImage = setImageView("background.png");
+    private boolean isDealerTurn = false;
 
     public BlackJackUI(String userName, MainMenu mainMenu, BlackjackMainMenu blackjackMainMenu) {
         this.userName = userName;
@@ -147,7 +146,7 @@ public class BlackJackUI {
         loadStage.setTitle("Load Game");
         loadStage.setScene(loadScene);
         loadStage.show();
-}
+    }
 
     // Helper method to set ImageView for images
     public ImageView setImageView(String imageName) {
@@ -333,6 +332,8 @@ public class BlackJackUI {
     private void dealerPlay() {
         blackJack.setTurn(blackJack.getDealer().getName());
 
+        isDealerTurn = true;
+
         if (allPlayersBusted()) {
             revealDealerCard();
             showResult();
@@ -352,6 +353,7 @@ public class BlackJackUI {
                 messageArea = new Label(blackJack.getDealer().getName() + " has Blackjack!");
             } else if (blackJack.getDealer().calculateTotal() >= 17) {
                 messageArea = new Label(blackJack.getDealer().getName() + " stands!");
+
             }
             messageArea.setId("custom-label");
             dealerTimeline.getKeyFrames().add(new KeyFrame(
@@ -363,7 +365,7 @@ public class BlackJackUI {
                     e -> dealerVBox.getChildren().remove(messageArea)
             ));
         } else {
-            for (int i = 2; i < blackJack.getDealer().getHand().size(); i++) {
+            for (int i = dealerHand.getChildren().size(); i < blackJack.getDealer().getHand().size(); i++) {
                 int index = i;
                 dealerTimeline.getKeyFrames().add(new KeyFrame(
                         Duration.millis(cardDelay * (index - 1) + 300),
@@ -383,9 +385,9 @@ public class BlackJackUI {
             showStandMessage(blackJack.getDealer(), dealerVBox, dealerTimeline, cardDelay);
         }
         dealerTimeline.setOnFinished(e -> {
-                showResult();
-                dealerVBox.setId(null);
-                });
+            showResult();
+            dealerVBox.setId(null);
+        });
         dealerTimeline.play();
     }
 
@@ -399,6 +401,8 @@ public class BlackJackUI {
     // Helper method to show the result of the game
     private void showResult() {
         blackJack.setTurn(null);
+
+        isDealerTurn = false;
 
         customResult(blackJack.getComputerOne(), resultOne, computerOneTotal, computerOneVBox);
         customResult(blackJack.getComputerTwo(), resultTwo, computerTwoTotal, computerTwoVBox);
@@ -570,8 +574,11 @@ public class BlackJackUI {
             userVBox.getChildren().remove(hitAndStand);
         }
 
-        if (currentTurn.equals("Computer 1") || currentTurn.equals("Computer 2") || currentTurn.equals("Dealer")) {
-            notUserPlay(); // Trigger computer or dealer logic
+        if (currentTurn.equals("Computer 1") || currentTurn.equals("Computer 2")) {
+            ((ImageView) dealerHand.getChildren().get(1)).setImage(backImage.getImage());
+            notUserPlay(); // Trigger computer logic
+        } else if (currentTurn.equals("Dealer")) {
+            notUserPlay(); // Trigger dealer logic
         }
 
         // Set the stage
@@ -612,6 +619,16 @@ public class BlackJackUI {
             String handString = extractValue(parts[1]); // Correctly extract hand
             List<Card> hand = parseHand(handString);
             player.setHand(hand);
+            // Loop through the deck and remove the matching card
+            for (Card card : hand) {
+                for (int i = 0; i < blackJack.getDeck().getCards().size(); i++) {
+                    if (blackJack.getDeck().getCards().get(i).equals(card)) {
+                        blackJack.getDeck().getCards().remove(i);
+                        break;
+                    }
+                }
+            }
+            System.out.println(blackJack.getDeck().getCards().size());
 
             // Parse balance
             int balance = Integer.parseInt(extractValue(parts[2])); // Correctly extract balance
@@ -827,7 +844,7 @@ public class BlackJackUI {
         // Set the action for the Save Game button
         saveGame.setOnAction(e -> {
             // Reset hands according to UI before saving
-            resetHands();
+            resetPlayerHands();
 
             String saveState = saveState();
 
@@ -1093,24 +1110,24 @@ public class BlackJackUI {
     }
 
     // Helper method to reset hands of non-user players and update it with the getCardFromImage method
-    private void resetHands() {
+    private void resetPlayerHands() {
         blackJack.getComputerOne().getHand().clear();
         blackJack.getComputerTwo().getHand().clear();
-//        blackJack.getDealer().getHand().clear();
+        blackJack.getDealer().getHand().clear();
 
-        for (ImageView cardImageView : computerOneHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
-            blackJack.getComputerOne().getHand().add(getCardFromImage(cardImageView));
-        }
+        for (ImageView cardImageViewOne : computerOneHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
+                blackJack.getComputerOne().getHand().add(getCardFromImage(cardImageViewOne));
+            }
         blackJack.getComputerOne().calculateTotal();
 
-        for (ImageView cardImageView : computerTwoHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
-            blackJack.getComputerTwo().getHand().add(getCardFromImage(cardImageView));
+        for (ImageView cardImageViewTwo : computerTwoHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
+                blackJack.getComputerTwo().getHand().add(getCardFromImage(cardImageViewTwo));
         }
         blackJack.getComputerTwo().calculateTotal();
 
-//        for (ImageView cardImageView : dealerHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
-//            blackJack.getDealer().getHand().add(getCardFromImage(cardImageView));
-//        }
+        for (ImageView cardImageViewDealer : dealerHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
+                blackJack.getDealer().getHand().add(getCardFromImage(cardImageViewDealer));
+        }
     }
 }
 
