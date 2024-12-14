@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -91,7 +92,7 @@ public class BlackJackUI {
         initializeGame();
 
         // Add New Round button to buttons HBox
-        buttons.getChildren().addAll(newRound);
+        buttons.getChildren().add(newRound);
 
         // Function the New Round button
         setNewRound();
@@ -294,6 +295,7 @@ public class BlackJackUI {
                         Duration.millis(cardDelay * (index - 1) + 300),
                         e -> {
                             hand.getChildren().add(createCardImage(player.getHand().get(index)));
+                            System.out.println(player.getTotal());
                             messageArea = new Label(player.getName() + " hits!");
                             messageArea.setId("custom-label");
                             playerBox.getChildren().add(messageArea);
@@ -537,9 +539,6 @@ public class BlackJackUI {
             showAlert("Round is not over", "The round is not over. Finish the round before starting a new one.");
             return;
         }
-
-        // Display chips and message to tell user to select a chip
-        displayChipsAndMessage();
 
         // Set current turn to the user
         blackJack.setTurn(blackJack.getTurn());
@@ -827,6 +826,9 @@ public class BlackJackUI {
 
         // Set the action for the Save Game button
         saveGame.setOnAction(e -> {
+            // Reset hands according to UI before saving
+            resetHands();
+
             String saveState = saveState();
 
             // Create an Alert of type INFORMATION
@@ -1072,6 +1074,43 @@ public class BlackJackUI {
         userVBox.getChildren().remove(result);
         computerOneVBox.getChildren().remove(resultOne);
         computerTwoVBox.getChildren().remove(resultTwo);
+    }
+
+    // Helper method to get a Card object from an ImageView
+    private Card getCardFromImage(ImageView cardImageView) {
+        // Extract the file name from the ImageView's Image
+        String imagePath = cardImageView.getImage().getUrl(); // Get the URL of the image
+        String fileName = new File(URI.create(imagePath)).getName(); // Get file name from the URL
+
+        // Split the file name to extract rank and suit
+        String[] parts = fileName.replace(".png", "").split("-");
+        String rank = parts[0];
+        String suit = parts[1];
+        int value = cardValue(rank); // Get the numeric value of the card
+
+        // Create and return the Card object
+        return new Card(suit, rank, value);
+    }
+
+    // Helper method to reset hands of non-user players and update it with the getCardFromImage method
+    private void resetHands() {
+        blackJack.getComputerOne().getHand().clear();
+        blackJack.getComputerTwo().getHand().clear();
+//        blackJack.getDealer().getHand().clear();
+
+        for (ImageView cardImageView : computerOneHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
+            blackJack.getComputerOne().getHand().add(getCardFromImage(cardImageView));
+        }
+        blackJack.getComputerOne().calculateTotal();
+
+        for (ImageView cardImageView : computerTwoHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
+            blackJack.getComputerTwo().getHand().add(getCardFromImage(cardImageView));
+        }
+        blackJack.getComputerTwo().calculateTotal();
+
+//        for (ImageView cardImageView : dealerHand.getChildren().stream().map(node -> (ImageView) node).toList()) {
+//            blackJack.getDealer().getHand().add(getCardFromImage(cardImageView));
+//        }
     }
 }
 

@@ -7,8 +7,9 @@
     <list default="true" id="33885ebe-7a7a-46bc-9926-111a8935f660" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game_manager.iml" beforeDir="false" afterPath="$PROJECT_DIR$/game_manager.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/SnakeGame/SnakeGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/SnakeGame/SnakeGame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackJackUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackJackUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/game/blackjack/BlackJackUI.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/game/blackjack/BlackJackUI.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/blackjack/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/blackjack/Player.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,43 +19,43 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "uyph1899"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;uyph1899&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/rytgo/game_manager.git",
-    "accountId": "2ec40b62-3e49-42ce-b7ff-1b5b07a8607e"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/rytgo/game_manager.git&quot;,
+    &quot;accountId&quot;: &quot;2ec40b62-3e49-42ce-b7ff-1b5b07a8607e&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2qBL0GnVRVA92QGXwilBL3rVaAK" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.App.executor": "Run",
-    "JUnit.SnakeGameTest.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "uyen-branch",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/uyenpham/Desktop/CS151Project/game_manager",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.App.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SnakeGameTest.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;uyen-branch&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/uyenpham/Desktop/CS151Project/game_manager&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -77,10 +78,31 @@
       <option name="presentableId" value="Default" />
       <updated>1734130798066</updated>
       <workItem from="1734130799229" duration="2994000" />
+      <workItem from="1734137221284" duration="9999000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackJackUI.java</url>
+          <line>1095</line>
+          <properties class="com.game.blackjack.BlackJackUI" method="resetHands">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/game/App.java</url>
+          <line>47</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -18,6 +18,8 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
+import java.util.Objects;
+
 public class SnakeGame {
     private Snake snake;
     private Food food;
@@ -25,8 +27,8 @@ public class SnakeGame {
     private boolean gameOver = false;
     private int score = 0;
     private boolean isPaused = false;
-    private Canvas canvas;
-    private GraphicsContext gc;
+    private Canvas canvas = new Canvas(800, 600);
+    private GraphicsContext gc = canvas.getGraphicsContext2D();
     private Label scoreLabel;  // Label for displaying the score
     private long lastUpdate = 0;    //tracks time since last movement
     private int speed = 200_000_000;    // initial speed in nanosecs
@@ -61,27 +63,27 @@ public class SnakeGame {
     public void start(Stage primaryStage) {
         // Create root layout
         StackPane root = new StackPane(); // Use StackPane for layering
+        root.getChildren().add(canvas);
         VBox gameLayout = new VBox();    // VBox for toolbar and canvas
     
         gameLayout.setSpacing(0);
     
         // Create toolbar
         HBox toolbar = new HBox();
-        toolbar.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7); -fx-padding: 10;");
-        toolbar.setPrefHeight(40);
+        toolbar.setId("toolbar");
     
         // Menu button
-        Button menuButton = new Button("Menu");
-        menuButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: transparent;");
+        Button menuButton = new Button("Main Menu");
+        menuButton.setId("main-menu-button");
         menuButton.setOnAction(e -> primaryStage.getScene().setRoot(menu.launchMainMenu(primaryStage)));
     
         // Pause instruction
         Label pauseInstruction = new Label("Pause: Press ESC");
-        pauseInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        pauseInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: black;");
     
         // Score label
         scoreLabel = new Label("Score: 0");
-        scoreLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+        scoreLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: black;");
     
         // Right container for alignment
         HBox rightContainer = new HBox(20, pauseInstruction, scoreLabel);
@@ -90,14 +92,6 @@ public class SnakeGame {
     
         // Add components to toolbar
         toolbar.getChildren().addAll(menuButton, rightContainer);
-    
-        // Get screen size
-        double screenWidth = Screen.getPrimary().getBounds().getWidth();
-        double screenHeight = Screen.getPrimary().getBounds().getHeight();
-        
-        // Initialize canvas
-        canvas = new Canvas(screenWidth, screenHeight - toolbar.getPrefHeight());  // Set the size of the canvas
-        gc = canvas.getGraphicsContext2D(); // Get the drawing context
     
         // Add toolbar and canvas to game layout
         gameLayout.getChildren().addAll(toolbar, canvas);
@@ -113,6 +107,7 @@ public class SnakeGame {
     
         // Create scene and handle key inputs
         Scene scene = new Scene(root);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("snake.css")).toExternalForm());
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
                 togglePause(root); // Pass the root StackPane for overlaying
@@ -145,6 +140,7 @@ public class SnakeGame {
     
         primaryStage.setScene(scene);
         primaryStage.setTitle("Snake Game");
+        primaryStage.centerOnScreen();
         primaryStage.show();
     }
 
@@ -241,17 +237,23 @@ public class SnakeGame {
         Stage gameOverStage = new Stage();
         StackPane gameOverRoot = new StackPane();
         Scene gameOverScene = new Scene(gameOverRoot, 300, 200);
+        gameOverScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("snake.css")).toExternalForm());
 
-        javafx.scene.control.Label gameOverLabel = new javafx.scene.control.Label("Game Over! Score: " + score);
-        gameOverLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
+        VBox layout = getvBox(primaryStage, gameOverRoot, gameOverStage);
+        layout.setAlignment(Pos.CENTER);
+        gameOverRoot.getChildren().add(layout);
         
-        javafx.scene.control.Button playAgainButton = new javafx.scene.control.Button("Play Again");
-        playAgainButton.setStyle(
-            "-fx-font-size: 24px; " + 
-            "-fx-padding: 10 20 10 20; " +
-            "-fx-background-color: #00ff00; " +
-            "-fx-text-fill: black;"
-        );
+        gameOverStage.setScene(gameOverScene);
+        gameOverStage.setTitle("Game Over");
+        gameOverStage.show();
+    }
+
+    private VBox getvBox(Stage primaryStage, StackPane gameOverRoot, Stage gameOverStage) {
+        Label gameOverLabel = new Label("Game Over! Score: " + score);
+        gameOverLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: black;");
+
+        Button playAgainButton = new Button("Play Again");
+
         playAgainButton.setOnAction(e -> {
             // Reset the game state
             gameOver = false;
@@ -261,14 +263,9 @@ public class SnakeGame {
             gameOverStage.close();
             start(primaryStage);  // Restart the game
         });
-        
+
         VBox layout = new VBox(10, gameOverLabel, playAgainButton);
-        layout.setAlignment(Pos.CENTER);
-        gameOverRoot.getChildren().add(layout);
-        
-        gameOverStage.setScene(gameOverScene);
-        gameOverStage.setTitle("Game Over");
-        gameOverStage.show();
+        return layout;
     }
 
     // Draw the grid background

@@ -59,6 +59,11 @@ abstract class Player {
         return total;
     }
 
+    // Setter for total
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
     // Getter for name
     public String getName() {
         return name;
