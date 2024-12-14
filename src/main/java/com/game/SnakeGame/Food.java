@@ -40,8 +40,6 @@ public class Food {
             // If position is valid, create the food block
             if (validPosition) {
                 foodBlock = new Block(x, y);  // Food as a block instead of a rectangle
-            } else if (++attempts > 100) { // Arbitrary max attempts
-                break;
             }
         } 
     }
