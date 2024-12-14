@@ -3,7 +3,6 @@ package com.game.SnakeGame;
 import com.game.HighScoresManager;
 import com.game.MainMenu;
 import javafx.animation.AnimationTimer;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -15,7 +14,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
@@ -86,6 +84,7 @@ public class SnakeGame {
         menuButton.setOnAction(e -> {
             togglePause(root);
             primaryStage.getScene().setRoot(menu.launchMainMenu(primaryStage));
+            primaryStage.setTitle("CS151 Game Manager");
 
         });
     

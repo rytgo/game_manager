@@ -162,4 +162,54 @@ public class BlackJack {
         computerTwo.setMoney(1000);
         human.setMoney(1000);
     }
+
+    public String determineWinnerUI(Player player) {
+        int dealerTotal = dealer.calculateTotal();
+        boolean dealerHasBlackjack = dealer.getHand().size() == 2 && dealerTotal == 21;
+        int playerTotal = player.calculateTotal();
+        boolean playerHasBlackjack = player.getHand().size() == 2 && playerTotal == 21;
+        int playerBet = player.getBet();
+        String message = "";
+
+        // Case 1: Player and Dealer both > 21 (both busted)
+        if (dealerTotal > 21 && playerTotal > 21) {
+            message = player.getName() + " lost!";
+        }
+        // Case 2: Player <= 21, Dealer > 21 (dealer busts)
+        else if (dealerTotal > 21) {
+            message = player.getName() + " won!";
+        }
+        // Case 3: Player > 21, Dealer <= 21 (player busts)
+        else if (playerTotal > 21) {
+            message = player.getName() + " lost!";
+        }
+        // Case 4: Dealer <= 21 && Player <= 21
+        else {
+            // Case 5: Player has Blackjack
+            if (playerHasBlackjack && !dealerHasBlackjack) {
+                message = player.getName() + " won!";
+            }
+            // Case 6: Dealer has Blackjack, Player doesn't
+            else if (dealerHasBlackjack && !playerHasBlackjack) {
+                message = player.getName() + " lost!";
+            }
+            // Case 7: Both Player and Dealer have Blackjack (Push)
+            else if (playerHasBlackjack) {
+                message = player.getName() + " tied!";
+            }
+            // Case 8: Player has a higher total than the dealer
+            else if (playerTotal > dealerTotal) {
+                message = player.getName() + " won!";
+            }
+            // Case 9: Player has a lower total than the dealer
+            else if (playerTotal < dealerTotal) {
+                message = player.getName() + " lost!";
+            }
+            // Case 10: Player and Dealer have the same total (Push)
+            else {
+                message = player.getName() + " tied!";
+            }
+        }
+        return message;
+    }
 }
