@@ -92,7 +92,7 @@ public class BlackJackUI {
         initializeGame();
 
         // Add New Round button to buttons HBox
-        buttons.getChildren().add(newRound);
+        buttons.getChildren().addAll(newRound);
 
         // Function the New Round button
         setNewRound();
@@ -289,7 +289,7 @@ public class BlackJackUI {
             ));
         } else {
             // Handle "Hit" animations
-            for (int i = 2; i < player.getHand().size(); i++) {
+            for (int i = hand.getChildren().size(); i < player.getHand().size(); i++) {
                 int index = i;
                 timeline.getKeyFrames().add(new KeyFrame(
                         Duration.millis(cardDelay * (index - 1) + 300),
