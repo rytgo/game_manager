@@ -65,6 +65,9 @@ public class BlackJackUI {
     private final ImageView backImage = setImageView("back.png");
     private final ImageView backgroundImage = setImageView("background.png");
     private boolean isDealerTurn = false;
+    private static final Set<String> VALID_RANKS = Set.of("2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k", "a");
+    private static final Set<String> VALID_SUITS = Set.of("club", "diamond", "heart", "spade");
+
 
     public BlackJackUI(String userName, MainMenu mainMenu, BlackjackMainMenu blackjackMainMenu) {
         this.userName = userName;
@@ -121,9 +124,13 @@ public class BlackJackUI {
         // Set the action for the load button
         loadButton.setOnAction(e -> {
             String saveStateString = saveStateArea.getText();
-            loadState(saveStateString);  // Load the game state
-            primaryStage.close(); // Close the load window
-            updateUI(primaryStage); // Ensure UI reflects the loaded state
+            if (isValidSaveState(saveStateString)) {
+                loadState(saveStateString);  // Load the game state
+                primaryStage.close(); // Close the load window
+                updateUI(primaryStage); // Ensure UI reflects the loaded state
+            } else {
+                showAlert("Invalid save state", "The save state is invalid. Please try again.");
+            }
         });
 
         // Create a VBox to hold the label, save state area, and load button
@@ -1304,5 +1311,182 @@ public class BlackJackUI {
         playerVBox.getChildren().add(resultLabel);
     }
 
+    // Validate the entire save state string
+    private boolean isValidSaveState(String saveStateString) {
+        if (saveStateString == null || saveStateString.isEmpty()) {
+            System.out.println("Save state is null or empty.");
+            return false;
+        }
+
+        // Split the save state string into sections for each player and turn
+        String[] sections = saveStateString.split("\\|"); // Use '|' as the delimiter
+        if (sections.length < 5) { // Expect sections for user, two computers, dealer, and turn
+            System.out.println("Save state does not contain enough sections for all players.");
+            return false;
+        }
+
+        // Collect player names to validate the "Turn" field
+        List<String> playerNames = new ArrayList<>();
+        playerNames.add(this.getUserName());
+        playerNames.add(blackJack.getComputerOne().getName());
+        playerNames.add(blackJack.getComputerTwo().getName());
+        playerNames.add(blackJack.getDealer().getName());
+
+        // Validate each section
+        for (String section : sections) {
+            Map<String, String> keyValueMap = parseSection(section);
+            if (keyValueMap == null) {
+                System.out.println("Invalid section: " + section);
+                return false;
+            }
+
+            // Extract player names for later validation of the "Turn" field
+            if (keyValueMap.containsKey("User-name")) {
+                playerNames.add(keyValueMap.get("User-name"));
+            } else if (keyValueMap.containsKey("Computer-1-name")) {
+                playerNames.add(keyValueMap.get("Computer-1-name"));
+            } else if (keyValueMap.containsKey("Computer-2-name")) {
+                playerNames.add(keyValueMap.get("Computer-2-name"));
+            } else if (keyValueMap.containsKey("Dealer-name")) {
+                playerNames.add(keyValueMap.get("Dealer-name"));
+            }
+
+            // Validate individual sections
+            if (keyValueMap.containsKey("Turn")) {
+                if (!validateTurn(keyValueMap.get("Turn"), playerNames)) {
+                    return false;
+                }
+            } else if (!validatePlayerSection(keyValueMap)) {
+                return false;
+            }
+        }
+
+        return true; // Save state is valid
+    }
+
+    // Parse a section into key-value pairs
+    private Map<String, String> parseSection(String section) {
+        Map<String, String> keyValueMap = new HashMap<>();
+
+        String[] keyValuePairs = section.split(";");
+        for (String pair : keyValuePairs) {
+            String[] keyValue = pair.split(":");
+            if (keyValue.length == 2) {
+                keyValueMap.put(keyValue[0].trim(), keyValue[1].trim());
+            } else {
+                System.out.println("Invalid key-value pair: " + pair);
+                return null;
+            }
+        }
+
+        return keyValueMap;
+    }
+
+    // Validate player section
+    private boolean validatePlayerSection(Map<String, String> keyValueMap) {
+        // Determine which hand key to validate
+        String handKey = keyValueMap.keySet().stream()
+                .filter(key -> key.endsWith("-hand") || key.equals("Human-hand"))
+                .findFirst()
+                .orElse(null);
+
+        if (handKey == null) {
+            System.out.println("No hand key found in section.");
+            return false;
+        }
+
+        // Validate the hand
+        if (!validateHand(keyValueMap.get(handKey))) {
+            System.out.println("Invalid hand: " + keyValueMap.get(handKey));
+            return false;
+        }
+
+        // Validate balance and bet
+        if (!keyValueMap.containsKey("Balance") || !keyValueMap.containsKey("Bet")) {
+            System.out.println("Missing balance or bet.");
+            return false;
+        }
+
+        return validateBalanceAndBet(keyValueMap.get("Balance"), keyValueMap.get("Bet"));
+    }
+
+    // Validate a hand (cards or null)
+    private boolean validateHand(String hand) {
+        if (hand == null || hand.equals("null")) return true; // Null hands are valid
+
+        // Validate each card in the hand
+        String[] cards = hand.split(",");
+        for (String card : cards) {
+            if (!validateCard(card)) {
+                System.out.println("Invalid card in hand: " + card);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Validate a single card
+    private boolean validateCard(String card) {
+        if (card.length() < 2) return false; // Too short to be valid
+
+        String rank;
+        String suit;
+
+        // Handle two-character ranks like "10"
+        if (card.length() > 2 && Character.isDigit(card.charAt(1))) {
+            rank = card.substring(0, 2); // First two characters are the rank
+            suit = card.substring(2);   // Rest is the suit
+        } else {
+            rank = card.substring(0, 1); // First character is the rank
+            suit = card.substring(1);   // Rest is the suit
+        }
+
+        if (!VALID_RANKS.contains(rank.toLowerCase())) {
+            System.out.println("Invalid rank: " + rank);
+            return false;
+        }
+
+        if (!VALID_SUITS.contains(suit.toLowerCase())) {
+            System.out.println("Invalid suit: " + suit);
+            return false;
+        }
+
+        return true;
+    }
+
+    // Validate balance and bet
+    private boolean validateBalanceAndBet(String balance, String bet) {
+        try {
+            int balanceValue = Integer.parseInt(balance);
+            int betValue = Integer.parseInt(bet);
+
+            if (balanceValue < 0 || betValue < 0) {
+                System.out.println("Balance or bet cannot be negative: Balance = " + balance + ", Bet = " + bet);
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid number format for balance or bet: " + e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    // Validate the turn field
+    private boolean validateTurn(String turn, List<String> playerNames) {
+        if (turn == null || turn.equals("null")) {
+            return true; // Allow null turns
+        }
+
+        // Check if the turn matches any valid player name
+        if (playerNames.contains(turn)) {
+            return true;
+        }
+
+        System.out.println("Invalid turn value: " + turn);
+        return false;
+    }
 }
+
 
