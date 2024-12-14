@@ -84,7 +84,6 @@ public class SnakeGame {
         menuButton.setOnAction(e -> {
             togglePause(root);
             primaryStage.getScene().setRoot(menu.launchMainMenu(primaryStage));
-            primaryStage.setTitle("CS151 Game Manager");
 
         });
     
