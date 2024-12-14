@@ -2,6 +2,7 @@ package com.game.SnakeGame;
 
 import java.util.Random;
 
+import javafx.scene.Parent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -12,12 +13,12 @@ public class Food {
     private Snake snake;
     private int attempts = 0;
 
-    public Food(StackPane root, Snake snake) {
+    public Food(Parent root, Snake snake) {
         this.snake = snake;
         spawnFood(root);
     }
 
-    public void spawnFood(StackPane root) {
+    public void spawnFood(Parent root) {
         Random random = new Random();
         boolean validPosition = false;
 
@@ -48,7 +49,7 @@ public class Food {
         return foodBlock;
     }
 
-    public void reposition(StackPane root) {
+    public void reposition(Parent root) {
         spawnFood(root);  // Reposition food at a new random location
     }
 
