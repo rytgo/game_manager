@@ -64,6 +64,10 @@ public class SnakeGame {
         this.gameOver = gameOver;
     }
 
+    public int getScore() {
+        return score;
+    }    
+
     public void start(Stage primaryStage) {
         // Create root layout
         StackPane root = new StackPane(); // Use StackPane for layering
@@ -165,6 +169,13 @@ public class SnakeGame {
         }
     }
 
+    public void incrementScore(int points) {
+        score += points;
+        if (scoreLabel != null) {  // Ensure the label is not null
+            scoreLabel.setText("Score: " + score);
+        }
+    }    
+
     public void togglePause(StackPane root) {
         if (gameOver) {
             return;
@@ -208,7 +219,7 @@ public class SnakeGame {
         if (head.getX() == food.getFoodBlock().getX() && head.getY() == food.getFoodBlock().getY()) {
             snake.grow();   //increase the length
             food.reposition((VBox)gc.getCanvas().getParent());  // reposition the food
-            score += 10;    // Increment score
+            incrementScore(10);   // Increment score
 
             scoreLabel.setText("Score: " + score);
 

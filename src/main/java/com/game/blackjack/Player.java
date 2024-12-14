@@ -2,14 +2,14 @@ package com.game.blackjack;
 
 import java.util.List;
 
-abstract class Player {
+public abstract class Player {
     protected String name;
     protected List<Card> hand;
     protected int money;
     protected int bet;
     protected int total;
 
-    protected Player(String name, int money, int bet) {
+    public Player(String name, int money, int bet) {
         this.name = name;
         this.money = money;
         this.bet = bet;
@@ -45,12 +45,12 @@ abstract class Player {
     }
 
     // Getter for hand
-    protected List<Card> getHand() {
+    public List<Card> getHand() {
         return hand;
     }
 
     // Setter for hand
-    protected void setHand(List<Card> hand) {
+    public void setHand(List<Card> hand) {
         this.hand = hand;
     }
 
