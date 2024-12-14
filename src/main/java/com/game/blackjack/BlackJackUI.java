@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.game.HighScoresManager;
 import com.game.MainMenu;
 import com.game.ToolbarManager;
 
@@ -67,13 +68,14 @@ public class BlackJackUI {
     private boolean isDealerTurn = false;
     private static final Set<String> VALID_RANKS = Set.of("2", "3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k", "a");
     private static final Set<String> VALID_SUITS = Set.of("club", "diamond", "heart", "spade");
-
+    private HighScoresManager highScoresManager;
 
     public BlackJackUI(String userName, MainMenu mainMenu, BlackjackMainMenu blackjackMainMenu) {
         this.userName = userName;
         this.mainMenu = mainMenu;
         this.blackjackMainMenu = blackjackMainMenu;
         blackJack.getHuman().setName(userName);
+        this.highScoresManager = blackjackMainMenu.getHighScoresManager();
     }
 
     // Getter for userName
@@ -420,6 +422,9 @@ public class BlackJackUI {
         customResult(blackJack.getComputerOne(), resultOne, computerOneTotal, computerOneVBox);
         customResult(blackJack.getComputerTwo(), resultTwo, computerTwoTotal, computerTwoVBox);
         roundPlaying = false;
+
+        int finalBalance = blackJack.getHuman().getMoney();
+        highScoresManager.updateScoreIfHigher(userName, "BlackJack", finalBalance); // Update high score
 
         if (blackJack.getHuman().getMoney() <= 0) {
             showResetWindow();
@@ -1027,7 +1032,7 @@ public class BlackJackUI {
 
             Stage mainMenuStage = (Stage) root.getScene().getWindow();
             mainMenuStage.close();
-            blackjackMainMenu = new BlackjackMainMenu(blackjackMainMenu.getName(), blackjackMainMenu.getMenu());
+            blackjackMainMenu = new BlackjackMainMenu(blackjackMainMenu.getName(), blackjackMainMenu.getMenu(), blackjackMainMenu.getHighScoresManager());
             blackjackMainMenu.start(new Stage());
         });
 

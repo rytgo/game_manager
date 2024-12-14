@@ -218,7 +218,7 @@ public class SnakeGame {
         if (head.getX() == food.getFoodBlock().getX() && head.getY() == food.getFoodBlock().getY()) {
             snake.grow();   //increase the length
             food.reposition((VBox)gc.getCanvas().getParent());  // reposition the food
-            incrementScore(10);   // Increment score
+            incrementScore(100);   // Increment score
 
             scoreLabel.setText("Score: " + score);
 
