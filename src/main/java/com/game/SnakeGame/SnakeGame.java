@@ -57,65 +57,68 @@ public class SnakeGame {
         this.gameOver = gameOver;
     }
 
-
     public void start(Stage primaryStage) {
         // Create root layout
-        VBox rootLayout = new VBox();
-        rootLayout.setSpacing(0);
-
+        StackPane root = new StackPane(); // Use StackPane for layering
+        VBox gameLayout = new VBox();    // VBox for toolbar and canvas
+    
+        gameLayout.setSpacing(0);
+    
         // Create toolbar
         HBox toolbar = new HBox();
         toolbar.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7); -fx-padding: 10;");
         toolbar.setPrefHeight(40);
-
+    
         // Menu button
         Button menuButton = new Button("Menu");
         menuButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: transparent;");
         menuButton.setOnAction(e -> primaryStage.getScene().setRoot(menu.launchMainMenu(primaryStage)));
-
+    
         // Pause instruction
         Label pauseInstruction = new Label("Pause: Press ESC");
         pauseInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-
+    
         // Score label
         scoreLabel = new Label("Score: 0");
         scoreLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-
+    
         // Right container for alignment
         HBox rightContainer = new HBox(20, pauseInstruction, scoreLabel);
         rightContainer.setAlignment(Pos.CENTER_RIGHT);
         HBox.setHgrow(rightContainer, Priority.ALWAYS);
-
+    
         // Add components to toolbar
         toolbar.getChildren().addAll(menuButton, rightContainer);
-        
+    
         // Initialize canvas
         canvas = new Canvas(600, 400);  // Set the size of the canvas
-        gc = canvas.getGraphicsContext2D();     // Get the drawing context
-
-        // Add toolbar and canvas to root layout
-        rootLayout.getChildren().addAll(toolbar, canvas);
-
+        gc = canvas.getGraphicsContext2D(); // Get the drawing context
+    
+        // Add toolbar and canvas to game layout
+        gameLayout.getChildren().addAll(toolbar, canvas);
+    
         drawGrid();
-
-        // Initialize snake and food 
+    
+        // Initialize snake and food
         snake = new Snake(300, 200);
-
         food = new Food(new StackPane(), snake);
-
+    
+        // Add the game layout to the root (StackPane)
+        root.getChildren().add(gameLayout);
+    
         // Create scene and handle key inputs
-        Scene scene = new Scene(rootLayout, 600, 400);
+        Scene scene = new Scene(root, 600, 400);
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
-                togglePause(primaryStage);
+                togglePause(root); // Pass the root StackPane for overlaying
             } else if (!isPaused) {
                 handleKeyInput(event.getCode());
             }
         });
-
+    
         // Consume arrow key events for the menu button
         menuButton.setFocusTraversable(false);
-
+    
         // Set up the game loop
         AnimationTimer gameLoop = new AnimationTimer() {
             @Override
@@ -134,7 +137,7 @@ public class SnakeGame {
             }
         };
         gameLoop.start();
-
+    
         primaryStage.setScene(scene);
         primaryStage.setTitle("Snake Game");
         primaryStage.show();
@@ -153,42 +156,39 @@ public class SnakeGame {
         }
     }
 
-    public void togglePause(Stage primaryStage) {
-
+    public void togglePause(StackPane root) {
         if (gameOver) {
             return;
         }
-
+    
         isPaused = !isPaused;
-
+    
         if (isPaused) {
             // Create pause menu
             VBox pauseMenu = new VBox(20);
             pauseMenu.setAlignment(Pos.CENTER);
-
+    
             // Add "Game Paused" label
             Label pauseLabel = new Label("Game Paused");
             pauseLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: white;");
-
+    
             // Add "Press ESC to resume" label
             Label resumeInstruction = new Label("Press ESC to resume");
             resumeInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-
+    
             pauseMenu.getChildren().addAll(pauseLabel, resumeInstruction);
-
+    
             // Dim background and overlay pause menu
-            Canvas overlay = new Canvas(600, 400);
+            Canvas overlay = new Canvas(canvas.getWidth(), canvas.getHeight());
             GraphicsContext overlayGc = overlay.getGraphicsContext2D();
             overlayGc.setFill(Color.rgb(0, 0, 0, 0.7));
             overlayGc.fillRect(0, 0, overlay.getWidth(), overlay.getHeight());
-
-            root = new StackPane(overlay, pauseMenu);
-            Scene pauseScene = new Scene(root, 600, 400);
-
-            primaryStage.setScene(pauseScene);
+    
+            root.getChildren().addAll(overlay, pauseMenu);
         } else {
-            // Resume the game by restoring the original scene
-            primaryStage.setScene(new Scene(canvas.getParent(), 600, 400));
+            // Resume the game by removing the pause menu and overlay
+            root.getChildren().remove(root.getChildren().size() - 1); // Remove pause menu
+            root.getChildren().remove(root.getChildren().size() - 1); // Remove overlay
         }
     }
 
@@ -198,7 +198,7 @@ public class SnakeGame {
 
         if (head.getX() == food.getFoodBlock().getX() && head.getY() == food.getFoodBlock().getY()) {
             snake.grow();   //increase the length
-            food.reposition((StackPane)gc.getCanvas().getParent());  // reposition the food
+            food.reposition((VBox)gc.getCanvas().getParent());  // reposition the food
             score += 10;    // Increment score
 
             scoreLabel.setText("Score: " + score);
