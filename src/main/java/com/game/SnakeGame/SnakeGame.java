@@ -14,6 +14,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
@@ -90,8 +91,12 @@ public class SnakeGame {
         // Add components to toolbar
         toolbar.getChildren().addAll(menuButton, rightContainer);
     
+        // Get screen size
+        double screenWidth = Screen.getPrimary().getBounds().getWidth();
+        double screenHeight = Screen.getPrimary().getBounds().getHeight();
+        
         // Initialize canvas
-        canvas = new Canvas(600, 400);  // Set the size of the canvas
+        canvas = new Canvas(screenWidth, screenHeight - toolbar.getPrefHeight());  // Set the size of the canvas
         gc = canvas.getGraphicsContext2D(); // Get the drawing context
     
         // Add toolbar and canvas to game layout
@@ -107,7 +112,7 @@ public class SnakeGame {
         root.getChildren().add(gameLayout);
     
         // Create scene and handle key inputs
-        Scene scene = new Scene(root, 600, 400);
+        Scene scene = new Scene(root);
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
                 togglePause(root); // Pass the root StackPane for overlaying
