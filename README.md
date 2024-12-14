@@ -10,7 +10,7 @@ The project follows OOP principles:
 
 - **Encapsulation**: All game logic and data are encapsulated in their respective classes.
     
-- **Abstraction**: Separate responsibilities for classes like `GameManager`, `HighScoresManager`, and game-specific logic (e.g., `BlackJack`, `SnakeGame`).
+- **Abstraction**: Separate responsibilities for classes like `GameManager`, `HighScoresManager`, and game-specific logic (e.g., `Blackjack`, `SnakeGame`).
     
 - **Polymorphism and Inheritance**: Shared functionality among players (human, computer, and dealer) is implemented through inheritance.
 
@@ -25,9 +25,9 @@ The project follows OOP principles:
 
 #### Blackjack
 
-- **BlackJack**: Core game logic, including dealing cards, managing turns, and calculating results.
+- **Blackjack**: Core game logic, including dealing cards, managing turns, and calculating results.
     
-- **BlackJackUI**: Frontend for the Blackjack game, handling user interaction and game state display.
+- **BlackjackUI**: Frontend for the Blackjack game, handling user interaction and game state display.
     
 - **Deck**: Represents a standard 52-card deck, with shuffle and deal functionality.
     
