@@ -2,12 +2,15 @@ package com.game.SnakeGame;
 
 import com.game.MainMenu;
 import javafx.animation.AnimationTimer;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -56,54 +59,53 @@ public class SnakeGame {
 
 
     public void start(Stage primaryStage) {
-        root = new StackPane();
-        Scene scene = new Scene(root, 600, 400);
+        // Create root layout
+        VBox rootLayout = new VBox();
+        rootLayout.setSpacing(0);
+
+        // Create toolbar
+        HBox toolbar = new HBox();
+        toolbar.setStyle("-fx-background-color: rgba(0, 0, 0, 0.7); -fx-padding: 10;");
+        toolbar.setPrefHeight(40);
+
+        // Menu button
+        Button menuButton = new Button("Menu");
+        menuButton.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: transparent;");
+        menuButton.setOnAction(e -> primaryStage.getScene().setRoot(menu.launchMainMenu(primaryStage)));
+
+        // Pause instruction
+        Label pauseInstruction = new Label("Pause: Press ESC");
+        pauseInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+
+        // Score label
+        scoreLabel = new Label("Score: 0");
+        scoreLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+
+        // Right container for alignment
+        HBox rightContainer = new HBox(20, pauseInstruction, scoreLabel);
+        rightContainer.setAlignment(Pos.CENTER_RIGHT);
+        HBox.setHgrow(rightContainer, Priority.ALWAYS);
+
+        // Add components to toolbar
+        toolbar.getChildren().addAll(menuButton, rightContainer);
         
         // Initialize canvas
         canvas = new Canvas(600, 400);  // Set the size of the canvas
         gc = canvas.getGraphicsContext2D();     // Get the drawing context
-        root.getChildren().add(canvas);     // Add the canvas to the root
 
-        // Add the score label
-        scoreLabel = new Label("Score: 0");
-        scoreLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7);");
-        StackPane.setAlignment(scoreLabel, Pos.TOP_LEFT);
-        scoreLabel.setTranslateX(10);  // Add padding from the left
-        scoreLabel.setTranslateY(10);  // Add padding from the top
-        root.getChildren().add(scoreLabel);
-
-        // Add pause instruction
-        Label pauseInstruction = new Label("Pause: Press ESC");
-        pauseInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: white; -fx-background-color: rgba(0, 0, 0, 0.7);");
-        StackPane.setAlignment(pauseInstruction, Pos.TOP_RIGHT);
-        pauseInstruction.setTranslateX(-10);  // Add padding from the right
-        pauseInstruction.setTranslateY(10);   // Add padding from the top
-        root.getChildren().add(pauseInstruction);
+        // Add toolbar and canvas to root layout
+        rootLayout.getChildren().addAll(toolbar, canvas);
 
         drawGrid();
 
         // Initialize snake and food 
         snake = new Snake(300, 200);
 
-        food = new Food(root, snake);
+        food = new Food(new StackPane(), snake);
 
-        // Handle keyboard input for snake direction
-        scene.setOnKeyPressed(event -> {
-            KeyCode code = event.getCode();
-            if (code == KeyCode.ESCAPE) {
-                togglePause(primaryStage);
-            } else if (!isPaused) {
-                if (code == KeyCode.UP && snake.getDirectionY() != 1) {
-                    snake.setDirection(0, -1);
-                } else if (code == KeyCode.DOWN && snake.getDirectionY() != -1) {
-                    snake.setDirection(0, 1);
-                } else if (code == KeyCode.LEFT && snake.getDirectionX() != 1) {
-                    snake.setDirection(-1, 0);
-                } else if (code == KeyCode.RIGHT && snake.getDirectionX() != -1) {
-                    snake.setDirection(1, 0);
-                }
-            }
-        });
+        // Create scene and handle key inputs
+        Scene scene = new Scene(rootLayout, 600, 400);
+        scene.setOnKeyPressed(event -> handleKeyInput(event.getCode(), primaryStage));
 
         // Set up the game loop
         AnimationTimer gameLoop = new AnimationTimer() {
@@ -129,6 +131,23 @@ public class SnakeGame {
         primaryStage.show();
     }
 
+    // Handle keyboard input for snake direction
+    private void handleKeyInput(KeyCode code, Stage primaryStage) {
+        if (code == KeyCode.ESCAPE) {
+            togglePause(primaryStage);
+        } else if (!isPaused) {
+            if (code == KeyCode.UP && snake.getDirectionY() != 1) {
+                snake.setDirection(0, -1);
+            } else if (code == KeyCode.DOWN && snake.getDirectionY() != -1) {
+                snake.setDirection(0, 1);
+            } else if (code == KeyCode.LEFT && snake.getDirectionX() != 1) {
+                snake.setDirection(-1, 0);
+            } else if (code == KeyCode.RIGHT && snake.getDirectionX() != -1) {
+                snake.setDirection(1, 0);
+            }
+        }
+    }
+
     public void togglePause(Stage primaryStage) {
 
         if (gameOver) {
@@ -148,27 +167,28 @@ public class SnakeGame {
             overlayGc.fillRect(0, 0, overlay.getWidth(), overlay.getHeight());
             root.getChildren().add(overlay);
 
-            // Add "Paused" label
-            javafx.scene.control.Label pauseLabel = new javafx.scene.control.Label("Game Paused");
+            // Add "Game Paused" label
+            Label pauseLabel = new Label("Game Paused");
             pauseLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: white;");
 
-            // Add Resume button
-            Button resumeButton = new Button("Resume");
-            resumeButton.setStyle(
-                "-fx-font-size: 24px; " +
-                "-fx-padding: 10 20 10 20; " +
-                "-fx-background-color: #00ff00; " +
-                "-fx-text-fill: black;" 
-            );
+            VBox pauseContainer = new VBox(20, pauseLabel);
+            pauseContainer.setAlignment(Pos.CENTER);
+            root.getChildren().add(pauseContainer);
 
-            resumeButton.setOnAction(e -> {
-                isPaused = false;
-                root.getChildren().remove(overlay);
-                root.getChildren().remove(pauseMenu);
+            // Add "Press ESC to resume" label
+            Label resumeInstruction = new Label("Press ESC to resume");
+            resumeInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+            StackPane.setAlignment(resumeInstruction, Pos.BOTTOM_LEFT);
+            StackPane.setMargin(resumeInstruction, new Insets(10));
+            root.getChildren().add(resumeInstruction);
+
+            // Handle ESC to resume
+            root.getScene().setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    isPaused = false;
+                    root.getChildren().removeAll(overlay, pauseMenu, resumeInstruction);
+                }
             });
-
-            pauseMenu.getChildren().addAll(pauseLabel, resumeButton);
-            root.getChildren().add(pauseMenu);
         }
     }
 
