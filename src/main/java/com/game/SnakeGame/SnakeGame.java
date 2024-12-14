@@ -105,7 +105,16 @@ public class SnakeGame {
 
         // Create scene and handle key inputs
         Scene scene = new Scene(rootLayout, 600, 400);
-        scene.setOnKeyPressed(event -> handleKeyInput(event.getCode(), primaryStage));
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                togglePause(primaryStage);
+            } else if (!isPaused) {
+                handleKeyInput(event.getCode());
+            }
+        });
+
+        // Consume arrow key events for the menu button
+        menuButton.setFocusTraversable(false);
 
         // Set up the game loop
         AnimationTimer gameLoop = new AnimationTimer() {
@@ -132,19 +141,15 @@ public class SnakeGame {
     }
 
     // Handle keyboard input for snake direction
-    private void handleKeyInput(KeyCode code, Stage primaryStage) {
-        if (code == KeyCode.ESCAPE) {
-            togglePause(primaryStage);
-        } else if (!isPaused) {
-            if (code == KeyCode.UP && snake.getDirectionY() != 1) {
-                snake.setDirection(0, -1);
-            } else if (code == KeyCode.DOWN && snake.getDirectionY() != -1) {
-                snake.setDirection(0, 1);
-            } else if (code == KeyCode.LEFT && snake.getDirectionX() != 1) {
-                snake.setDirection(-1, 0);
-            } else if (code == KeyCode.RIGHT && snake.getDirectionX() != -1) {
-                snake.setDirection(1, 0);
-            }
+    private void handleKeyInput(KeyCode code) {
+        if (code == KeyCode.UP && snake.getDirectionY() != 1) {
+            snake.setDirection(0, -1);
+        } else if (code == KeyCode.DOWN && snake.getDirectionY() != -1) {
+            snake.setDirection(0, 1);
+        } else if (code == KeyCode.LEFT && snake.getDirectionX() != 1) {
+            snake.setDirection(-1, 0);
+        } else if (code == KeyCode.RIGHT && snake.getDirectionX() != -1) {
+            snake.setDirection(1, 0);
         }
     }
 
@@ -157,38 +162,33 @@ public class SnakeGame {
         isPaused = !isPaused;
 
         if (isPaused) {
+            // Create pause menu
             VBox pauseMenu = new VBox(20);
             pauseMenu.setAlignment(Pos.CENTER);
-
-            // Dim background
-            Canvas overlay = new Canvas(600, 400);
-            GraphicsContext overlayGc = overlay.getGraphicsContext2D();
-            overlayGc.setFill(Color.rgb(0, 0, 0, 0.7));
-            overlayGc.fillRect(0, 0, overlay.getWidth(), overlay.getHeight());
-            root.getChildren().add(overlay);
 
             // Add "Game Paused" label
             Label pauseLabel = new Label("Game Paused");
             pauseLabel.setStyle("-fx-font-size: 36px; -fx-text-fill: white;");
 
-            VBox pauseContainer = new VBox(20, pauseLabel);
-            pauseContainer.setAlignment(Pos.CENTER);
-            root.getChildren().add(pauseContainer);
-
             // Add "Press ESC to resume" label
             Label resumeInstruction = new Label("Press ESC to resume");
             resumeInstruction.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-            StackPane.setAlignment(resumeInstruction, Pos.BOTTOM_LEFT);
-            StackPane.setMargin(resumeInstruction, new Insets(10));
-            root.getChildren().add(resumeInstruction);
 
-            // Handle ESC to resume
-            root.getScene().setOnKeyPressed(event -> {
-                if (event.getCode() == KeyCode.ESCAPE) {
-                    isPaused = false;
-                    root.getChildren().removeAll(overlay, pauseMenu, resumeInstruction);
-                }
-            });
+            pauseMenu.getChildren().addAll(pauseLabel, resumeInstruction);
+
+            // Dim background and overlay pause menu
+            Canvas overlay = new Canvas(600, 400);
+            GraphicsContext overlayGc = overlay.getGraphicsContext2D();
+            overlayGc.setFill(Color.rgb(0, 0, 0, 0.7));
+            overlayGc.fillRect(0, 0, overlay.getWidth(), overlay.getHeight());
+
+            root = new StackPane(overlay, pauseMenu);
+            Scene pauseScene = new Scene(root, 600, 400);
+
+            primaryStage.setScene(pauseScene);
+        } else {
+            // Resume the game by restoring the original scene
+            primaryStage.setScene(new Scene(canvas.getParent(), 600, 400));
         }
     }
 
