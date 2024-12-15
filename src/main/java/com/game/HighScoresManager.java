@@ -75,26 +75,21 @@ public class HighScoresManager {
         if (scores.containsKey(username)) {
             scores.get(username).put(game, newScore);
             saveHighScores();
-        } else {
-            System.out.println("User not found!");
-        }
+            }
+
     }
     public void updateScoreIfHigher(String username, String game, int newScore) {
         if (scores.containsKey(username)) {
             Map<String, Integer> userScores = scores.get(username);
             int currentScore = userScores.getOrDefault(game, 0);
-    
+
             // Update only if the new score is higher
             if (newScore > currentScore) {
                 userScores.put(game, newScore);
                 saveHighScores();
-                System.out.println("High score updated for " + username + " in " + game + ": " + newScore);
-            } else {
-                System.out.println("New score is not higher than the current high score.");
             }
-        } else {
-            System.out.println("User not found!");
         }
+
     }
 
     public Map<String, Map<String, Integer>> getScores() {
