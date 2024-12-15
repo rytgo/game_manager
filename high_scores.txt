@@ -1,5 +1,1 @@
-ryan:BlackJack=1000:Snake=1000
 telvin:BlackJack=1000:Snake=1000
-uyen:BlackJack=1000:Snake=1000
-kundyz:BlackJack=1000:Snake=1000
-mohammed:BlackJack=1000:Snake=1000

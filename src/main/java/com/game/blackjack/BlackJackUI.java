@@ -136,8 +136,7 @@ public class BlackJackUI {
                     showAlert("Invalid save state", "The save state is invalid. Please try again.");
                 }
             } catch (RuntimeException ex) {
-                showAlert("Decryption Error", "An error occurred while decrypting the save state: " + ex.getMessage());
-                ex.printStackTrace();  // Log the stack trace for debugging
+                showAlert("Invalid save state", "The save state is invalid. Please try again.");
             }
         });
 
