@@ -154,7 +154,7 @@ public class LoginManager {
             String password = passwordField.getText();
 
             if (username.trim().isEmpty() || password.trim().isEmpty()) {
-                showAlert("Error", "Username and password cannot be empty.");
+                showAlert("Error", "Username or password cannot be empty.");
                 return;
             }
 
