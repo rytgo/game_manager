@@ -19,6 +19,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.game.Encryption;
 import com.game.HighScoresManager;
 import com.game.MainMenu;
 import com.game.ToolbarManager;
@@ -125,13 +126,18 @@ public class BlackJackUI {
 
         // Set the action for the load button
         loadButton.setOnAction(e -> {
-            String saveStateString = saveStateArea.getText();
-            if (isValidSaveState(saveStateString)) {
-                loadState(saveStateString);  // Load the game state
-                primaryStage.close(); // Close the load window
-                updateUI(primaryStage); // Ensure UI reflects the loaded state
-            } else {
-                showAlert("Invalid save state", "The save state is invalid. Please try again.");
+            try {
+                String saveStateString = saveStateArea.getText();
+                if (isValidSaveState(saveStateString)) {
+                    loadState(saveStateString);  // Load the game state
+                    primaryStage.close(); // Close the load window
+                    updateUI(primaryStage); // Ensure UI reflects the loaded state
+                } else {
+                    showAlert("Invalid save state", "The save state is invalid. Please try again.");
+                }
+            } catch (RuntimeException ex) {
+                showAlert("Decryption Error", "An error occurred while decrypting the save state: " + ex.getMessage());
+                ex.printStackTrace();  // Log the stack trace for debugging
             }
         });
 
@@ -510,7 +516,7 @@ public class BlackJackUI {
         // Save whose turn it is
         saveState.append("Turn:").append(blackJack.getTurn());
 
-        return saveState.toString();
+        return Encryption.encrypt(saveState.toString());
     }
 
     // Helper method to format a player's hand as a string
@@ -521,25 +527,31 @@ public class BlackJackUI {
     }
 
     // Update the UI based on the loaded state
-    private void loadState(String saveStateString) {
-        String[] playerData = saveStateString.split("\\|");
-
-        System.out.println(Arrays.toString(playerData));
-
-        for (String data : playerData) {
-            if (data.startsWith("User-name:")) {
-                loadPlayerState(data, blackJack.getHuman());
-            } else if (data.startsWith("Computer-1-name:")) {
-                loadPlayerState(data, blackJack.getComputerOne());
-            } else if (data.startsWith("Computer-2-name:")) {
-                loadPlayerState(data, blackJack.getComputerTwo());
-            } else if (data.startsWith("Dealer-name:")) {
-                loadDealerState(data, blackJack.getDealer());
-            } else if (data.startsWith("Turn:")) {
-                String turn = data.split(":")[1];
-                System.out.println(turn);
-                blackJack.setTurn(turn);
+    private void loadState(String encryptedSaveState) {
+        try {
+            String saveStateString = Encryption.decrypt(encryptedSaveState);
+            String[] playerData = saveStateString.split("\\|");
+    
+            System.out.println(Arrays.toString(playerData));
+    
+            for (String data : playerData) {
+                if (data.startsWith("User-name:")) {
+                    loadPlayerState(data, blackJack.getHuman());
+                } else if (data.startsWith("Computer-1-name:")) {
+                    loadPlayerState(data, blackJack.getComputerOne());
+                } else if (data.startsWith("Computer-2-name:")) {
+                    loadPlayerState(data, blackJack.getComputerTwo());
+                } else if (data.startsWith("Dealer-name:")) {
+                    loadDealerState(data, blackJack.getDealer());
+                } else if (data.startsWith("Turn:")) {
+                    String turn = data.split(":")[1];
+                    System.out.println(turn);
+                    blackJack.setTurn(turn);
+                }
             }
+        } catch (RuntimeException e){
+            // Show an alert when there's an error decrypting the save state
+            showAlert("Decryption Error", "Failed to load the game state. Please check the input and try again.");
         }
     }
 
@@ -1348,7 +1360,8 @@ public class BlackJackUI {
     }
 
     // Validate the entire save state string
-    private boolean isValidSaveState(String saveStateString) {
+    private boolean isValidSaveState(String encryptedSaveState) {
+        String saveStateString = Encryption.decrypt(encryptedSaveState);
         if (saveStateString == null || saveStateString.isEmpty()) {
             System.out.println("Save state is null or empty.");
             return false;
