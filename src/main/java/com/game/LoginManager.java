@@ -53,6 +53,10 @@ public class LoginManager {
     }
 
     public boolean createAccount(String username, String password) {
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            return false; // Reject empty username or password
+        }
+
         if (users.containsKey(username)) {
             return false;
         }
@@ -148,6 +152,11 @@ public class LoginManager {
         createAccountButton.setOnAction(e -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
+
+            if (username.trim().isEmpty() || password.trim().isEmpty()) {
+                showAlert("Error", "Username and password cannot be empty.");
+                return;
+            }
 
             if (createAccount(username, password)) {
                 showAlert("Success", "Account created successfully!");

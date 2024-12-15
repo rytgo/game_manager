@@ -1,1 +1,1 @@
-telvin:BlackJack=1300:Snake=1000
+telvin:BlackJack=1000:Snake=1000
