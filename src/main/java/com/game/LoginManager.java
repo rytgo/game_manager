@@ -54,7 +54,6 @@ public class LoginManager {
 
     public boolean createAccount(String username, String password) {
         if (users.containsKey(username)) {
-            System.out.println("Username already exists!");
             return false;
         }
         users.put(username, password);
@@ -107,7 +106,6 @@ public class LoginManager {
             String password = passwordField.getText();
 
             if (authenticate(username, password)) {
-                System.out.println("Login successful!");
 
                 // Initialize high scores for existing users if missing
                 highScoresManager.addUser(username);

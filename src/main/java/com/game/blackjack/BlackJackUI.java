@@ -173,7 +173,6 @@ public class BlackJackUI {
     // Helper method to add chip click handlers
     private void addChipClickHandler(ImageView chip, int betAmount, TextField messageField, Label userBet, AnchorPane root) {
         chip.setOnMouseClicked(e -> {
-            System.out.println("Chip clicked: " + betAmount);
 
             // Random bet for computers
             if (blackJack.getComputerOne().getBet() == 0) {
@@ -313,7 +312,6 @@ public class BlackJackUI {
                         Duration.millis(cardDelay * (index - 1) + 300),
                         e -> {
                             hand.getChildren().add(createCardImage(player.getHand().get(index)));
-                            System.out.println(player.getTotal());
                             messageArea = new Label(player.getName() + " hits!");
                             messageArea.setId("custom-label");
                             playerBox.getChildren().add(messageArea);
@@ -530,9 +528,7 @@ public class BlackJackUI {
         try {
             String saveStateString = Encryption.decrypt(encryptedSaveState);
             String[] playerData = saveStateString.split("\\|");
-    
-            System.out.println(Arrays.toString(playerData));
-    
+
             for (String data : playerData) {
                 if (data.startsWith("User-name:")) {
                     loadPlayerState(data, blackJack.getHuman());
@@ -544,7 +540,6 @@ public class BlackJackUI {
                     loadDealerState(data, blackJack.getDealer());
                 } else if (data.startsWith("Turn:")) {
                     String turn = data.split(":")[1];
-                    System.out.println(turn);
                     blackJack.setTurn(turn);
                 }
             }
@@ -582,7 +577,6 @@ public class BlackJackUI {
             // Show the scene
             stage.setScene(scene);
             stage.show();
-            System.out.println(1);
             return;
 
             // Case 2: Result state
@@ -633,7 +627,6 @@ public class BlackJackUI {
             // Show the scene
             stage.setScene(scene);
             stage.show();
-            System.out.println("Blackjack round is playing");
             return;
 
             // Case 3: No turn, yes bet, and round is not playing
@@ -666,7 +659,6 @@ public class BlackJackUI {
             // Show the scene
             stage.setScene(scene);
             stage.show();
-            System.out.println("Blackjack round is not playing");
             return;
         }
 
@@ -778,7 +770,6 @@ public class BlackJackUI {
                     }
                 }
             }
-            System.out.println(blackJack.getDeck().getCards().size());
 
             // Parse balance
             int balance = Integer.parseInt(extractValue(parts[2])); // Correctly extract balance
@@ -1362,14 +1353,12 @@ public class BlackJackUI {
     private boolean isValidSaveState(String encryptedSaveState) {
         String saveStateString = Encryption.decrypt(encryptedSaveState);
         if (saveStateString == null || saveStateString.isEmpty()) {
-            System.out.println("Save state is null or empty.");
             return false;
         }
 
         // Split the save state string into sections for each player and turn
         String[] sections = saveStateString.split("\\|"); // Use '|' as the delimiter
         if (sections.length < 5) { // Expect sections for user, two computers, dealer, and turn
-            System.out.println("Save state does not contain enough sections for all players.");
             return false;
         }
 
@@ -1384,7 +1373,6 @@ public class BlackJackUI {
         for (String section : sections) {
             Map<String, String> keyValueMap = parseSection(section);
             if (keyValueMap == null) {
-                System.out.println("Invalid section: " + section);
                 return false;
             }
 
@@ -1422,7 +1410,6 @@ public class BlackJackUI {
             if (keyValue.length == 2) {
                 keyValueMap.put(keyValue[0].trim(), keyValue[1].trim());
             } else {
-                System.out.println("Invalid key-value pair: " + pair);
                 return null;
             }
         }
@@ -1439,19 +1426,16 @@ public class BlackJackUI {
                 .orElse(null);
 
         if (handKey == null) {
-            System.out.println("No hand key found in section.");
             return false;
         }
 
         // Validate the hand
         if (!validateHand(keyValueMap.get(handKey))) {
-            System.out.println("Invalid hand: " + keyValueMap.get(handKey));
             return false;
         }
 
         // Validate balance and bet
         if (!keyValueMap.containsKey("Balance") || !keyValueMap.containsKey("Bet")) {
-            System.out.println("Missing balance or bet.");
             return false;
         }
 
@@ -1466,7 +1450,6 @@ public class BlackJackUI {
         String[] cards = hand.split(",");
         for (String card : cards) {
             if (!validateCard(card)) {
-                System.out.println("Invalid card in hand: " + card);
                 return false;
             }
         }
@@ -1491,12 +1474,10 @@ public class BlackJackUI {
         }
 
         if (!VALID_RANKS.contains(rank.toLowerCase())) {
-            System.out.println("Invalid rank: " + rank);
             return false;
         }
 
         if (!VALID_SUITS.contains(suit.toLowerCase())) {
-            System.out.println("Invalid suit: " + suit);
             return false;
         }
 
@@ -1510,11 +1491,9 @@ public class BlackJackUI {
             int betValue = Integer.parseInt(bet);
 
             if (balanceValue < 0 || betValue < 0) {
-                System.out.println("Balance or bet cannot be negative: Balance = " + balance + ", Bet = " + bet);
                 return false;
             }
         } catch (NumberFormatException e) {
-            System.out.println("Invalid number format for balance or bet: " + e.getMessage());
             return false;
         }
 
@@ -1531,8 +1510,6 @@ public class BlackJackUI {
         if (playerNames.contains(turn)) {
             return true;
         }
-
-        System.out.println("Invalid turn value: " + turn);
         return false;
     }
 }
