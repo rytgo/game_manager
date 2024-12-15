@@ -82,3 +82,14 @@ VBox.container, GridPane.container {
 #main-menu-button:hover {
     -fx-background-color: #957DAD;
 }
+
+#title {
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-font-family: "AppleMyungjo";
+    -fx-font-weight: bolder;
+    -fx-alignment: center;
+    -fx-background-color: #957DAD;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px 10px;
+}
