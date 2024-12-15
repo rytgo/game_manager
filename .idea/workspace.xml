@@ -6,9 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="33885ebe-7a7a-46bc-9926-111a8935f660" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/high_scores.txt" beforeDir="false" afterPath="$PROJECT_DIR$/high_scores.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/HighScoresManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/HighScoresManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/MainMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/MainMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/SnakeGame/SnakeGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/SnakeGame/SnakeGame.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackJackUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackJackUI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackjackMainMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/game/blackjack/BlackjackMainMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/game/blackjack/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/game/blackjack/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,22 +42,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.App.executor": "Run",
-    "JUnit.SnakeGameTest.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "uyen-branch",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/uyenpham/Desktop/CS151Project/game_manager",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.App.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.SnakeGameTest.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;uyen-branch&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/uyenpham/Desktop/CS151Project/game_manager&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -78,6 +81,7 @@
       <updated>1734130798066</updated>
       <workItem from="1734130799229" duration="2994000" />
       <workItem from="1734137221284" duration="20149000" />
+      <workItem from="1734244769223" duration="3058000" />
     </task>
     <servers />
   </component>

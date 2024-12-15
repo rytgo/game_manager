@@ -1,6 +1,7 @@
 package com.game.blackjack;
 
 import com.game.HighScoresManager;
+import com.game.ToolbarManager;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -8,15 +9,14 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
 import java.util.Objects;
-
 import com.game.MainMenu;
 
 public class BlackjackMainMenu {
     private String userName;
     private MainMenu menu;
     private HighScoresManager highScoresManager;
+    private ToolbarManager toolbarManager = new ToolbarManager();
 
     public BlackjackMainMenu(String userName, MainMenu menu, HighScoresManager highScoresManager) {
         this.userName = userName;
@@ -41,9 +41,9 @@ public class BlackjackMainMenu {
         // Create BlackJackUI instance
         BlackJackUI blackJackUI = new BlackJackUI(this.userName, menu, this);
 
-        StackPane root = new StackPane();
-        Scene scene = new Scene(root, 640, 480);
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("blackjack.css")).toExternalForm());
+        BorderPane root = new BorderPane();
+        Scene scene = new Scene(root, 800, 600);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
 
         // Create background image for main menu
         ImageView backgroundImage = blackJackUI.setImageView("main_background.jpeg");
@@ -53,12 +53,10 @@ public class BlackjackMainMenu {
 
         // Add label for main menu
         Label title = new Label("Welcome to Blackjack!");
-        StackPane.setAlignment(title, Pos.CENTER);
-        title.getStyleClass().add("title");
+        title.setId("title");
         VBox holder = new VBox(10);
         holder.setAlignment(Pos.CENTER);
         holder.getChildren().add(title);
-        root.getChildren().add(holder);
 
         // Create the buttons for the main menu
         Button newGame = new Button("New Game");
@@ -67,6 +65,13 @@ public class BlackjackMainMenu {
         buttons.getChildren().addAll(newGame, loadGame);
         buttons.setAlignment(Pos.CENTER);
         holder.getChildren().add(buttons);
+        newGame.setId("main-menu-button");
+        loadGame.setId("main-menu-button");
+
+        root.setCenter(holder);
+
+        // Create the toolbar
+        root.setTop(toolbarManager.createToolbar(primaryStage, root, menu));
 
         // Set the action for the New Game button
         newGame.setOnAction(e -> {

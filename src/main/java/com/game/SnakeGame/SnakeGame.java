@@ -2,6 +2,7 @@ package com.game.SnakeGame;
 
 import com.game.HighScoresManager;
 import com.game.MainMenu;
+import com.game.ToolbarManager;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,10 +10,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
@@ -83,8 +81,21 @@ public class SnakeGame {
         menuButton.setId("main-menu-button");
         menuButton.setOnAction(e -> {
             togglePause(root);
-            primaryStage.getScene().setRoot(menu.launchMainMenu(primaryStage));
+            Stage s = (Stage) root.getScene().getWindow();
+            BorderPane rootLayout = new BorderPane();
 
+            ToolbarManager toolbarManager = new ToolbarManager();
+            rootLayout.setTop(toolbarManager.createToolbar(s, rootLayout, menu));
+
+            VBox menuVBox = menu.launchMainMenu(s);
+            rootLayout.setCenter(menuVBox);
+
+            Scene menuScene = new Scene(rootLayout, 800, 600);
+            menuScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("snake.css")).toExternalForm());
+            s.setTitle("CS151 Game Manager");
+            s.centerOnScreen();
+            s.setResizable(false);
+            s.setScene(menuScene);
         });
     
         // Pause instruction
@@ -256,7 +267,6 @@ public class SnakeGame {
             int currentHighScore = userScores.getOrDefault("Snake", 0);
             if (score > currentHighScore) {
                 highScoresManager.updateScore(userName, "Snake", score);
-                System.out.println("New high score for Snake: " + score);
         }
     }
     

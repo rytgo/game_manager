@@ -1051,6 +1051,8 @@ public class BlackJackUI {
             Scene menuScene = new Scene(rootLayout, 800, 600);
             menuScene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
             s.setTitle("CS151 Game Manager");
+            s.centerOnScreen();
+            s.setResizable(false);
             s.setScene(menuScene);
         });
     }
